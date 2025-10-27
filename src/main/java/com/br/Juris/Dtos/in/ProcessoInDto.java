@@ -1,6 +1,6 @@
 package com.br.Juris.Dtos.in;
 
-import com.br.Juris.Dtos.out.MessageOutDTO;
+import com.br.Juris.Entities.Contrato;
 import com.br.Juris.Entities.Processo;
 import com.br.Juris.Enums.StatusProcesso;
 import com.br.Juris.Utils.FileUtils;
@@ -36,8 +36,11 @@ public record ProcessoInDto(
                         "Arquivo não está no formato PDF"
                 );
         }
-        entity.setContrato(contrato.getBytes());
+        Contrato contratoEntity = new Contrato();
+        contratoEntity.setProcesso(entity);
+        contratoEntity.setDados(contrato.getBytes());
+        contratoEntity.setNome(contrato.getOriginalFilename());
+        entity.setContrato(contratoEntity);
         return entity;
     }
-
 }

@@ -6,6 +6,8 @@ import com.br.Juris.Dtos.out.ProcessoOutDto;
 import com.br.Juris.Entities.Processo;
 import com.br.Juris.Repositories.ProcessoRepository;
 import jakarta.annotation.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -43,5 +45,10 @@ public class ProcessosService {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         String.format("Processo de ID: %s não encontrado", id)));
+    }
+
+    public Page<ProcessoOutDto> listAll(Pageable pageable) {
+        Page<Processo> processos = repository.findAll(pageable);
+        return processos.map(ProcessoOutDto::fromEntity);
     }
 }

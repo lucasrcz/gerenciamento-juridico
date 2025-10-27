@@ -6,6 +6,10 @@ import com.br.Juris.Dtos.out.ProcessoOutDto;
 import com.br.Juris.Services.ProcessosService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -42,4 +46,13 @@ public class ProcessosRestController {
     public ResponseEntity<MessageOutDTO> delete(@PathVariable Long id){
         return ResponseEntity.ok(processosService.delete(id));
     }
+
+    @Operation(description = "Listagem páginada de processos")
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE,name = "/list")
+    public ResponseEntity<Page<ProcessoOutDto>> listAll(@PageableDefault(size = 10,sort = "id",direction = Sort.Direction.ASC) Pageable pageable){
+        return ResponseEntity.ok(processosService.listAll(pageable));
+    }
+
+
+
 }
