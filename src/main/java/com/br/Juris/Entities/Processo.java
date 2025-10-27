@@ -41,5 +41,4 @@ public class Processo {
     @Column(length = 2, nullable = false , name = "estado")
     private String estado;
 
-
 }
