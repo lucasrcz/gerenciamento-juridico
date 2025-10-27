@@ -1,0 +1,50 @@
+package com.br.Juris.Services;
+
+import com.br.Juris.Dtos.in.ProcessoInDto;
+import com.br.Juris.Dtos.out.MessageOutDTO;
+import com.br.Juris.Dtos.out.ProcessoOutDto;
+import com.br.Juris.Entities.Processo;
+import com.br.Juris.Exception.JurisException;
+import com.br.Juris.Repositories.ProcessoRepository;
+import com.br.Juris.Utils.FileUtils;
+import jakarta.annotation.Resource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.io.IOException;
+import java.util.Optional;
+
+@Service
+public class ProcessosService {
+
+    @Resource
+    ProcessoRepository repository;
+
+    public ProcessoOutDto getById(Long id) {
+        Processo processo = findById(id);
+        return ProcessoOutDto.fromEntity(processo);
+    }
+
+
+    public MessageOutDTO create(ProcessoInDto dto) throws IOException {
+        Processo processo = ProcessoInDto.toEntity(dto);
+        processo = repository.save(processo);
+        return new MessageOutDTO(processo.getId(),String.format("Processo Nº %s criado com sucesso",processo.getNumero()));
+    }
+
+    public MessageOutDTO delete(Long id) {
+        Processo processo = findById(id);
+        String numeroProceso = processo.getNumero();
+        repository.delete(processo);
+        return new MessageOutDTO(processo.getId(),String.format("Processo Nº %s Deletado com sucesso",numeroProceso));
+    }
+
+    public Processo findById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        String.format("Processo Nº %s não encontrado", id)));
+    }
+}
