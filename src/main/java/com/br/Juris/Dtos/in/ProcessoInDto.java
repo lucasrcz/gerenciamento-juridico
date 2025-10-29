@@ -20,6 +20,7 @@ public record ProcessoInDto(
         @NotBlank(message = "Número do processo é obrigatório") String numero,
         @NotNull(message = "Status do processo é obrigatório") StatusProcesso status,
         @NotBlank(message = "Estado é obrigatório") String estado,
+        String observacoes,
         MultipartFile contrato)
         implements Serializable {
 
@@ -28,6 +29,7 @@ public record ProcessoInDto(
         entity.setNumero(dto.numero());
         entity.setStatus(dto.status());
         entity.setEstado(dto.estado());
+        entity.setObservacoes(dto.observacoes());
 
         MultipartFile contrato = dto.contrato();
         if (!FileUtils.isPdf(contrato)) {
