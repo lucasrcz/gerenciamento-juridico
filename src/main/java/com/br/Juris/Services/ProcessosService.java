@@ -1,11 +1,12 @@
 package com.br.Juris.Services;
 
-import com.br.Juris.Dtos.in.ProcessoInDto;
+import com.br.Juris.Dtos.in.ProcessoInDTO;
 import com.br.Juris.Dtos.out.MessageOutDTO;
-import com.br.Juris.Dtos.out.ProcessoOutDto;
+import com.br.Juris.Dtos.out.ProcessoOutDTO;
 import com.br.Juris.Entities.Processo;
 import com.br.Juris.Repositories.ProcessoRepository;
 import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -21,18 +22,20 @@ public class ProcessosService {
     @Resource
     ProcessoRepository repository;
 
-    public ProcessoOutDto getById(Long id) {
+    public ProcessoOutDTO getById(Long id) {
         Processo processo = findById(id);
-        return ProcessoOutDto.fromEntity(processo);
+        return ProcessoOutDTO.fromEntity(processo);
     }
 
 
-    public MessageOutDTO create(ProcessoInDto dto) throws IOException {
-        Processo processo = ProcessoInDto.toEntity(dto);
+    @Transactional
+    public MessageOutDTO create(ProcessoInDTO dto) throws IOException {
+        Processo processo = ProcessoInDTO.toEntity(dto);
         processo = repository.save(processo);
         return new MessageOutDTO(processo.getId(),String.format("Processo Nº %s criado com sucesso",processo.getNumero()));
     }
 
+    @Transactional
     public MessageOutDTO delete(Long id) {
         Processo processo = findById(id);
         String numeroProceso = processo.getNumero();
@@ -47,8 +50,8 @@ public class ProcessosService {
                         String.format("Processo de ID: %s não encontrado", id)));
     }
 
-    public Page<ProcessoOutDto> listAll(Pageable pageable) {
+    public Page<ProcessoOutDTO> listAll(Pageable pageable) {
         Page<Processo> processos = repository.findAll(pageable);
-        return processos.map(ProcessoOutDto::fromEntity);
+        return processos.map(ProcessoOutDTO::fromEntity);
     }
 }

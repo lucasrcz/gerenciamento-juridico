@@ -1,8 +1,8 @@
 package com.br.Juris.Rest;
 
-import com.br.Juris.Dtos.in.ProcessoInDto;
+import com.br.Juris.Dtos.in.ProcessoInDTO;
 import com.br.Juris.Dtos.out.MessageOutDTO;
-import com.br.Juris.Dtos.out.ProcessoOutDto;
+import com.br.Juris.Dtos.out.ProcessoOutDTO;
 import com.br.Juris.Services.ProcessosService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.Resource;
@@ -31,13 +31,13 @@ public class ProcessosRestController {
 
     @Operation(description = "Encontra o processo por sua ID")
     @GetMapping("/{id}")
-    public ResponseEntity<ProcessoOutDto> getById(@PathVariable Long id){
+    public ResponseEntity<ProcessoOutDTO> getById(@PathVariable Long id){
         return ResponseEntity.ok(processosService.getById(id));
     }
 
     @Operation(description = "Cadastro de Processo")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MessageOutDTO> save(@ModelAttribute ProcessoInDto processo) throws IOException {
+    public ResponseEntity<MessageOutDTO> save(@ModelAttribute ProcessoInDTO processo) throws IOException {
         return ResponseEntity.ok(processosService.create(processo));
     }
 
@@ -49,7 +49,7 @@ public class ProcessosRestController {
 
     @Operation(description = "Listagem páginada de processos")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE,name = "/list")
-    public ResponseEntity<Page<ProcessoOutDto>> listAll(@PageableDefault(size = 10,sort = "id",direction = Sort.Direction.ASC) Pageable pageable){
+    public ResponseEntity<Page<ProcessoOutDTO>> listAll(@PageableDefault(size = 10,sort = "id",direction = Sort.Direction.ASC) Pageable pageable){
         return ResponseEntity.ok(processosService.listAll(pageable));
     }
 

@@ -13,6 +13,9 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Entity
 @Table(name = "processos_contratos")
@@ -35,4 +38,9 @@ public class Contrato {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "processo_id", nullable = false, unique = true)
     private Processo processo;
+
+    public void updateContrato(MultipartFile arquivo) throws IOException {
+        this.nome = arquivo.getName();
+        this.dados = arquivo.getBytes();
+    }
 }
