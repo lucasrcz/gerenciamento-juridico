@@ -1,6 +1,8 @@
 package com.br.Juris.Utils;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,4 +39,20 @@ public class FileUtils {
                 return false;
             }
         }
+
+    /**
+     * Verifica se o arquivo MultipartFile é vazio ou nulo.
+     * Caso seja, lança ResponseStatusException (400 Bad Request).
+     *
+     * @param file MultipartFile enviado pelo usuário
+     */
+    public static void validateNotEmpty(MultipartFile file) {
+        if (file == null || file.isEmpty() || file.getSize() == 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "O arquivo enviado está vazio ou não foi anexado."
+            );
+        }
+    }
+
 }
