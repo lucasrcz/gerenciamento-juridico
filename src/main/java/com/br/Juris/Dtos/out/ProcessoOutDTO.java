@@ -8,11 +8,11 @@ import java.io.Serializable;
 /**
  * DTO for {@link com.br.Juris.Entities.Processo}
  */
-public record ProcessoOutDto(Long id, String numero, StatusProcesso status, String observacoes,
+public record ProcessoOutDTO(Long id, String numero, StatusProcesso status, String observacoes,
                              String estado, ContratoOutDTO contrato) implements Serializable {
 
-    public static ProcessoOutDto fromEntity(Processo processo){
-        return new ProcessoOutDto(processo.getId(), processo.getNumero(),  processo.getStatus(), processo.getObservacoes(), processo.getEstado(),
+    public static ProcessoOutDTO fromEntity(Processo processo){
+        return new ProcessoOutDTO(processo.getId(), processo.getNumero(),  processo.getStatus(), processo.getObservacoes(), processo.getEstado(),
                 ContratoOutDTO.fromEntity(processo.getContrato()));
     }
 }

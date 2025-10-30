@@ -16,7 +16,7 @@ import java.io.Serializable;
 /**
  * DTO for {@link com.br.Juris.Entities.Processo}
  */
-public record ProcessoInDto(
+public record ProcessoInDTO(
         @NotBlank(message = "Número do processo é obrigatório") String numero,
         @NotNull(message = "Status do processo é obrigatório") StatusProcesso status,
         @NotBlank(message = "Estado é obrigatório") String estado,
@@ -24,7 +24,7 @@ public record ProcessoInDto(
         MultipartFile contrato)
         implements Serializable {
 
-    public static Processo toEntity(ProcessoInDto dto) throws IOException {
+    public static Processo toEntity(ProcessoInDTO dto) throws IOException {
         Processo entity = new Processo();
         entity.setNumero(dto.numero());
         entity.setStatus(dto.status());
