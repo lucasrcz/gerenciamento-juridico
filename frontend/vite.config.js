@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     port: 8080,
     proxy: {
-      '/api': {
+      '/juris': {
         target: 'http://localhost:9000',
         changeOrigin: true
       }
