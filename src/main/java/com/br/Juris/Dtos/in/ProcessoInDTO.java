@@ -30,19 +30,21 @@ public record ProcessoInDTO(
         entity.setStatus(dto.status());
         entity.setEstado(dto.estado());
         entity.setObservacoes(dto.observacoes());
-
         MultipartFile contrato = dto.contrato();
-        if (!FileUtils.isPdf(contrato)) {
+        if (contrato != null) {
+            if (!FileUtils.isPdf(contrato)) {
                 throw new ResponseStatusException(
                         HttpStatus.BAD_REQUEST,
                         "Arquivo não está no formato PDF"
                 );
+            }
+
+            // Só seta se for PDF válido
+            Contrato contratoEntity = new Contrato();
+            contratoEntity.setProcesso(entity);
+            contratoEntity.setNome(contrato.getOriginalFilename());
+            entity.setContrato(contratoEntity);
         }
-        Contrato contratoEntity = new Contrato();
-        contratoEntity.setProcesso(entity);
-        contratoEntity.setDados(contrato.getBytes());
-        contratoEntity.setNome(contrato.getOriginalFilename());
-        entity.setContrato(contratoEntity);
         return entity;
     }
 }

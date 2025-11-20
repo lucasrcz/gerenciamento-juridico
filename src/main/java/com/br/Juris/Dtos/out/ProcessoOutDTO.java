@@ -12,7 +12,19 @@ public record ProcessoOutDTO(Long id, String numero, StatusProcesso status, Stri
                              String estado, ContratoOutDTO contrato) implements Serializable {
 
     public static ProcessoOutDTO fromEntity(Processo processo){
-        return new ProcessoOutDTO(processo.getId(), processo.getNumero(),  processo.getStatus(), processo.getObservacoes(), processo.getEstado(),
-                ContratoOutDTO.fromEntity(processo.getContrato()));
+        ContratoOutDTO contratoOut = null;
+
+        if (processo.getContrato() != null) {
+            contratoOut = ContratoOutDTO.fromEntity(processo.getContrato());
+        }
+
+        return new ProcessoOutDTO(
+                processo.getId(),
+                processo.getNumero(),
+                processo.getStatus(),
+                processo.getObservacoes(),
+                processo.getEstado(),
+                contratoOut
+        );
     }
 }
