@@ -1,4 +1,6 @@
 import { getFunction, postFunction  } from "../services/APIService"
+import Navbar from "../components/Navbar"
+import { Outlet } from "react-router-dom"
 
 function App() {
 
@@ -15,22 +17,21 @@ function App() {
   }
 
   return (
-    <div style={{
-      backgroundColor: '#1a1a1a',  // Fundo escuro
-      color: '#ffffff',            // Texto branco
-      minHeight: '100vh',          // Altura mínima da tela toda
-      padding: '20px'
-    }}>
-      <h2>Gerenciamento Jurídico</h2>
-
-      <div style={{padding: '10px'}}>
+    <>
+      <div className="App">
+        <Navbar />
+        <div style={{padding: '10px'}}>
         <button onClick={ButtonGet}>Teste GET</button>
       </div>
 
       <div style={{padding: '10px'}}>
         <button onClick={ButtonPost}>Teste POST</button>
       </div>
-    </div>
+        <div className="container">
+          <Outlet />
+        </div>
+      </div>
+    </>
   )
 }
 
