@@ -4,10 +4,10 @@ import './Navbar.css'
 const Navbar = () => {
   return (
     <nav className="navbar">
-        <Link to={`/`}>Gerenciamento Jurídico</Link>
+        <Link to={`/processos`}>Gerenciamento Jurídico</Link>
         <ul>
-            <li><Link to={`/`}>Home</Link></li>
-            <li><Link to={`/new`}
+            <li><Link to={`/processos`}>Home</Link></li>
+            <li><Link to={`/processos/create`}
                 className="new-btn">
                     Novo Processo
                 </Link>

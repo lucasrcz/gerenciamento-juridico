@@ -5,8 +5,8 @@ import App from './pages/App.jsx'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 // páginas
-import Home from './routes/Home.jsx'
-import NewPost from './routes/NewPost.jsx'
+import Processos from './routes/Processos.jsx'
+import NewProcesso from './routes/NewProcesso.jsx'
 
 import './index.css'
 
@@ -15,12 +15,12 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        path: "/",
-        element: <Home />
+        path: "/processos",
+        element: <Processos />
       },
       {
-        path: "/new",
-        element: <NewPost />
+        path: "/processos/create",
+        element: <NewProcesso />
       },
     ]
   }
