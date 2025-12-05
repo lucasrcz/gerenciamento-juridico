@@ -41,9 +41,14 @@ public class Processo {
     @Column(length = 2, nullable = false , name = "estado")
     private String estado;
 
-    @OneToOne(mappedBy = "processo", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToOne(mappedBy = "processo", cascade = CascadeType.ALL, orphanRemoval = true)
     private Contrato contrato;
 
-    @OneToMany(mappedBy = "processo", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "processo", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Documento> documentos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "processo", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY )
+    private List<Prazo> prazos = new ArrayList<>();
+
+
 }

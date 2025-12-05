@@ -35,6 +35,7 @@ public record ProcessoInDTO(
             Contrato contratoEntity = new Contrato();
             contratoEntity.setProcesso(entity);
             contratoEntity.setNome(contrato.getOriginalFilename());
+            contratoEntity.setDados(contrato.getBytes());
             entity.setContrato(contratoEntity);
         }
         return entity;
