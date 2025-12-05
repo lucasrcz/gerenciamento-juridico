@@ -6,51 +6,73 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 public class FileUtils {
 
-    private static final String PDF_MAGIC = "%PDF-";
-
-        /**
-         * Verifica se o arquivo é PDF.
-         * @param file MultipartFile enviado pelo usuário
-         * @return true se for PDF, false caso contrário
-         */
-        public static boolean isPdf(MultipartFile file) {
-            if (file == null || file.isEmpty()) {
-                return false;
-            }
-
-            //Verifica content type (opcional, rápido)
-            String contentType = file.getContentType();
-            if (contentType != null && contentType.equalsIgnoreCase("application/pdf")) {
-                return true;
-            }
-
-            //Verifica magic number no início do arquivo
-            try (InputStream is = file.getInputStream()) {
-                byte[] header = new byte[5]; // "%PDF-" tem 5 bytes
-                if (is.read(header) != 5) {
-                    return false;
-                }
-                String headerStr = new String(header);
-                return PDF_MAGIC.equals(headerStr);
-            } catch (IOException e) {
-                return false;
-            }
-        }
+    /**
+     * Valida se o arquivo:
+     * - Não é nulo
+     * - Não está vazio
+     * - É um PDF válido (Content-Type + Magic Number)
+     */
+    public static void checkFile(MultipartFile file) {
+        validateNotEmpty(file);
+        validateContentType(file);
+        validateMagicNumber(file);
+    }
 
     /**
      * Verifica se o arquivo MultipartFile é vazio ou nulo.
-     * Caso seja, lança ResponseStatusException (400 Bad Request).
-     *
-     * @param file MultipartFile enviado pelo usuário
      */
     public static void validateNotEmpty(MultipartFile file) {
         if (file == null || file.isEmpty() || file.getSize() == 0) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "O arquivo enviado está vazio ou não foi anexado."
+            );
+        }
+    }
+
+    /**
+     * Verifica se o Content-Type é application/pdf
+     */
+    private static void validateContentType(MultipartFile file) {
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.equalsIgnoreCase("application/pdf")) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "O arquivo não está no formato PDF."
+            );
+        }
+    }
+
+    /**
+     * Verifica o magic number do arquivo (%PDF-)
+     */
+    private static void validateMagicNumber(MultipartFile file) {
+        try (InputStream is = file.getInputStream()) {
+            byte[] header = new byte[5];
+            if (is.read(header) != 5) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Arquivo inválido ou corrompido."
+                );
+            }
+
+            String signature = new String(header, StandardCharsets.US_ASCII);
+            if (!signature.equals("%PDF-")) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "O arquivo não é um PDF válido."
+                );
+            }
+
+        } catch (IOException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Erro ao ler o arquivo.",
+                    e
             );
         }
     }

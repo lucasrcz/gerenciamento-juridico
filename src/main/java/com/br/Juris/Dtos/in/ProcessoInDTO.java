@@ -6,9 +6,7 @@ import com.br.Juris.Enums.StatusProcesso;
 import com.br.Juris.Utils.FileUtils;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -32,13 +30,7 @@ public record ProcessoInDTO(
         entity.setObservacoes(dto.observacoes());
         MultipartFile contrato = dto.contrato();
         if (contrato != null) {
-            if (!FileUtils.isPdf(contrato)) {
-                throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "Arquivo não está no formato PDF"
-                );
-            }
-
+            FileUtils.checkFile(contrato);
             // Só seta se for PDF válido
             Contrato contratoEntity = new Contrato();
             contratoEntity.setProcesso(entity);

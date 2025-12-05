@@ -50,7 +50,7 @@ public class ProcessosService {
                         String.format("Processo de ID: %s não encontrado", id)));
     }
 
-    public Page<ProcessoOutDTO> listAll(Pageable pageable) {
+    public Page<ProcessoOutDTO> listAllPageable(Pageable pageable) {
         Page<Processo> processos = repository.findAll(pageable);
         return processos.map(ProcessoOutDTO::fromEntity);
     }
