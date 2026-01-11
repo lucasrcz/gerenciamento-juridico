@@ -51,4 +51,19 @@ public class SecurityFilter extends OncePerRequestFilter {
         return authHeader.replace("Bearer ", "");
     }
 
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+
+         return path.contains("/v3/api-docs")
+                || path.contains("/api-docs") // Adicione esta linha
+                || path.contains("/swagger-ui")
+                || path.contains("/swagger-ui.html")
+                || path.contains("/h2-console")
+                || path.contains("/auth/login")
+                || path.contains("/error");
+    }
+
+
 }
