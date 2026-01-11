@@ -1,74 +1,72 @@
-import axios from "axios"
-import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
-import './Processos.css'
+import { useEffect, useState } from 'react'
+import { api } from '../services/API';
+import { Link } from 'react-router-dom'
 
-const API_URL = import.meta.env.VITE_API_URL;
+function Processos() {
+  const [processos, setProcessos] = useState([])
 
-const api = axios.create({
-    baseURL: API_URL,
-    headers: { 'Content-Type': 'application/json' }
-});
+  useEffect(()=> {
+    api.get('/processos')
+    .then(res => setProcessos(res.data.content || res.data))
+    .catch(err => console.log(err));
+  }, [])
 
-const Processos = () => {
-
-  const[processos, setProcessos] = useState([])
-
-  const getProcessos = async() => {
-    try {
-      const response = await api.get(`/processos`)
-      setProcessos(response.data.content || [])
-
-    } catch (error) {
-      console.log("Erro ao buscar processos:", error)
+  const handleDelete = (id) => {
+    const confirm = window.confirm("Tem certeza que deseja deletar o processo?" );
+    if(confirm) {
+      api.delete('/processos/' + id)
+      .then(res => {
+        setProcessos(processos.filter(p => p.id !== id));
+      })
+      .catch(err => console.log(err));
     }
   }
 
-  useEffect(() => {
-    getProcessos()
-  }, [])
+  return (
+    <div className='d-flex flex-column justify-content-center align-items-center bg-light vh-100'>
 
-return (
-    <div style={{padding: '10px'}}>
-      <h1>Lista de Processos Jurídicos</h1>
-      
-      {processos.length === 0 ? (
-        <div className="empty-state">
-            <p>Nenhum processo encontrado.</p>
+      <h2>Lista de Processos Jurídicos</h2><br></br>
+      <div className='w-75 rounded bg-white border shadow p-4'>
+        <div className='d-fex justify-content-end'>
+          <Link to="/create" className='btn btn-success'>Cadastrar Processo</Link>
         </div>
-      ) : (
-        <div className="processo-list">
-          {processos.map((processo) => (
-            
-            <div className="processo-card" key={processo.id}> 
-              
-              <div className="card-header">
-                <h3>Processo: {processo.numero}</h3>
-                <span className={`status-badge ${processo.status ? processo.status.toLowerCase() : ''}`}>
-                    {processo.status}
-                </span>
-              </div>
 
-              <div className="card-body">
-                <p><strong>Estado:</strong> {processo.estado}</p>
-                
-                {processo.observacoes && (
-                    <p className="obs"><strong>Obs:</strong> {processo.observacoes}</p>
-                )}
-                
-                <div className="file-area">
-                    <strong>Contrato: </strong>
-                    {processo.contrato ? (
-                        <span className="file-exists">Arquivo anexado</span> 
-                    ) : (
-                        <span className="file-missing">Sem contrato</span>
-                    )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+        <table className='table table-striped'>
+          <thead>
+            <tr>
+              <th>Nº Processo</th>
+              <th>Status</th>
+              <th>Estado</th>
+              <th>Observações</th>
+              <th>Contrato</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {
+              processos.map((processo) => (
+                <tr key={processo.id}>
+                  <td>{processo.numero}</td>
+                  <td>{processo.status}</td>
+                  <td>{processo.estado}</td>
+                  <td>{processo.observacoes}</td>
+                  <td>{processo.contrato ? (
+                          <span className="file-exists">Arquivo anexado</span> 
+                      ) : (
+                          <span className="file-missing">Sem contrato</span>
+                      )}</td>
+                  <td>
+                    <Link to={`/read/${processo.id}`} className='btn btn-sm btn-info me-2'>Visualizar</Link>
+                    <Link to={`/update/${processo.id}`} className='btn btn-sm btn-primary me-2'>Editar</Link>
+                    <button onClick={e => handleDelete(processo.id)} className='btn btn-sm btn-danger'>Deletar</button>
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }
