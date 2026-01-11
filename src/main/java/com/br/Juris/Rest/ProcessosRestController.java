@@ -50,7 +50,7 @@ public class ProcessosRestController {
     @Operation(description = "Listagem páginada de processos")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE,name = "/list")
     public ResponseEntity<Page<ProcessoOutDTO>> listAll(@PageableDefault(size = 10,sort = "id",direction = Sort.Direction.ASC) Pageable pageable){
-        return ResponseEntity.ok(processosService.listAll(pageable));
+        return ResponseEntity.ok(processosService.listAllPageable(pageable));
     }
 
 
