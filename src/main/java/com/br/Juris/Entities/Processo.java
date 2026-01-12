@@ -8,7 +8,10 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -50,5 +53,18 @@ public class Processo {
     @OneToMany(mappedBy = "processo", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY )
     private List<Prazo> prazos = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "processo_advogado",
+            joinColumns = @JoinColumn(name = "processo_id"),
+            inverseJoinColumns = @JoinColumn(name = "advogado_id")
+    )
+    private List<Advogado> advogados = new ArrayList<>();
 
+    @OneToMany(
+            mappedBy = "processo",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<ProcessoParte> processoPartes = new ArrayList<>();
 }

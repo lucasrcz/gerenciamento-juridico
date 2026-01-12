@@ -6,6 +6,7 @@ import com.br.Juris.Repositories.AdvogadoRepository;
 import com.br.Juris.infra.security.SecurityConfigurations;
 import com.br.Juris.infra.security.SecurityFilter;
 import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +14,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class AuthorizationService implements UserDetailsService {
@@ -49,5 +52,9 @@ public class AuthorizationService implements UserDetailsService {
         advogado.setSeccional(dto.seccional().toUpperCase());
 
         repository.save(advogado);
+    }
+
+    public List<Advogado> findAllByCpf(List<String> cpfs){
+        return repository.findAllByCpfIn(cpfs);
     }
 }

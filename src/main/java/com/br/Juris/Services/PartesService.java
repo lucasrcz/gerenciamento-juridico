@@ -88,7 +88,7 @@ public class PartesService {
                 .map(PartesOutDTO::fromEntity);
     }
 
-    private Partes findById(Long id) {
+    public Partes findById(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
