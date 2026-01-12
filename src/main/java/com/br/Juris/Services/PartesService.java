@@ -1,5 +1,6 @@
 package com.br.Juris.Services;
 
+import com.br.Juris.Dtos.in.ClientesSelectDTO;
 import com.br.Juris.Dtos.in.PartesInDTO;
 import com.br.Juris.Dtos.out.MessageOutDTO;
 import com.br.Juris.Dtos.out.PartesOutDTO;
@@ -13,6 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @Service
 public class PartesService {
@@ -94,6 +97,16 @@ public class PartesService {
                         HttpStatus.NOT_FOUND,
                         String.format("Parte de ID %s não encontrada", id)
                 ));
+    }
+
+    @Transactional
+    public List<ClientesSelectDTO> buscarParaSelect(String query) {
+
+        if (query == null || query.isBlank()) {
+            return List.of();
+        }
+
+        return repository.buscarParaSelect(query.trim());
     }
 }
 

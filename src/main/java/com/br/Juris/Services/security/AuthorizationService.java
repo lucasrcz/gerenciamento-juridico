@@ -1,12 +1,12 @@
 package com.br.Juris.Services.security;
 
+import com.br.Juris.Dtos.in.AdvogadoSelectDTO;
 import com.br.Juris.Dtos.in.AdvogadoUpdateInDTO;
 import com.br.Juris.Entities.Advogado;
 import com.br.Juris.Repositories.AdvogadoRepository;
 import com.br.Juris.infra.security.SecurityConfigurations;
 import com.br.Juris.infra.security.SecurityFilter;
 import jakarta.annotation.Resource;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -57,4 +58,15 @@ public class AuthorizationService implements UserDetailsService {
     public List<Advogado> findAllByCpf(List<String> cpfs){
         return repository.findAllByCpfIn(cpfs);
     }
+
+    @Transactional(readOnly = true)
+    public List<AdvogadoSelectDTO> buscarParaSelect(String query) {
+
+        if (query == null || query.isBlank()) {
+            return List.of();
+        }
+
+        return repository.buscarAdvogadosParaSelect(query.trim());
+    }
+
 }

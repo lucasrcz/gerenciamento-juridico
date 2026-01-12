@@ -1,5 +1,6 @@
 package com.br.Juris.Rest;
 
+import com.br.Juris.Dtos.in.ClientesSelectDTO;
 import com.br.Juris.Dtos.in.PartesInDTO;
 import com.br.Juris.Dtos.out.MessageOutDTO;
 import com.br.Juris.Dtos.out.PartesOutDTO;
@@ -19,7 +20,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/partes")
@@ -65,5 +69,13 @@ public class PartesRestController {
     ) {
         return ResponseEntity.ok(partesService.listAllPageable(pageable));
     }
+
+    @GetMapping("/select")
+    public ResponseEntity<List<ClientesSelectDTO>> buscarClientesParaSelect(
+            @RequestParam("q") String q
+    ) {
+        return ResponseEntity.ok(partesService.buscarParaSelect(q));
+    }
+
 }
 
