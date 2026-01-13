@@ -41,7 +41,6 @@ public class ProcessosService {
         return ProcessoOutDTO.fromEntity(processo);
     }
 
-
     @Transactional
     public MessageOutDTO create(ProcessoInDTO dto) throws IOException {
         Processo processo = ProcessoInDTO.toEntity(dto);
@@ -69,6 +68,41 @@ public class ProcessosService {
     public Page<ProcessoOutDTO> listAllPageable(Pageable pageable) {
         Page<Processo> processos = repository.findAll(pageable);
         return processos.map(ProcessoOutDTO::fromEntity);
+    }
+
+    @Transactional
+    public MessageOutDTO update(Long id, ProcessoInDTO dto) throws IOException {
+        Processo processoExistente = findById(id);
+
+        atualizarDadosSimples(processoExistente, dto);
+
+
+        if (dto.advogadosIds() != null) {
+            processoExistente.getAdvogados().clear();
+            if (!dto.advogadosIds().isEmpty()) {
+                vincularAdvogados(dto.advogadosIds(), processoExistente);
+            }
+        }
+
+        if (dto.partes() != null) {
+            processoExistente.getProcessoPartes().clear();
+            if (!dto.partes().isEmpty()) {
+                vincularPartes(dto.partes(), processoExistente);
+            }
+        }
+
+        processoExistente = repository.save(processoExistente);
+
+        return new MessageOutDTO(processoExistente.getId(), String.format("Processo Nº %s atualizado com sucesso", processoExistente.getNumero()));
+    }
+
+    private void atualizarDadosSimples(Processo processo, ProcessoInDTO dto) throws IOException {
+        Processo edit = ProcessoInDTO.toEntity(dto);
+        processo.setNumero(edit.getNumero());
+        processo.setObservacoes(edit.getObservacoes());
+        processo.setStatus(edit.getStatus());
+        processo.setEstado(edit.getEstado());
+        processo.setContrato(edit.getContrato());
     }
 
     private void vincularPartes(List<ProcessoParteInDTO> dtos , Processo processo){

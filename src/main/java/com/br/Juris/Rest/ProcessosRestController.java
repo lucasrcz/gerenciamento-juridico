@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -51,6 +52,12 @@ public class ProcessosRestController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE,name = "/list")
     public ResponseEntity<Page<ProcessoOutDTO>> listAll(@PageableDefault(size = 10,sort = "id",direction = Sort.Direction.ASC) Pageable pageable){
         return ResponseEntity.ok(processosService.listAllPageable(pageable));
+    }
+
+    @Operation(description = "Atualização de Processo")
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<MessageOutDTO> update(@PathVariable Long id, @ModelAttribute ProcessoInDTO processo) throws IOException {
+        return ResponseEntity.ok(processosService.update(id, processo));
     }
 
 
