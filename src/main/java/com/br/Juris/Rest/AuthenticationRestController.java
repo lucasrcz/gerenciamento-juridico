@@ -1,5 +1,6 @@
 package com.br.Juris.Rest;
 
+import com.br.Juris.Dtos.in.AdvogadoSelectDTO;
 import com.br.Juris.Dtos.in.AdvogadoUpdateInDTO;
 import com.br.Juris.Dtos.in.AuthenticationInDTO;
 import com.br.Juris.Dtos.in.RegisterInDTO;
@@ -17,13 +18,17 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
@@ -74,6 +79,14 @@ public class AuthenticationRestController {
         authorizationService.atualizar(cpf, dto);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/advogados/select")
+    public ResponseEntity<List<AdvogadoSelectDTO>> buscarAdvogadosParaSelect(
+            @RequestParam("q") String q
+    ) {
+        return ResponseEntity.ok(authorizationService.buscarParaSelect(q));
+    }
+
 
     //TODO implementar paginação de usuários e exclusão lógica
 }

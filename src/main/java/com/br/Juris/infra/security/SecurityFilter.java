@@ -51,7 +51,12 @@ public class SecurityFilter extends OncePerRequestFilter {
         return authHeader.replace("Bearer ", "");
     }
 
+<<<<<<< HEAD
         @Override
+=======
+
+    @Override
+>>>>>>> 4bd0ddad22e2924a04fdf424ef6814549f2533ba
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
 
@@ -62,7 +67,14 @@ public class SecurityFilter extends OncePerRequestFilter {
                 || path.contains("/h2-console")
                 || path.contains("/auth/login")
                 || path.contains("/error");
+<<<<<<< HEAD
             
     
     }
 }
+=======
+    }
+
+
+}
+>>>>>>> 4bd0ddad22e2924a04fdf424ef6814549f2533ba
