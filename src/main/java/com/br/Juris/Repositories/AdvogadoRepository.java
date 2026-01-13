@@ -18,7 +18,7 @@ public interface AdvogadoRepository extends JpaRepository<Advogado, String> {
 
    @Query("""
     select new com.br.Juris.Dtos.in.AdvogadoSelectDTO(
-        u.id,
+        u.cpf,
         concat(
             u.nome,
             ' - OAB ',
@@ -27,9 +27,8 @@ public interface AdvogadoRepository extends JpaRepository<Advogado, String> {
             u.seccional
         )
     )
-    from Usuario u
-    where u.role = 'ADVOGADO'
-      and lower(u.nome) like lower(concat('%', :q, '%'))
+    from Advogado u
+    where lower(u.nome) like lower(concat('%', :q, '%'))
     order by u.nome
 """)
    List<AdvogadoSelectDTO> buscarAdvogadosParaSelect(@Param("q") String q);

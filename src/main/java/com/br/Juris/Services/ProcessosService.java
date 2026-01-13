@@ -8,6 +8,7 @@ import com.br.Juris.Entities.Advogado;
 import com.br.Juris.Entities.Partes;
 import com.br.Juris.Entities.Processo;
 import com.br.Juris.Entities.ProcessoParte;
+import com.br.Juris.Enums.StatusProcesso;
 import com.br.Juris.Repositories.PartesRepository;
 import com.br.Juris.Repositories.ProcessoRepository;
 import com.br.Juris.Services.security.AuthorizationService;
@@ -65,10 +66,27 @@ public class ProcessosService {
                         String.format("Processo de ID: %s não encontrado", id)));
     }
 
-    public Page<ProcessoOutDTO> listAllPageable(Pageable pageable) {
-        Page<Processo> processos = repository.findAll(pageable);
-        return processos.map(ProcessoOutDTO::fromEntity);
+    public Page<ProcessoOutDTO> listAllPageable(
+            String numero,
+            StatusProcesso status,
+            String estado,
+            Long advogadoId,
+            List<Long> advogadosIds,
+            List<Long> partesIds,
+            Pageable pageable
+    ) {
+
+        return repository.buscarComFiltros(
+                numero,
+                status,
+                estado,
+                advogadoId,
+                advogadosIds,
+                partesIds,
+                pageable
+        ).map(ProcessoOutDTO::fromEntity);
     }
+
 
     @Transactional
     public MessageOutDTO update(Long id, ProcessoInDTO dto) throws IOException {

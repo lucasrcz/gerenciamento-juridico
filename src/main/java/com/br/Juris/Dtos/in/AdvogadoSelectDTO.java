@@ -5,11 +5,11 @@ import lombok.Data;
 @Data
 public class AdvogadoSelectDTO {
 
-    private Long id;
+    private String cpf;
     private String nome;
 
-    public AdvogadoSelectDTO(Long id, String nome) {
-        this.id = id;
+    public AdvogadoSelectDTO(String cpf, String nome) {
+        this.cpf = cpf;
         this.nome = nome;
     }
 }
