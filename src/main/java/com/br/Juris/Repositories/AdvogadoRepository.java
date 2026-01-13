@@ -18,14 +18,15 @@ public interface AdvogadoRepository extends JpaRepository<Advogado, String> {
 
    @Query("""
     select new com.br.Juris.Dtos.in.AdvogadoSelectDTO(
-        u.cpf,
+        u.id,
         concat(
             u.nome,
             ' - OAB ',
             u.numeroOAB,
             '/',
             u.seccional
-        )
+        ),
+        u.cpf
     )
     from Advogado u
     where lower(u.nome) like lower(concat('%', :q, '%'))

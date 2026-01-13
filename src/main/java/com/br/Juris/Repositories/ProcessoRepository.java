@@ -23,15 +23,15 @@ public interface ProcessoRepository extends JpaRepository<Processo, Long> {
       AND (:status IS NULL OR p.status = :status)
       AND (:estado IS NULL OR p.estado = :estado)
       AND (:advogadoId IS NULL OR a.id = :advogadoId)
-      AND (:advogadosIds IS NULL OR a.id IN :advogadosIds)
+      AND (:advogadosIds IS NULL OR a.cpf IN :advogadosIds)
       AND (:partesIds IS NULL OR parte.id IN :partesIds)
 """)
     Page<Processo> buscarComFiltros(
             @Param("numero") String numero,
             @Param("status") StatusProcesso status,
             @Param("estado") String estado,
-            @Param("advogadoId") Long advogadoId,
-            @Param("advogadosIds") List<Long> advogadosIds,
+            @Param("advogadoId") String advogadoId,
+            @Param("advogadosIds") List<String> advogadosIds,
             @Param("partesIds") List<Long> partesIds,
             Pageable pageable
     );

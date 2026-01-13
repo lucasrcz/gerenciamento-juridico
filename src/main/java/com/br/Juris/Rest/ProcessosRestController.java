@@ -57,8 +57,8 @@ public class ProcessosRestController {
             @RequestParam(required = false) String numero,
             @RequestParam(required = false) StatusProcesso status,
             @RequestParam(required = false) String estado,
-            @RequestParam(required = false) Long advogadoId,
-            @RequestParam(required = false) List<Long> advogadosIds,
+            @RequestParam(required = false) String advogadoId,
+            @RequestParam(required = false) List<String> advogadosIds,
             @RequestParam(required = false) List<Long> partesIds,
             @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.ASC)
             Pageable pageable

@@ -70,8 +70,8 @@ public class ProcessosService {
             String numero,
             StatusProcesso status,
             String estado,
-            Long advogadoId,
-            List<Long> advogadosIds,
+            String advogadoId,
+            List<String> advogadosIds,
             List<Long> partesIds,
             Pageable pageable
     ) {
