@@ -36,7 +36,7 @@ function Read() {
                       )}
             </div>
             <Link to={`/update/${id}`} className='btn btn-success'>Editar</Link>
-            <Link to="/processos" className='btn btn-primary ms-3'>Voltar</Link>
+            <Link to="/processos/list" className='btn btn-primary ms-3'>Voltar</Link>
         </div>
     </div>
   )

@@ -40,13 +40,10 @@ function Create() {
     .then(res => {
       console.log(res);
       alert('Processo cadastrado com sucesso!');
-      navigate('/processos');
+      navigate('/processos/list');
     })
     .catch(err => {
-      console.error('❌ Erro completo:', err);
-      console.error('Status:', err.response?.status);
-      console.error('Mensagem:', err.response?.data);
-      console.error('Headers da resposta:', err.response?.headers);
+      console.error(err);
       alert(`Erro ao cadastrar: ${err.response?.data?.message || err.message}`);
     });
   }
@@ -93,7 +90,7 @@ function Create() {
 
               <center><br></br>
                 <button className='btn btn-success'>Cadastrar</button>
-                <Link to="/processos" className='btn btn-primary ms-3'>Voltar</Link>
+                <Link to="/processos/list" className='btn btn-primary ms-3'>Voltar</Link>
               </center>
            </form>
        </div>

@@ -53,7 +53,7 @@ function Update() {
     })
     .then(res => {
       console.log(res);
-      navigate('/processos');
+      navigate('/processos/list');
     })
     .catch(err => console.log(err));
   }
@@ -103,7 +103,7 @@ function Update() {
 
               <center><br></br>
                 <button className='btn btn-success'>Atualizar</button>
-                <Link to="/processos" className='btn btn-primary ms-3'>Voltar</Link>
+                <Link to="/processos/list" className='btn btn-primary ms-3'>Voltar</Link>
               </center>
            </form>
        </div>
