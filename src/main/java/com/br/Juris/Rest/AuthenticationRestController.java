@@ -3,7 +3,7 @@ package com.br.Juris.Rest;
 import com.br.Juris.Dtos.in.AdvogadoSelectDTO;
 import com.br.Juris.Dtos.in.AdvogadoUpdateInDTO;
 import com.br.Juris.Dtos.in.AuthenticationInDTO;
-import com.br.Juris.Dtos.in.RegisterInDTO;
+import com.br.Juris.Dtos.in.AdvogadoRegisterInDTO;
 import com.br.Juris.Dtos.out.TokenOutDTO;
 import com.br.Juris.Entities.Advogado;
 import com.br.Juris.Services.security.AuthorizationService;
@@ -57,14 +57,14 @@ public class AuthenticationRestController {
 
     @Operation(description = "Endpoint de criação de usuário(advogado)")
     @PostMapping("/register")
-    public ResponseEntity register(@RequestBody @Valid RegisterInDTO dto){
+    public ResponseEntity register(@RequestBody @Valid AdvogadoRegisterInDTO dto){
         if(authorizationService.loadUserByUsername(dto.login()) != null){
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     String.format("CPF já está cadastrado na base", dto.login()));
         }
         String encryptPassword = passwordEncoder.encode(dto.senha());
-        Advogado user = new Advogado(dto.login(),encryptPassword,dto.nome(),dto.numeroOAB(),dto.seccional(), dto.role());
+        Advogado user = new Advogado(dto.login(),encryptPassword,dto.nome(),dto.email(),dto.telefone(),dto.numeroOAB(),dto.seccional(), dto.role());
         authorizationService.save(user);
         return ResponseEntity.ok().build();
     }
