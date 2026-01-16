@@ -1,15 +1,15 @@
 package com.br.Juris.Dtos.in;
 
 import com.br.Juris.Enums.UserRole;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
-public record AdvogadoUpdateInDTO(
+public record AdvogadoRegisterInDTO(
 
-        @NotBlank(message = "O nome é obrigatório")
+        @NotBlank(message = "O nome do advogado é obrigatório")
         @Size(max = 150, message = "O nome pode ter no máximo 150 caracteres")
         @Pattern(
                 regexp = "^[A-Za-zÀ-ÿ ]+$",
@@ -17,16 +17,12 @@ public record AdvogadoUpdateInDTO(
         )
         String nome,
 
-        @NotBlank(message = "A senha é obrigatória")
-        @Size(
-                min = 6,
-                max = 15,
-                message = "A senha deve ter entre 6 e 15 caracteres"
+        @NotBlank(message = "O CPF é obrigatório")
+        @Pattern(
+                regexp = "\\d{11}",
+                message = "O CPF deve conter exatamente 11 dígitos numéricos"
         )
-        String senha,
-
-        @NotNull(message = "O perfil do usuário é obrigatório")
-        UserRole role,
+        String login,
 
         @NotBlank(message = "O e-mail é obrigatório")
         @Email(message = "E-mail inválido")
@@ -40,6 +36,13 @@ public record AdvogadoUpdateInDTO(
         )
         String telefone,
 
+        @NotBlank(message = "A senha é obrigatória")
+        @Size(min = 6, max = 30, message = "A senha deve ter entre 6 e 30 caracteres")
+        String senha,
+
+        @NotNull(message = "O perfil do usuário é obrigatório")
+        UserRole role,
+
         @NotBlank(message = "O número da OAB é obrigatório")
         @Size(max = 10, message = "O número da OAB pode ter no máximo 10 caracteres")
         @Pattern(
@@ -48,12 +51,12 @@ public record AdvogadoUpdateInDTO(
         )
         String numeroOAB,
 
-        @NotBlank(message = "A seccional é obrigatória")
+        @NotBlank(message = "A seccional da OAB é obrigatória")
+        @Size(min = 2, max = 2, message = "A seccional deve conter exatamente 2 letras")
         @Pattern(
                 regexp = "[A-Za-z]{2}",
-                message = "A seccional deve conter exatamente 2 letras"
+                message = "A seccional deve conter apenas letras (ex: SP, RJ)"
         )
         String seccional
 ) {
-
 }
