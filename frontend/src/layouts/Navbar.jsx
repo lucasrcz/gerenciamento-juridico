@@ -1,20 +1,41 @@
-import { Link } from "react-router-dom"
-import './Navbar.css'
+import React from 'react';
+import { logout } from '../services/API';
 
-const Navbar = () => {
+function Navbar() {
   return (
-    <nav className="navbar">
-        <Link to={`/processos`}>Gerenciamento Jurídico</Link>
-        <ul>
-            <li><Link to={`/processos`}>Home</Link></li>
-            <li><Link to={`/processos/create`}
-                className="new-btn">
-                    Novo Processo
-                </Link>
-            </li>
-        </ul>
-    </nav>
-  )
-}
+    <nav className="navbar navbar-expand-lg navbar-light sticky-top bg-white shadow-sm px-4">
+        <div className="d-flex container-fluid justify-content-between">
+            <span className="navbar-text fw-bold">Gerenciamento de Processos Jurídicos</span>
 
-export default Navbar
+            <div className="d-flex align-items-center gap-3">
+                <span className="badge bg-warning text-dark px-3 py-2 rounded-2" style={{ fontSize: '13px' }}>Admin</span>
+
+                <div className="dropdown">
+                    <button type="button" 
+                        className="btn btn-outline-dark rounded-3 dropdown-toggle d-flex align-items-center py-1" 
+                        data-bs-toggle="dropdown" 
+                        aria-expanded="false">
+                        <i className="bi bi-person-circle me-3"></i>
+                        <span>Usuário | Advogado</span>
+                    </button>
+
+                    <ul className="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a className="dropdown-item" href="#">
+                            <i className="bi bi-gear me-2"></i>Editar Perfil</a>
+                        </li>
+
+                        <li>
+                            <button className="dropdown-item" onClick={logout}>
+                            <i className="bi bi-box-arrow-right me-2"></i> Sair</button>
+                        </li>
+                    </ul>
+                </div>
+                
+            </div>
+        </div>
+    </nav>
+  );
+};
+
+export default Navbar;
