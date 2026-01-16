@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api } from '../services/API';
+import { api } from '../../services/API';
 import { Link } from 'react-router-dom'
 import Search from './Search';
 import Tabela from './Tabela';
@@ -56,7 +56,7 @@ function Processos() {
       <h2>Lista de Processos Jurídicos</h2>
       <div className='w-75 rounded bg-white border shadow p-4 m-3'>
         <div className='d-flex gap-2 pb-3'>
-          <Link to="/create" className='btn btn-success'>Cadastrar Processo</Link>
+          <Link to="/processos/create" className='btn btn-success'>Cadastrar Processo</Link>
           <Link to="" className='btn btn-primary'>Prazos</Link>
           <Link to="" className='btn btn-primary'>Contratos</Link>
           <Link to="" className='btn btn-primary'>Documentos</Link>

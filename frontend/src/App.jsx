@@ -1,25 +1,42 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
-import Processos from "./routes/Processos"
-import Create from "./routes/Create"
-import Update from "./routes/Update"
-import Read from "./routes/Read"
-import Index from "./routes/Index"
+import ProtectedRoute from "./routes/ProtectedRoute"
+import Layout from "./layouts/Layout"
+import Processos from "./routes/processos/Processos"
+import Create from "./routes/processos/Create"
+import Update from "./routes/processos/Update"
+import Read from "./routes/processos/Read"
+import Login from "./routes/Login"
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 function App() {
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route path='/' element={<Index />}></Route>
-        <Route path='/processos/list' element={<Processos />}></Route>
-        <Route path='/create' element={<Create />}></Route>
-        <Route path='/update/:id' element={<Update />}></Route>
-        <Route path='/read/:id' element={<Read />}></Route>
+        <Route path='/' element={
+          <ProtectedRoute>
+            <Layout />
+          </ProtectedRoute>}>
+
+          {/* Procesos */}
+          <Route index path='processos' element={<Processos />}/>
+          <Route path='processos/create' element={<Create />}/>
+          <Route path='update/:id' element={<Update />}/>
+          <Route path='read/:id' element={<Read />}/>
+
+          {/* Advogados */}
+          {/* Partes */}
+        </Route>
+
+        {/* Login */}
+        <Route path='/auth/login' element={<Login />}/>
       </Routes>
     </BrowserRouter>
   )
 }
 
+
 export default App
+ 

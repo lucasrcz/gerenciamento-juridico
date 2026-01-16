@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { api } from '../services/API';
+import { api } from '../../services/API';
 import { Link, useParams } from 'react-router-dom';
 
 function Read() {
@@ -36,7 +36,7 @@ function Read() {
                       )}
             </div>
             <Link to={`/update/${id}`} className='btn btn-success'>Editar</Link>
-            <Link to="/processos/list" className='btn btn-primary ms-3'>Voltar</Link>
+            <Link to="/processos" className='btn btn-primary ms-3'>Voltar</Link>
         </div>
     </div>
   )
