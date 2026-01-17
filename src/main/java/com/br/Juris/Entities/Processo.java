@@ -1,5 +1,6 @@
 package com.br.Juris.Entities;
 
+import com.br.Juris.Enums.EstadoBrasil;
 import com.br.Juris.Enums.StatusProcesso;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -42,7 +43,7 @@ public class Processo {
     private String observacoes;
 
     @Column(length = 2, nullable = false , name = "estado")
-    private String estado;
+    private EstadoBrasil estado;
 
     @OneToOne(mappedBy = "processo", cascade = CascadeType.ALL, orphanRemoval = true)
     private Contrato contrato;

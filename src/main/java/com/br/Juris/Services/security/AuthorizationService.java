@@ -1,13 +1,21 @@
 package com.br.Juris.Services.security;
 
-import com.br.Juris.Dtos.in.AdvogadoSelectDTO;
+import com.br.Juris.Dtos.out.AdvogadoOutDTO;
+import com.br.Juris.Dtos.out.AdvogadoSelectOutDTO;
 import com.br.Juris.Dtos.in.AdvogadoUpdateInDTO;
 import com.br.Juris.Entities.Advogado;
+import com.br.Juris.Enums.EstadoBrasil;
+import com.br.Juris.Enums.UserRole;
 import com.br.Juris.Repositories.AdvogadoRepository;
 import com.br.Juris.infra.security.SecurityConfigurations;
-import com.br.Juris.infra.security.SecurityFilter;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,6 +23,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -36,12 +47,13 @@ public class AuthorizationService implements UserDetailsService {
         return repository.findAdvogadoByCpf(username);
     }
 
-    public void save(Advogado user){
-        this.repository.save(user);
+    public AdvogadoSelectOutDTO save(Advogado user){
+       Advogado saved =  this.repository.save(user);
+       return new AdvogadoSelectOutDTO(saved.getId(), saved.getEmail(), saved.getCpf());
     }
 
     @PreAuthorize("hasRole('ADMIN') or #cpf == authentication.cpf")
-    public void atualizar(String cpf, AdvogadoUpdateInDTO dto) {
+    public AdvogadoSelectOutDTO atualizar(String cpf, AdvogadoUpdateInDTO dto) {
 
         Advogado advogado = repository.findAdvogadoByCpf(cpf);
 
@@ -50,9 +62,10 @@ public class AuthorizationService implements UserDetailsService {
         advogado.setSenha(passwordEncoder.encode(dto.senha()));
         advogado.setRole(dto.role());
         advogado.setNumeroOAB(dto.numeroOAB());
-        advogado.setSeccional(dto.seccional().toUpperCase());
+        advogado.setSeccional(dto.seccional());
 
-        repository.save(advogado);
+        advogado = repository.save(advogado);
+        return new AdvogadoSelectOutDTO(advogado.getId(), advogado.getEmail(), advogado.getCpf());
     }
 
     public List<Advogado> findAllByCpf(List<String> cpfs){
@@ -60,7 +73,7 @@ public class AuthorizationService implements UserDetailsService {
     }
 
     @Transactional(readOnly = true)
-    public List<AdvogadoSelectDTO> buscarParaSelect(String query) {
+    public List<AdvogadoSelectOutDTO> buscarParaSelect(String query) {
 
         if (query == null || query.isBlank()) {
             return List.of();
@@ -68,5 +81,68 @@ public class AuthorizationService implements UserDetailsService {
 
         return repository.buscarAdvogadosParaSelect(query.trim());
     }
+
+    @Transactional(readOnly = true)
+    public AdvogadoOutDTO findByCpf(String cpf) {
+
+        Advogado advogado = repository.findAdvogadoByCpf(cpf);
+
+        if (advogado == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Advogado não encontrado"
+            );
+        }
+
+        return AdvogadoOutDTO.fromEntity(advogado);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<AdvogadoOutDTO> listarPaginado(
+            String nome,
+            String email,
+            UserRole role,
+            String numeroOAB,
+            EstadoBrasil seccional,
+            Boolean ativo,
+            Pageable pageable
+    ) {
+        return repository.filtrar(
+                nome,
+                email,
+                role,
+                numeroOAB,
+                seccional,
+                ativo,
+                pageable
+        ).map(AdvogadoOutDTO::fromEntity);
+    }
+
+
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deletarLogicoPorCpf(String cpf) {
+
+        Advogado advogado = repository.findAdvogadoByCpf(cpf);
+
+        if (advogado == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Advogado não encontrado"
+            );
+        }
+
+        if (Boolean.FALSE.equals(advogado.getAtivo())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Advogado já está inativo"
+            );
+        }
+
+        advogado.setAtivo(false);
+        repository.save(advogado);
+    }
+
+
 
 }

@@ -1,5 +1,6 @@
 package com.br.Juris.Dtos.in;
 
+import com.br.Juris.Enums.EstadoBrasil;
 import com.br.Juris.Enums.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -48,12 +49,8 @@ public record AdvogadoUpdateInDTO(
         )
         String numeroOAB,
 
-        @NotBlank(message = "A seccional é obrigatória")
-        @Pattern(
-                regexp = "[A-Za-z]{2}",
-                message = "A seccional deve conter exatamente 2 letras"
-        )
-        String seccional
+        @NotNull(message = "Seccional é obrigatória")
+        EstadoBrasil seccional
 ) {
 
 }

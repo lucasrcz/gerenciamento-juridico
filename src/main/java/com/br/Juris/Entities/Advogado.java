@@ -1,5 +1,6 @@
 package com.br.Juris.Entities;
 
+import com.br.Juris.Enums.EstadoBrasil;
 import com.br.Juris.Enums.UserRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -55,8 +56,10 @@ public class Advogado implements UserDetails {
     @Column(name = "numero_oab", nullable = false, length = 10)
     private String numeroOAB;
 
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "seccional", length = 2, nullable = false)
-    private String seccional;
+    private EstadoBrasil seccional;
 
     @Column(name = "nome", length = 150, nullable = false)
     private String nome;
@@ -66,6 +69,9 @@ public class Advogado implements UserDetails {
 
     @Column(name = "telefone", length = 20)
     private String telefone;
+
+    @Column(name = "ativo", nullable = false)
+    private Boolean ativo = true;
 
     @ManyToMany(mappedBy = "advogados")
     private List<Processo> processos = new ArrayList<>();
@@ -98,7 +104,7 @@ public class Advogado implements UserDetails {
             String email,
             String telefone,
             String numeroOAB,
-            String seccional,
+            EstadoBrasil seccional,
             UserRole role
     ) {
         this.cpf = cpf;
