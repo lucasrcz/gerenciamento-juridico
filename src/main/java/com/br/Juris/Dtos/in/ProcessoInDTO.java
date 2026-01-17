@@ -3,6 +3,7 @@ package com.br.Juris.Dtos.in;
 import com.br.Juris.Entities.Contrato;
 import com.br.Juris.Entities.Processo;
 import com.br.Juris.Entities.ProcessoParte;
+import com.br.Juris.Enums.EstadoBrasil;
 import com.br.Juris.Enums.StatusProcesso;
 import com.br.Juris.Utils.FileUtils;
 import jakarta.validation.constraints.NotBlank;
@@ -23,8 +24,8 @@ public record ProcessoInDTO(
         @NotNull(message = "Status do processo é obrigatório")
         StatusProcesso status,
 
-        @NotBlank(message = "Estado é obrigatório")
-        String estado,
+        @NotNull(message = "Estado é obrigatório")
+        EstadoBrasil estado,
 
         String observacoes,
 

@@ -1,6 +1,7 @@
 package com.br.Juris.Dtos.out;
 
 import com.br.Juris.Entities.Processo;
+import com.br.Juris.Enums.EstadoBrasil;
 import com.br.Juris.Enums.StatusProcesso;
 
 import java.io.Serializable;
@@ -10,7 +11,7 @@ import java.util.List;
  * DTO for {@link com.br.Juris.Entities.Processo}
  */
 public record ProcessoOutDTO(Long id, String numero, StatusProcesso status, String observacoes,
-                             String estado, ContratoOutDTO contrato, List<String> advogadosIds,List<Long> partesIds) implements Serializable {
+                             EstadoBrasil estado, ContratoOutDTO contrato, List<String> advogadosIds, List<Long> partesIds) implements Serializable {
 
     public static ProcessoOutDTO fromEntity(Processo processo){
         ContratoOutDTO contratoOut = null;

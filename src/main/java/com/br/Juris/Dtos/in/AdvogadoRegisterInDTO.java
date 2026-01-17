@@ -1,5 +1,6 @@
 package com.br.Juris.Dtos.in;
 
+import com.br.Juris.Enums.EstadoBrasil;
 import com.br.Juris.Enums.UserRole;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -31,8 +32,8 @@ public record AdvogadoRegisterInDTO(
 
         @NotBlank(message = "O telefone é obrigatório")
         @Pattern(
-                regexp = "^\\(?\\d{2}\\)?\\s?9?\\d{4}-?\\d{4}$",
-                message = "Telefone inválido. Ex: (11) 91234-5678"
+                regexp = "^[0-9]{10,11}$",
+                message = "Telefone inválido. Use apenas números (DDD + número). Ex: 11912345678"
         )
         String telefone,
 
@@ -51,12 +52,7 @@ public record AdvogadoRegisterInDTO(
         )
         String numeroOAB,
 
-        @NotBlank(message = "A seccional da OAB é obrigatória")
-        @Size(min = 2, max = 2, message = "A seccional deve conter exatamente 2 letras")
-        @Pattern(
-                regexp = "[A-Za-z]{2}",
-                message = "A seccional deve conter apenas letras (ex: SP, RJ)"
-        )
-        String seccional
+        @NotNull(message = "Seccional é obrigatório")
+        EstadoBrasil seccional
 ) {
 }
