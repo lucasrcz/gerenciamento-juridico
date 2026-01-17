@@ -1,12 +1,15 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
+  const location = useLocation();
 
   const toggleSidebar = () => {
     setCollapsed(!collapsed);
   };
+
+  const isActive = (path) => location.pathname === path;
 
   const sidebarStyle = {
     width: collapsed ? '80px' : '220px',
@@ -27,70 +30,35 @@ function Sidebar() {
       
       <ul className="nav nav-pills flex-column mb-auto">
         <li className="nav-item">
-          <Link to="/processos" className="nav-link d-flex text-white align-items-center" aria-current="page">
+          <Link to="/dashboard"
+          className={`nav-link d-flex align-items-center ${isActive('/dashboard') ? 'active' : 'text-white'}`}
+          aria-current={isActive('/dashboard') ? 'page' : undefined}>
             <i className="bi bi-house-door fs-4"></i>
             {!collapsed && <span className="ms-2">Dashboard</span>}
           </Link>
         </li>
 
         <li className='nav-item'>
-          <a className="nav-link text-white d-flex align-items-center"
-          href="#submenuProcessos"
-          data-bs-toggle="collapse"
-          role='button'
-          aria-expanded="false"
-          aria-controls='submenuProcessos'
-          >
-            <div className="d-flex align-items-center">
+          <Link to="/processos"
+          className={`nav-link d-flex align-items-center ${isActive('/processos') ? 'active' : 'text-white'}`}
+          aria-current={isActive('/processos') ? 'page' : undefined}>
             <i className="bi bi-folder fs-4"></i>
             {!collapsed && <span className="ms-2">Processos</span>}
-            {!collapsed && <i className="bi bi-chevron-down transition ms-2" id="iconSetaCertidoes"></i>}
-            </div>
-          </a>
-
-          <div className='collapse' id='submenuProcessos'>
-            <ul className="list-unstyled ps-4">
-              <li>
-                <a className="nav-link text-white py-1" href="#">
-                <i className="bi bi-file-earmark-text"></i>
-                {!collapsed && <span className="ms-2">Lista de Processos</span>}
-                </a>
-              </li>
-
-              <li>
-                <a className="nav-link text-white py-1" href="#">
-                <i className="bi bi-file-earmark-text"></i>
-                {!collapsed && <span className="ms-2">Prazos</span>}
-                </a>
-              </li>
-
-              <li>
-                <a className="nav-link text-white py-1" href="#">
-                <i className="bi bi-file-earmark-check"></i>
-                {!collapsed && <span className="ms-2">Contratos</span>}
-                </a>
-              </li>
-
-              <li>
-                <a className="nav-link text-white py-1" href="#">
-                <i className="bi bi-file-earmark-pdf"></i>
-                {!collapsed && <span className="ms-2">Documentos</span>}
-                </a>
-              </li>
-            </ul>
-          </div>
+          </Link>
         </li>
 
         <li className="nav-item">
-          <a href="#" className="nav-link text-white d-flex align-items-center">
-            <i className="bi bi-speedometer2 fs-4"></i>
+          <Link to="/advogados"
+          className={`nav-link d-flex align-items-center ${isActive('/advogados') ? 'active' : 'text-white'}`}
+          aria-current={isActive('/advogados') ? 'page' : undefined}>
+            <i className="bi bi-person-lines-fill fs-4"></i>
             {!collapsed && <span className="ms-2">Advogados</span>}
-          </a>
+          </Link>
         </li>
 
         <li className="nav-item">
           <a href="#" className="nav-link text-white d-flex align-items-center">
-            <i className="bi bi-table fs-4"></i>
+            <i className="bi bi-people-fill fs-4"></i>
             {!collapsed && <span className="ms-2">Partes</span>}
           </a>
         </li>

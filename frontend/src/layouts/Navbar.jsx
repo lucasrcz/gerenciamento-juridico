@@ -1,5 +1,5 @@
 import React from 'react';
-import { logout } from '../services/API';
+import { logout, login } from '../services/API';
 
 function Navbar() {
   return (
@@ -8,7 +8,7 @@ function Navbar() {
             <span className="navbar-text fw-bold">Gerenciamento de Processos Jurídicos</span>
 
             <div className="d-flex align-items-center gap-3">
-                <span className="badge bg-warning text-dark px-3 py-2 rounded-2" style={{ fontSize: '13px' }}>Admin</span>
+                <span className="badge bg-warning text-dark px-3 py-2 rounded-2" style={{ fontSize: '13px' }}>{login?.role}</span>
 
                 <div className="dropdown">
                     <button type="button" 
@@ -16,7 +16,7 @@ function Navbar() {
                         data-bs-toggle="dropdown" 
                         aria-expanded="false">
                         <i className="bi bi-person-circle me-3"></i>
-                        <span>Usuário | Advogado</span>
+                        <span>{login?.name}</span>
                     </button>
 
                     <ul className="dropdown-menu dropdown-menu-end">

@@ -6,12 +6,12 @@ import Navbar from './Navbar';
 function Layout() {
 
   return (
-    <div className="d-flex" style={{ minHeight: '100vh' }}>
+    <div className="d-flex vh-100 overflow-hidden">
       <Sidebar />
 
       <div className="d-flex flex-column w-100">
         <Navbar />
-        <main className="flex-grow-1 p-4 bg-light">
+        <main className="flex-grow-1 p-4 bg-light overflow-auto">
           <Outlet />
         </main>
         {/* <Footer /> */}

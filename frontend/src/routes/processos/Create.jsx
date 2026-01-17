@@ -54,13 +54,13 @@ function Create() {
           <center><h2>Novo Processo</h2><br></br></center>
           <form onSubmit={handleSubmit}>
               <div className='mb-2'>
-                <label htmlFor="numero"><strong>Nº Processo:</strong></label>
+                <label htmlFor="numero"><b>Nº Processo:</b></label>
                 <input type="text" name='numero' className='form-control'
                 onChange={e => setProcesso({...processo, numero:e.target.value})} required/>
               </div>
 
               <div className='mb-2'>
-                <label htmlFor="status"><strong>Status</strong></label>
+                <label htmlFor="status"><b>Status</b></label>
                 <select name='status' className='form-control' value={processo.status}
                 onChange={e => setProcesso({...processo, status: e.target.value})} required>
                   <option value="">Selecionar</option>
@@ -71,19 +71,19 @@ function Create() {
               </div>
 
               <div className='mb-3'>
-                <label htmlFor="estado"><strong>Estado</strong></label>
+                <label htmlFor="estado"><b>Estado</b></label>
                 <input type="text" name='estado' className='form-control'
                 onChange={e => setProcesso({...processo, estado:e.target.value})}/>
               </div>
 
               <div className='mb-3'>
-                <label htmlFor="observacoes"><strong>Observações</strong></label>
+                <label htmlFor="observacoes"><b>Observações</b></label>
                 <input type="text" name='observacoes' className='form-control'
                 onChange={e => setProcesso({...processo, observacoes:e.target.value})}/>
               </div>
 
               <div className='mb-3'>
-                <label htmlFor="contrato"><strong>Contrato</strong></label>
+                <label htmlFor="contrato"><b>Contrato</b></label>
                 <input type="file" name='contrato' className='form-control' accept='.pdf'
                 onChange={handleFileChange}/>
               </div>

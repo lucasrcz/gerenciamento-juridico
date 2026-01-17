@@ -39,12 +39,14 @@ function Login() {
 
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                  <label className="form-label">Login (CPF)</label>
+                  <label className="form-label">CPF</label>
                   <input
-                    type="login"
+                    type="text"
                     className="form-control"
                     value={credentials.login}
                     onChange={(e) => setCredentials({...credentials, login: e.target.value})}
+                    placeholder="00000000000"
+                    maxLength="11"
                     required
                   />
                 </div>
@@ -52,9 +54,9 @@ function Login() {
                 <div className="mb-3">
                   <label className="form-label">Senha</label>
                   <input
-                    type="senha"
+                    type="password"
                     className="form-control"
-                    value={credentials.password}
+                    value={credentials.senha}
                     onChange={(e) => setCredentials({...credentials, senha: e.target.value})}
                     required
                   />
@@ -62,7 +64,7 @@ function Login() {
 
                 <button 
                   type="submit" 
-                  className="btn btn-primary w-100"
+                  className="mx-auto d-block btn btn-primary w-50"
                   disabled={loading}
                 >
                   {loading ? 'Entrando...' : 'Entrar'}

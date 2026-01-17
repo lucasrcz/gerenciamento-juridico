@@ -35,6 +35,7 @@ export const login = async (credentials) => {
     const response = await api.post('/auth/login', credentials);
     if (response.data.token) {
         localStorage.setItem('token', response.data.token);
+        localStorage.setItem('login', JSON.stringify(response.data.login));
     }
     return response.data;
 };
@@ -42,10 +43,17 @@ export const login = async (credentials) => {
 // Função de logout
 export const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('login');
     window.location.href = '/auth/login';
 };
 
 // Verificar se está autenticado
 export const isAuthenticated = () => {
     return !!localStorage.getItem('token');
+};
+
+// Obter dados do usuário
+export const getLogin = () => {
+    const login = localStorage.getItem('login');
+    return login ? JSON.parse(login) : null;
 };

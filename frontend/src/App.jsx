@@ -1,14 +1,17 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom"
+import Login from "./routes/Login"
 import ProtectedRoute from "./routes/ProtectedRoute"
 import Layout from "./layouts/Layout"
+import Dashboard from "./routes/dashboard/Dashboard"
 import Processos from "./routes/processos/Processos"
-import Create from "./routes/processos/Create"
-import Update from "./routes/processos/Update"
-import Read from "./routes/processos/Read"
-import Login from "./routes/Login"
+import CreateProcessos from "./routes/processos/Create"
+import ReadProcessos from "./routes/processos/Read"
+import UpdateProcessos from "./routes/processos/Update"
+import Advogados from "./routes/advogados/Advogados"
+import CreateAdvogados from "./routes/advogados/Create"
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 
 function App() {
 
@@ -19,14 +22,18 @@ function App() {
           <ProtectedRoute>
             <Layout />
           </ProtectedRoute>}>
+          <Route index path='/dashboard' element={<Dashboard />}/>
 
           {/* Procesos */}
-          <Route index path='processos' element={<Processos />}/>
-          <Route path='processos/create' element={<Create />}/>
-          <Route path='update/:id' element={<Update />}/>
-          <Route path='read/:id' element={<Read />}/>
+          <Route path='processos' element={<Processos />}/>
+          <Route path='processos/create' element={<CreateProcessos />}/>
+          <Route path='update/:id' element={<UpdateProcessos />}/>
+          <Route path='read/:id' element={<ReadProcessos />}/>
 
           {/* Advogados */}
+          <Route path='advogados' element={<Advogados />}/>
+          <Route path='advogados/create' element={<CreateAdvogados />}/>
+
           {/* Partes */}
         </Route>
 
