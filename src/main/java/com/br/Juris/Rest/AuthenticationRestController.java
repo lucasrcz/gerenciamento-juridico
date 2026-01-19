@@ -78,13 +78,13 @@ public class AuthenticationRestController {
     }
 
     @Operation(description = "Endpoint de edição")
-    @PutMapping("/{cpf}")
+    @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or #cpf == authentication.name")
     public ResponseEntity<AdvogadoSelectOutDTO> atualizar(
-            @PathVariable String cpf,
+            @PathVariable String id,
             @RequestBody @Valid AdvogadoUpdateInDTO dto
     ) {
-        authorizationService.atualizar(cpf, dto);
+        authorizationService.atualizar(id, dto);
         return ResponseEntity.noContent().build();
     }
 
@@ -97,7 +97,7 @@ public class AuthenticationRestController {
     @GetMapping("/advogados/{id}")
     public ResponseEntity<AdvogadoOutDTO> findByCpf(@PathVariable String id) {
         return ResponseEntity.ok(
-                authorizationService.findById(id)
+                authorizationService.findByIdAndReturnDTO(id)
         );
     }
 
@@ -121,12 +121,12 @@ public class AuthenticationRestController {
     }
 
     @Operation(description = "Exclusão lógica de advogado (somente ADMIN)")
-    @DeleteMapping("/advogados/{cpf}")
+    @DeleteMapping("/advogados/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MessageOutDTO> deletarLogico(
-            @PathVariable String cpf
+            @PathVariable String id
     ) {
-        authorizationService.deletarLogicoPorCpf(cpf);
-        return ResponseEntity.ok(new MessageOutDTO(null,"Advogado de CPF Nº: %s desativado com sucesso".formatted(cpf)));
+        authorizationService.deletarLogicoPorId(id);
+        return ResponseEntity.ok(new MessageOutDTO(null,"Advogado de CPF Nº: %s desativado com sucesso".formatted(id)));
     }
 }
