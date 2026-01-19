@@ -91,7 +91,7 @@ function Create() {
       
       await api.post('/auth/register', dataToSend);
       alert('Advogado cadastrado com sucesso!');
-      navigate('/advogados');
+      navigate('/advogados/read/' + dataToSend.cpf);
     } catch (err) {
       console.error('Erro completo:', err.response?.data);
       setError(err.response?.data?.message || 'Erro ao registrar usuário');

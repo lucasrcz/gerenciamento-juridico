@@ -13,6 +13,7 @@ function Processos() {
   useEffect(() => {
     const fetchProcessos = async() => {
       try {
+        console.log('Query enviada:', query); // DEBUG
         const res = await api.get('/processos/list', {
           params: {
             numero: query.numero || null,
@@ -22,10 +23,12 @@ function Processos() {
             advogadosIds: query.advogadosIds || null,
             partesIds: query.partesIds || null
           }
+          
         });
+        console.log('Processos retornados:', res.data); // DEBUG
         setProcessos(res.data.content || res.data);
       } catch(err) {
-        console.log(err);
+        console.log('Erro na requisição:', err.response?.data || err); // DEBUG
       }
     }
     fetchProcessos()
@@ -33,10 +36,12 @@ function Processos() {
 
   // Armazena o filtro
   const handleChange = (e) => {
+    console.log('Filtro alterado:', e.target.name, '=', e.target.value); // DEBUG
     setQuery({ ...query, [e.target.name]: e.target.value });
   };
 
   // Lógica de deletar processo (Tabela)
+
   const handleDelete = (id) => {
     const confirm = window.confirm("Tem certeza que deseja deletar o processo?" );
     if(confirm) {

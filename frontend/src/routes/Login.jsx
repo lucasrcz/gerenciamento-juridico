@@ -8,16 +8,42 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Função para formatar CPF
+  const formatCPF = (value) => {
+    const numbers = value.replace(/\D/g, '');
+    
+    return numbers
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  };
+
+  const handleCPFChange = (e) => {
+    const formattedCPF = formatCPF(e.target.value);
+    setCredentials({...credentials, login: formattedCPF});
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      await login(credentials);
-      navigate('/processos');
+      // Remove formatação do CPF antes de enviar
+      const dataToSend = {
+        login: credentials.login.replace(/\D/g, ''),
+        senha: credentials.senha
+      };
+
+      console.log('Tentando login com:', dataToSend);
+      
+      await login(dataToSend);
+      console.log('Login bem-sucedido!');
+      navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Erro ao fazer login');
+      console.error('Erro completo:', err);
+      console.error('Resposta do servidor:', err.response?.data);
+      setError(err.response?.data?.message || 'CPF ou senha inválidos');
     } finally {
       setLoading(false);
     }
@@ -39,22 +65,25 @@ function Login() {
 
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                  <label className="form-label">CPF</label>
+                  <label htmlFor='cpf' className="form-label"><b>CPF</b></label>
                   <input
                     type="text"
+                    id="cpf"
+                    name="login"
                     className="form-control"
                     value={credentials.login}
-                    onChange={(e) => setCredentials({...credentials, login: e.target.value})}
-                    placeholder="00000000000"
-                    maxLength="11"
+                    onChange={handleCPFChange}
+                    maxLength="14"
                     required
                   />
                 </div>
 
                 <div className="mb-3">
-                  <label className="form-label">Senha</label>
+                  <label htmlFor='senha' className="form-label"><b>Senha</b></label>
                   <input
                     type="password"
+                    id="senha"
+                    name="senha"
                     className="form-control"
                     value={credentials.senha}
                     onChange={(e) => setCredentials({...credentials, senha: e.target.value})}

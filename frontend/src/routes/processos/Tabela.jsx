@@ -29,7 +29,7 @@ function Tabela({processos, handleDelete}) {
                           <span className="file-missing">Sem contrato</span>
                       )}</td>
                   <td>
-                    <Link to={`/read/${processo.id}`} className='btn btn-sm btn-info me-2'>Visualizar</Link>
+                    <Link to={`/processos/read/${processo.id}`} className='btn btn-sm btn-info me-2'>Visualizar</Link>
                     <Link to={`/update/${processo.id}`} className='btn btn-sm btn-primary me-2'>Editar</Link>
                     <button onClick={e => handleDelete(processo.id)} className='btn btn-sm btn-danger'>Deletar</button>
                   </td>

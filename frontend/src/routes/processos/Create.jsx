@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../../services/API';
+import { EstadosBrasileiros } from '../../constants/EstadosBrasileiros';
 
 function Create() {
   const [processo, setProcesso] = useState({
@@ -70,10 +71,17 @@ function Create() {
                 </select>
               </div>
 
-              <div className='mb-3'>
+              <div className='mb-2'>
                 <label htmlFor="estado"><b>Estado</b></label>
-                <input type="text" name='estado' className='form-control'
-                onChange={e => setProcesso({...processo, estado:e.target.value})}/>
+                <select name='estado' className='form-control' value={processo.estado}
+                onChange={e => setProcesso({...processo, estado: e.target.value})} required>
+                  <option value="">Selecionar</option>
+                  {EstadosBrasileiros.map((estado) => (
+                    <option key={estado.sigla} value={estado.sigla}>
+                      {estado.sigla} - {estado.nome}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className='mb-3'>

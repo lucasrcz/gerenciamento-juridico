@@ -1,4 +1,5 @@
 import React from 'react'
+import { EstadosBrasileiros } from '../../constants/EstadosBrasileiros'
 
 function Search({handleChange}) {
   return (
@@ -20,6 +21,19 @@ function Search({handleChange}) {
                     <option value={'EM_ANDAMENTO'}>Em Andamento</option>
                     <option value={'ARQUIVADO'}>Arquivado</option>
                     <option value={'FINALIZADO'}>Finalizado</option>
+                </select>
+            </div>
+
+            <div className='col-lg-2 col-md-4'>
+                <label htmlFor='estado'><strong>Estado</strong></label>
+                <select id='estado' name='estado' className='form-select border p-2 mt-2'
+                onChange={handleChange}>
+                    <option value=''>Selecione</option>
+                    {EstadosBrasileiros.map((estado) => (
+                        <option key={estado.sigla} value={estado.sigla}>
+                            {estado.sigla} - {estado.nome}
+                        </option>
+                    ))}
                 </select>
             </div>
         </div>
