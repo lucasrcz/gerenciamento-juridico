@@ -29,7 +29,8 @@ public interface AdvogadoRepository extends JpaRepository<Advogado, String> {
             '/',
             u.seccional
         ),
-        u.cpf
+        u.cpf,
+        u.role
     )
     from Advogado u
     where lower(u.nome) like lower(concat('%', :q, '%'))

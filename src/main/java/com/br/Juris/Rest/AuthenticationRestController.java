@@ -59,8 +59,9 @@ public class AuthenticationRestController {
     public ResponseEntity<TokenOutDTO> login(@RequestBody @Valid AuthenticationInDTO dto) {
         var userNamePassword = new UsernamePasswordAuthenticationToken(dto.login(),dto.senha());
         var auth = this.authenticationManager.authenticate(userNamePassword);
-        var token = tokenService.generateToken((Advogado) auth.getPrincipal());
-        return ResponseEntity.ok(new TokenOutDTO(token));
+        Advogado advogado = (Advogado) auth.getPrincipal();
+        var token = tokenService.generateToken(advogado);
+        return ResponseEntity.ok(new TokenOutDTO(token,advogado.getId(), advogado.getCpf(), advogado.getRole()));
     }
 
     @Operation(description = "Endpoint de criação de usuário(advogado)")
@@ -88,19 +89,15 @@ public class AuthenticationRestController {
     }
 
     @GetMapping("/advogados/select")
-    public ResponseEntity<List<AdvogadoSelectOutDTO>> buscarAdvogadosParaSelect(
-            @RequestParam("q") String q
-    ) {
+    public ResponseEntity<List<AdvogadoSelectOutDTO>> buscarAdvogadosParaSelect(@RequestParam("q") String q) {
         return ResponseEntity.ok(authorizationService.buscarParaSelect(q));
     }
 
     @Operation(description = "Buscar advogado por CPF")
-    @GetMapping("/advogados/{cpf}")
-    public ResponseEntity<AdvogadoOutDTO> findByCpf(
-            @PathVariable String cpf
-    ) {
+    @GetMapping("/advogados/{id}")
+    public ResponseEntity<AdvogadoOutDTO> findByCpf(@PathVariable String id) {
         return ResponseEntity.ok(
-                authorizationService.findByCpf(cpf)
+                authorizationService.findById(id)
         );
     }
 
