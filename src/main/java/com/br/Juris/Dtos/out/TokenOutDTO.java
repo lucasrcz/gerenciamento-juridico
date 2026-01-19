@@ -1,4 +1,6 @@
 package com.br.Juris.Dtos.out;
 
-public record TokenOutDTO(String token) {
+import com.br.Juris.Enums.UserRole;
+
+public record TokenOutDTO(String token, String id, String cpf, UserRole role) {
 }
