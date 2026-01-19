@@ -3,6 +3,7 @@ package com.br.Juris.Rest;
 import com.br.Juris.Dtos.in.ProcessoInDTO;
 import com.br.Juris.Dtos.out.MessageOutDTO;
 import com.br.Juris.Dtos.out.ProcessoOutDTO;
+import com.br.Juris.Enums.EstadoBrasil;
 import com.br.Juris.Enums.StatusProcesso;
 import com.br.Juris.Services.ProcessosService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -56,7 +57,7 @@ public class ProcessosRestController {
     public ResponseEntity<Page<ProcessoOutDTO>> listAll(
             @RequestParam(required = false) String numero,
             @RequestParam(required = false) StatusProcesso status,
-            @RequestParam(required = false) String estado,
+            @RequestParam(required = false) EstadoBrasil estado,
             @RequestParam(required = false) String advogadoId,
             @RequestParam(required = false) List<String> advogadosIds,
             @RequestParam(required = false) List<Long> partesIds,

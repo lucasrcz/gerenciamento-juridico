@@ -8,6 +8,7 @@ import com.br.Juris.Entities.Advogado;
 import com.br.Juris.Entities.Partes;
 import com.br.Juris.Entities.Processo;
 import com.br.Juris.Entities.ProcessoParte;
+import com.br.Juris.Enums.EstadoBrasil;
 import com.br.Juris.Enums.StatusProcesso;
 import com.br.Juris.Repositories.PartesRepository;
 import com.br.Juris.Repositories.ProcessoRepository;
@@ -69,7 +70,7 @@ public class ProcessosService {
     public Page<ProcessoOutDTO> listAllPageable(
             String numero,
             StatusProcesso status,
-            String estado,
+            EstadoBrasil estado,
             String advogadoId,
             List<String> advogadosIds,
             List<Long> partesIds,
