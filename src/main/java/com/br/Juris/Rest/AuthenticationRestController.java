@@ -51,7 +51,7 @@ public class AuthenticationRestController {
     @Resource
     private TokenService tokenService;
 
-    @Autowired
+    @Resource
     private PasswordEncoder passwordEncoder;
 
     @Operation(description = "Login do usuário(Advogado), retorna o Token")
@@ -70,7 +70,7 @@ public class AuthenticationRestController {
         if(authorizationService.loadUserByUsername(dto.login()) != null){
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    String.format("CPF já está cadastrado na base", dto.login()));
+                    String.format("CPF Nº %s já está cadastrado na base", dto.login()));
         }
         String encryptPassword = passwordEncoder.encode(dto.senha());
         Advogado user = new Advogado(dto.login(),encryptPassword,dto.nome(),dto.email(),dto.telefone(),dto.numeroOAB(),dto.seccional(), dto.role());
