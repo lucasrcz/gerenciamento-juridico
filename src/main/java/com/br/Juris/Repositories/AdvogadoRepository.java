@@ -38,6 +38,7 @@ public interface AdvogadoRepository extends JpaRepository<Advogado, String> {
 """)
    List<AdvogadoSelectOutDTO> buscarAdvogadosParaSelect(@Param("q") String q);
 
+
    @Query("""
     SELECT a FROM Advogado a
     WHERE (:nome IS NULL OR LOWER(a.nome) LIKE LOWER(CONCAT('%', :nome, '%')))

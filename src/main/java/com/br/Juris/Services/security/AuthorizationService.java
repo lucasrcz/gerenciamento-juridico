@@ -70,10 +70,6 @@ public class AuthorizationService implements UserDetailsService {
     @Transactional(readOnly = true)
     public List<AdvogadoSelectOutDTO> buscarParaSelect(String query) {
 
-        if (query == null || query.isBlank()) {
-            return List.of();
-        }
-
         return repository.buscarAdvogadosParaSelect(query.trim());
     }
 
