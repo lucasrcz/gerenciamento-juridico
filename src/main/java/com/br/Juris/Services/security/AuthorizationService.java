@@ -48,9 +48,9 @@ public class AuthorizationService implements UserDetailsService {
     }
 
     @PreAuthorize("hasRole('ADMIN') or #cpf == authentication.cpf")
-    public AdvogadoSelectOutDTO atualizar(String cpf, AdvogadoUpdateInDTO dto) {
+    public AdvogadoSelectOutDTO atualizar(String id, AdvogadoUpdateInDTO dto) {
 
-        Advogado advogado = repository.findAdvogadoByCpf(cpf);
+        Advogado advogado = findById(id);
 
 
         advogado.setNome(dto.nome());
@@ -78,12 +78,9 @@ public class AuthorizationService implements UserDetailsService {
     }
 
     @Transactional(readOnly = true)
-    public AdvogadoOutDTO findById(String id) {
+    public AdvogadoOutDTO findByIdAndReturnDTO(String id) {
 
-        Advogado advogado = repository.findById(id).orElseThrow(()-> new ResponseStatusException(
-                HttpStatus.NOT_FOUND,
-                "Advogado não encontrado"
-        ));
+        Advogado advogado = findById(id);
 
         return AdvogadoOutDTO.fromEntity(advogado);
     }
@@ -112,28 +109,22 @@ public class AuthorizationService implements UserDetailsService {
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
-    public void deletarLogicoPorCpf(String cpf) {
+    public void deletarLogicoPorId(String id) {
 
-        Advogado advogado = repository.findAdvogadoByCpf(cpf);
-
-        if (advogado == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Advogado não encontrado"
-            );
-        }
-
+        Advogado advogado = this.findById(id);
         if (Boolean.FALSE.equals(advogado.getAtivo())) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Advogado já está inativo"
             );
         }
-
         advogado.setAtivo(false);
         repository.save(advogado);
     }
 
-
-
+    public Advogado findById(String id){
+        return repository.findById(id).orElseThrow(()-> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Advogado não encontrado"));
+    }
 }

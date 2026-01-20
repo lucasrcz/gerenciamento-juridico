@@ -15,7 +15,6 @@ import com.br.Juris.Services.security.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -51,7 +50,7 @@ public class AuthenticationRestController {
     @Resource
     private TokenService tokenService;
 
-    @Autowired
+    @Resource
     private PasswordEncoder passwordEncoder;
 
     @Operation(description = "Login do usuário(Advogado), retorna o Token")
@@ -70,7 +69,7 @@ public class AuthenticationRestController {
         if(authorizationService.loadUserByUsername(dto.login()) != null){
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    String.format("CPF já está cadastrado na base", dto.login()));
+                    String.format("CPF Nº %s já está cadastrado na base", dto.login()));
         }
         String encryptPassword = passwordEncoder.encode(dto.senha());
         Advogado user = new Advogado(dto.login(),encryptPassword,dto.nome(),dto.email(),dto.telefone(),dto.numeroOAB(),dto.seccional(), dto.role());
@@ -78,13 +77,13 @@ public class AuthenticationRestController {
     }
 
     @Operation(description = "Endpoint de edição")
-    @PutMapping("/{cpf}")
+    @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or #cpf == authentication.name")
     public ResponseEntity<AdvogadoSelectOutDTO> atualizar(
-            @PathVariable String cpf,
+            @PathVariable String id,
             @RequestBody @Valid AdvogadoUpdateInDTO dto
     ) {
-        authorizationService.atualizar(cpf, dto);
+        authorizationService.atualizar(id, dto);
         return ResponseEntity.noContent().build();
     }
 
@@ -97,7 +96,7 @@ public class AuthenticationRestController {
     @GetMapping("/advogados/{id}")
     public ResponseEntity<AdvogadoOutDTO> findByCpf(@PathVariable String id) {
         return ResponseEntity.ok(
-                authorizationService.findById(id)
+                authorizationService.findByIdAndReturnDTO(id)
         );
     }
 
@@ -121,12 +120,12 @@ public class AuthenticationRestController {
     }
 
     @Operation(description = "Exclusão lógica de advogado (somente ADMIN)")
-    @DeleteMapping("/advogados/{cpf}")
+    @DeleteMapping("/advogados/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MessageOutDTO> deletarLogico(
-            @PathVariable String cpf
+            @PathVariable String id
     ) {
-        authorizationService.deletarLogicoPorCpf(cpf);
-        return ResponseEntity.ok(new MessageOutDTO(null,"Advogado de CPF Nº: %s desativado com sucesso".formatted(cpf)));
+        authorizationService.deletarLogicoPorId(id);
+        return ResponseEntity.ok(new MessageOutDTO(null,"Advogado de CPF Nº: %s desativado com sucesso".formatted(id)));
     }
 }

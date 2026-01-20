@@ -3,7 +3,7 @@ import { isAuthenticated } from '../services/API';
 
 function ProtectedRoute({ children }) {
   if (!isAuthenticated()) {
-    return <Navigate to="/auth/login" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return children;

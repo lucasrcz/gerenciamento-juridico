@@ -1,6 +1,7 @@
 package com.br.Juris.Repositories;
 
 import com.br.Juris.Entities.Processo;
+import com.br.Juris.Enums.EstadoBrasil;
 import com.br.Juris.Enums.StatusProcesso;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,7 +30,7 @@ public interface ProcessoRepository extends JpaRepository<Processo, Long> {
     Page<Processo> buscarComFiltros(
             @Param("numero") String numero,
             @Param("status") StatusProcesso status,
-            @Param("estado") String estado,
+            @Param("estado") EstadoBrasil estado,
             @Param("advogadoId") String advogadoId,
             @Param("advogadosIds") List<String> advogadosIds,
             @Param("partesIds") List<Long> partesIds,

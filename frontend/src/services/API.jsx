@@ -44,7 +44,7 @@ export const login = async (credentials) => {
 export const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('login');
-    window.location.href = '/auth/login';
+    window.location.href = '/login';
 };
 
 // Verificar se está autenticado

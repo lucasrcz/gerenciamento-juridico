@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { BrowserRouter, Routes, Route, Navigate, NavigationType } from "react-router-dom"
 import Login from "./routes/Login"
 import ProtectedRoute from "./routes/ProtectedRoute"
 import Layout from "./layouts/Layout"
@@ -19,10 +19,14 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path='/' element={
+        <Route path='/' element={<Navigate to="/dashboard" replace />}/>
+
+        <Route element={
           <ProtectedRoute>
             <Layout />
           </ProtectedRoute>}>
+
+          {/* Dashboard */}
           <Route index path='/dashboard' element={<Dashboard />}/>
 
           {/* Procesos */}
@@ -34,13 +38,13 @@ function App() {
           {/* Advogados */}
           <Route path='advogados' element={<Advogados />}/>
           <Route path='advogados/create' element={<CreateAdvogados />}/>
-          <Route path='advogados/read/:cpf' element={<ReadAdvogados />}/>
+          <Route path='advogados/read/:id' element={<ReadAdvogados />}/>
 
           {/* Partes */}
         </Route>
 
         {/* Login */}
-        <Route path='/auth/login' element={<Login />}/>
+        <Route path='/login' element={<Login />}/>
       </Routes>
     </BrowserRouter>
   )
@@ -48,4 +52,3 @@ function App() {
 
 
 export default App
- 
