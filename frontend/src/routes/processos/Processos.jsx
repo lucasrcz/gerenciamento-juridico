@@ -8,6 +8,16 @@ function Processos() {
   // GETTERS E SETTERS
   const [processos, setProcessos] = useState([]);
   const [query, setQuery] = useState({});
+  const [pendingQuery, setPendingQuery] = useState({});
+
+const handleSearch = () => {
+  setQuery(pendingQuery);
+};
+
+const handleClear = () => {
+  setPendingQuery({});
+  setQuery({});
+};
 
   // Busca os dados de processos da API
   useEffect(() => {
@@ -18,13 +28,13 @@ function Processos() {
           params: {
             numero: query.numero || null,
             status: query.status || null,
-            estado: query.estado || null,
+            estado: query.estado || undefined,
             advogadoId: query.advogadoId || null,
             advogadosIds: query.advogadosIds || null,
             partesIds: query.partesIds || null
           }
           
-        });
+        }); 
         console.log('Processos retornados:', res.data); // DEBUG
         setProcessos(res.data.content || res.data);
       } catch(err) {
@@ -32,12 +42,12 @@ function Processos() {
       }
     }
     fetchProcessos()
+    console.log(query)
   }, [query]);
 
   // Armazena o filtro
   const handleChange = (e) => {
-    console.log('Filtro alterado:', e.target.name, '=', e.target.value); // DEBUG
-    setQuery({ ...query, [e.target.name]: e.target.value });
+    setPendingQuery({ ...pendingQuery, [e.target.name]: e.target.value });
   };
 
   // Lógica de deletar processo (Tabela)
@@ -56,7 +66,12 @@ function Processos() {
   return (
     <div className='d-flex flex-column justify-content-center align-items-center bg-light vh-100'>
       <h2>Pesquisa</h2>
-      <Search handleChange={handleChange}/>
+      <Search
+      handleChange={handleChange}
+      handleSearch={handleSearch}
+      handleClear={handleClear}
+      values={pendingQuery}
+      />
 
       <h2>Lista de Processos Jurídicos</h2>
       <div className='w-75 rounded bg-white border shadow p-4 m-3'>

@@ -53,7 +53,7 @@ function Update() {
     })
     .then(res => {
       console.log(res);
-      navigate('/processos');
+      navigate('/processos/read/' + id);
     })
     .catch(err => console.log(err));
   }

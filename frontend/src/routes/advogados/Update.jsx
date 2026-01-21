@@ -1,17 +1,16 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../services/API';
-import { EstadosBrasileiros } from '../../constants/EstadosBrasileiros';
 
-function Create() {
-  const [advogado, setAdvogado] = useState({
+function Update() {
+  const [formData, setFormData] = useState({
     nome: '',
     cpf: '',
     email: '',
     telefone: '',
     senha: '',
     confirmarSenha: '',
-    role: '',
+    role: 'USER',
     numeroOAB: '',
     seccional: ''
   });
@@ -58,8 +57,8 @@ function Create() {
       formattedValue = value.replace(/\D/g, '');
     }
 
-    setAdvogado({
-      ...advogado,
+    setFormData({
+      ...formData,
       [name]: formattedValue
     });
   };
@@ -68,18 +67,18 @@ function Create() {
     e.preventDefault();
     setError('');
 
-    if (advogado.senha !== advogado.confirmarSenha) {
+    if (formData.senha !== formData.confirmarSenha) {
       setError('As senhas não coincidem');
       return;
     }
 
-    if (advogado.senha.length < 6) {
+    if (formData.senha.length < 6) {
       setError('A senha deve ter no mínimo 6 caracteres');
       return;
     }
 
     try {
-      const { confirmarSenha, ...rest } = advogado;
+      const { confirmarSenha, ...rest } = formData;
 
       const dataToSend = {
         ...rest,
@@ -91,9 +90,8 @@ function Create() {
       console.log('Dados enviados:', dataToSend);
       
       await api.post('/auth/register', dataToSend);
-      const id = response.data.id;
       alert('Advogado cadastrado com sucesso!');
-      navigate('/advogados/read/' + id);
+      navigate('/advogados/read/' + dataToSend.cpf);
     } catch (err) {
       console.error('Erro completo:', err.response?.data);
       setError(err.response?.data?.message || 'Erro ao registrar usuário');
@@ -118,7 +116,7 @@ function Create() {
               type="text"
               name="nome"
               className="form-control"
-              value={advogado.nome}
+              value={formData.nome}
               onChange={handleChange}
               minLength="1"
               maxLength="150"
@@ -133,7 +131,7 @@ function Create() {
                 type="text"
                 name="cpf"
                 className="form-control"
-                value={advogado.cpf}
+                value={formData.cpf}
                 onChange={handleChange}
                 placeholder="000-000-000.00"
                 maxLength="14"
@@ -147,7 +145,7 @@ function Create() {
                 type="text"
                 name="telefone"
                 className="form-control"
-                value={advogado.telefone}
+                value={formData.telefone}
                 onChange={handleChange}
                 placeholder="(00) 00000-0000"
                 maxLength="15"
@@ -162,7 +160,7 @@ function Create() {
               type="email"
               name="email"
               className="form-control"
-              value={advogado.email}
+              value={formData.email}
               onChange={handleChange}
               maxLength="150"
               required
@@ -176,7 +174,7 @@ function Create() {
                 type="password"
                 name="senha"
                 className="form-control"
-                value={advogado.senha}
+                value={formData.senha}
                 onChange={handleChange}
                 minLength="6"
                 maxLength="30"
@@ -191,7 +189,7 @@ function Create() {
                 type="password"
                 name="confirmarSenha"
                 className="form-control"
-                value={advogado.confirmarSenha}
+                value={formData.confirmarSenha}
                 onChange={handleChange}
                 minLength="6"
                 maxLength="30"
@@ -201,43 +199,31 @@ function Create() {
           </div>
 
           <div className="row">
-            <div className='col-md-6 mb-2'>
-                <label htmlFor="seccional"><b>Seccional</b></label>
-                <select name='seccional' className='form-select' value={advogado.seccional}
-                onChange={e => setAdvogado({...advogado, seccional: e.target.value})} required>
-                  <option value="">Selecionar</option>
-                  {EstadosBrasileiros.map((seccional) => (
-                    <option key={seccional.sigla} value={seccional.sigla}>
-                      {seccional.sigla} - {seccional.nome}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            
-            <div className="col-md-3 mb-3">
-              <label htmlFor="role"><b>Role</b></label>
-              <select name='role' className='form-select' value={advogado.role}
-                onChange={e => setAdvogado({...advogado, role: e.target.value})} required>
-                  <option value="">Selecionar</option>
-                  <option value="USER">Usuário</option>
-                  <option value="ADMIN">Administrador</option>
-                </select>
-            </div>
-
-            <div className="col-md-3 mb-3">
+            <div className="col-md-6 mb-3">
               <label htmlFor="numeroOAB"><b>Número OAB</b></label>
               <input
                 type="text"
                 name="numeroOAB"
                 className="form-control"
-                value={advogado.numeroOAB}
+                value={formData.numeroOAB}
                 onChange={handleChange}
                 maxLength="6"
                 required
               />
             </div>
 
-            
+            <div className="col-md-6 mb-3">
+              <label htmlFor="seccional"><b>Seccional</b></label>
+              <input
+                type="text"
+                name="seccional"
+                className="form-control"
+                value={formData.seccional}
+                onChange={handleChange}
+                maxLength="2"
+                required
+              />
+            </div>
           </div>
 
           <center><br />
@@ -250,4 +236,4 @@ function Create() {
   );
 }
 
-export default Create;
+export default Update;

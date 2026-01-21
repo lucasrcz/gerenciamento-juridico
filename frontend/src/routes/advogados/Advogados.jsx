@@ -37,12 +37,12 @@ function Advogados() {
   };
 
   // Lógica de deletar processo (Tabela)
-  const handleDelete = (cpf) => {
-    const confirm = window.confirm("Tem certeza que deseja deletar o processo?" );
+  const handleDelete = (id) => {
+    const confirm = window.confirm("Tem certeza que deseja desativar o advogado?" );
     if(confirm) {
-      api.delete('/advogados/' + cpf)
+      api.delete('/auth/advogados/' + id)
       .then(res => {
-        setAdvogados(advogados.filter(p => p.cpf !== cpf));
+        setAdvogados(advogados.filter(p => p.id !== id));
       })
       .catch(err => console.log(err));
     }

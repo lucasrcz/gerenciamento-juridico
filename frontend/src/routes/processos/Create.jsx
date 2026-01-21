@@ -41,7 +41,7 @@ function Create() {
     .then(res => {
       console.log(res);
       alert('Processo cadastrado com sucesso!');
-      navigate('/processos');
+      navigate('/processos/read/' + id);
     })
     .catch(err => {
       console.error(err);

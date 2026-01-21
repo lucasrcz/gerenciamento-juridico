@@ -4,13 +4,13 @@ import { Link, useParams } from 'react-router-dom';
 
 function Read() {
   const [advogado, setAdvogado] = useState({})
-  const { cpf } = useParams();
+  const { id } = useParams();
 
   useEffect(()=> {
-    api.get('/auth/advogados/' + cpf)
+    api.get('/auth/advogados/' + id)
       .then(res => setAdvogado(res.data))
       .catch(err => console.log(err));
-  }, [cpf])
+  }, [id])
 
   return (
     <div className='d-flex w-100 vh-100 justify-content-center align-items-center bg-light'>
@@ -33,7 +33,7 @@ function Read() {
                 <strong>Número OAB:</strong> {advogado.numeroOAB}/{advogado.seccional}
             </div>
 
-            <Link to={`/update/${cpf}`} className='btn btn-success'>Editar</Link>
+            <Link to={`/update/${id}`} className='btn btn-success'>Editar</Link>
             <Link to="/advogados" className='btn btn-primary ms-3'>Voltar</Link>
         </div>
     </div>

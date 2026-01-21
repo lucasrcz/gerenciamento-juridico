@@ -25,9 +25,9 @@ function Tabela({advogados, handleDelete}) {
                   <td>{advogado.telefone}</td>
                   <td>{advogado.numeroOAB}/{advogado.seccional}</td>
                   <td>
-                    <Link to={`/advogados/read/${advogado.cpf}`} className='btn btn-sm btn-info me-2'>Visualizar</Link>
-                    <Link to={`/update/${advogado.cpf}`} className='btn btn-sm btn-primary me-2'>Editar</Link>
-                    <button onClick={e => handleDelete(advogado.cpf)} className='btn btn-sm btn-danger'>Deletar</button>
+                    <Link to={`/advogados/read/${advogado.id}`} className='btn btn-sm btn-info me-2'>Visualizar</Link>
+                    <Link to={`/update/${advogado.id}`} className='btn btn-sm btn-primary me-2'>Editar</Link>
+                    <button onClick={e => handleDelete(advogado.id)} className='btn btn-sm btn-danger'>Deletar</button>
                   </td>
                 </tr>
               ))

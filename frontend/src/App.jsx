@@ -10,6 +10,7 @@ import UpdateProcessos from "./routes/processos/Update"
 import Advogados from "./routes/advogados/Advogados"
 import CreateAdvogados from "./routes/advogados/Create"
 import ReadAdvogados from "./routes/advogados/Read"
+import UpdateAdvogados from "./routes/advogados/Update"
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
@@ -32,12 +33,13 @@ function App() {
           {/* Procesos */}
           <Route path='processos' element={<Processos />}/>
           <Route path='processos/create' element={<CreateProcessos />}/>
-          <Route path='update/:id' element={<UpdateProcessos />}/>
+          <Route path='processos/update/:id' element={<UpdateProcessos />}/>
           <Route path='processos/read/:id' element={<ReadProcessos />}/>
 
           {/* Advogados */}
           <Route path='advogados' element={<Advogados />}/>
           <Route path='advogados/create' element={<CreateAdvogados />}/>
+          <Route path='advogados/update/:id' element={<UpdateAdvogados />}/>
           <Route path='advogados/read/:id' element={<ReadAdvogados />}/>
 
           {/* Partes */}

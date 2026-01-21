@@ -11,7 +11,7 @@ function Tabela({processos, handleDelete}) {
               <th>Estado</th>
               <th>Observações</th>
               <th>Contrato</th>
-              <th>Ações</th>
+              <th><center>Ações</center></th>
             </tr>
           </thead>
 
@@ -29,9 +29,9 @@ function Tabela({processos, handleDelete}) {
                           <span className="file-missing">Sem contrato</span>
                       )}</td>
                   <td>
-                    <Link to={`/processos/read/${processo.id}`} className='btn btn-sm btn-info me-2'>Visualizar</Link>
-                    <Link to={`/update/${processo.id}`} className='btn btn-sm btn-primary me-2'>Editar</Link>
-                    <button onClick={e => handleDelete(processo.id)} className='btn btn-sm btn-danger'>Deletar</button>
+                    <Link to={`/processos/read/${processo.id}`} className='btn btn-opaque bi bi-eye-fill me-1' title='Visualizar'></Link>
+                    <Link to={`/update/${processo.id}`} className='btn btn-opaque bi bi-pencil-fill me-1' title='Editar'></Link>
+                    <button onClick={e => handleDelete(processo.id)} className='btn btn-opaque text-danger bi bi-trash3-fill' title='Deletar'></button>
                   </td>
                 </tr>
               ))
