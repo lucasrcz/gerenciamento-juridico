@@ -18,12 +18,7 @@ public record AdvogadoUpdateInDTO(
         )
         String nome,
 
-        @NotBlank(message = "A senha é obrigatória")
-        @Size(
-                min = 6,
-                max = 15,
-                message = "A senha deve ter entre 6 e 15 caracteres"
-        )
+        @Size(min = 6, max = 15, message = "A senha deve ter entre 6 e 15 caracteres")
         String senha,
 
         @NotNull(message = "O perfil do usuário é obrigatório")
