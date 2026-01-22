@@ -7,7 +7,7 @@ function Tabela({advogados, handleDelete}) {
           <thead>
             <tr>
               <th>Nome</th>
-              <th>CPF</th>
+              <th>Tipo</th>
               <th>E-mail</th>
               <th>Telefone</th>
               <th>Número OAB</th>
@@ -25,9 +25,9 @@ function Tabela({advogados, handleDelete}) {
                   <td>{advogado.telefone}</td>
                   <td>{advogado.numeroOAB}/{advogado.seccional}</td>
                   <td>
-                    <Link to={`/advogados/read/${advogado.id}`} className='btn btn-sm btn-info me-2'>Visualizar</Link>
-                    <Link to={`/update/${advogado.id}`} className='btn btn-sm btn-primary me-2'>Editar</Link>
-                    <button onClick={e => handleDelete(advogado.id)} className='btn btn-sm btn-danger'>Deletar</button>
+                    <Link to={`/advogados/read/${advogado.id}`} className='btn btn-opaque bi bi-eye-fill me-1' title='Visualizar'></Link>
+                    <Link to={`/advogados/update/${advogado.id}`} className='btn btn-opaque bi bi-pencil-fill me-1' title='Editar'></Link>
+                    <button onClick={e => handleDelete(advogado.id)} className='btn btn-opaque text-danger bi bi-trash3-fill' title='Deletar'></button>
                   </td>
                 </tr>
               ))

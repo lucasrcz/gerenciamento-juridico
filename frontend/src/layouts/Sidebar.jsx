@@ -57,10 +57,12 @@ function Sidebar() {
         </li>
 
         <li className="nav-item">
-          <a href="#" className="nav-link text-white d-flex align-items-center">
+          <Link to="/partes"
+          className={`nav-link d-flex align-items-center ${isActive('/partes') ? 'active' : 'text-white'}`}
+          aria-current={isActive('/partes') ? 'page' : undefined}>
             <i className="bi bi-people-fill fs-4"></i>
             {!collapsed && <span className="ms-2">Partes</span>}
-          </a>
+          </Link>
         </li>
       </ul>
     </div>

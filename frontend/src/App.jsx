@@ -11,6 +11,7 @@ import Advogados from "./routes/advogados/Advogados"
 import CreateAdvogados from "./routes/advogados/Create"
 import ReadAdvogados from "./routes/advogados/Read"
 import UpdateAdvogados from "./routes/advogados/Update"
+import Partes from "./routes/partes/Partes"
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
@@ -43,6 +44,7 @@ function App() {
           <Route path='advogados/read/:id' element={<ReadAdvogados />}/>
 
           {/* Partes */}
+          <Route path='partes' element={<Partes />}/>
         </Route>
 
         {/* Login */}

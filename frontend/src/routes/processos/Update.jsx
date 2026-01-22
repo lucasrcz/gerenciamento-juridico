@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { api } from '../../services/API';
+import { api } from '../../services/API'
+import { EstadosBrasileiros } from '../../constants/EstadosBrasileiros'
 
 function Update() {
   const { id } = useParams();
@@ -53,6 +54,7 @@ function Update() {
     })
     .then(res => {
       console.log(res);
+      alert('Processo cadastrado com sucesso!');
       navigate('/processos/read/' + id);
     })
     .catch(err => console.log(err));
@@ -61,7 +63,8 @@ function Update() {
   return (
     <div className='d-flex w-100 vh-100 justify-content-center align-items-center bg-light'>
       <div className='w-50 border bg-white shadow px-5 pt-3 pb-5 rounded'>
-          <center><h2>Atualizar Processo</h2></center><br></br>
+          <center><h2>Editar Processo</h2></center><br></br>
+          
           <form onSubmit={handleUpdate}>
               <div className='mb-2'>
                 <label htmlFor="numero"><strong>Nº Processo:</strong></label>

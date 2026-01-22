@@ -1,21 +1,27 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { api } from '../../services/API';
+import { useState, useEffect } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { api } from '../../services/API'
+import { EstadosBrasileiros } from '../../constants/EstadosBrasileiros'
 
 function Update() {
-  const [formData, setFormData] = useState({
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [advogado, setAdvogado] = useState({
     nome: '',
     cpf: '',
     email: '',
     telefone: '',
-    senha: '',
-    confirmarSenha: '',
     role: 'USER',
     numeroOAB: '',
     seccional: ''
   });
-  const [error, setError] = useState('');
-  const navigate = useNavigate();
+
+  useEffect(()=> { 
+      api.get('/auth/advogados/' + id)
+        .then(res => setAdvogado(res.data))
+        .catch(err => console.log(err));
+    }, [id])
+
 
   // Função para formatar CPF
   const formatCPF = (value) => {
@@ -57,177 +63,109 @@ function Update() {
       formattedValue = value.replace(/\D/g, '');
     }
 
-    setFormData({
-      ...formData,
+    setAdvogado({
+      ...advogado,
       [name]: formattedValue
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
-    setError('');
-
-    if (formData.senha !== formData.confirmarSenha) {
-      setError('As senhas não coincidem');
-      return;
-    }
-
-    if (formData.senha.length < 6) {
-      setError('A senha deve ter no mínimo 6 caracteres');
-      return;
-    }
 
     try {
-      const { confirmarSenha, ...rest } = formData;
-
       const dataToSend = {
-        ...rest,
-        login: rest.cpf.replace(/\D/g, ''),
-        cpf: rest.cpf.replace(/\D/g, ''),
-        telefone: rest.telefone.replace(/\D/g, '')
+        nome: advogado.nome,
+        email: advogado.email,
+        seccional: advogado.seccional,
+        numeroOAB: advogado.numeroOAB,
+        role: advogado.role,
+        senha: advogado.senha,
+        login: advogado.cpf.replace(/\D/g, ''),
+        cpf: advogado.cpf.replace(/\D/g, ''),
+        telefone: advogado.telefone.replace(/\D/g, '')
       };
 
-      console.log('Dados enviados:', dataToSend);
-      
-      await api.post('/auth/register', dataToSend);
-      alert('Advogado cadastrado com sucesso!');
-      navigate('/advogados/read/' + dataToSend.cpf);
+      await api.put('/auth/' + id, dataToSend);
+      alert('Advogado atualizado com sucesso!');
+      navigate('/advogados/read/' + id);
     } catch (err) {
-      console.error('Erro completo:', err.response?.data);
-      setError(err.response?.data?.message || 'Erro ao registrar usuário');
+      console.log(err);
+      if (err.response && err.response.data && err.response.data.errors) {
+         console.log("Erros de validação:", err.response.data.errors);
+      }
     }
   };
 
   return (
     <div className='d-flex w-100 vh-100 justify-content-center align-items-center bg-light'>
       <div className='w-50 border bg-white shadow px-5 pt-3 pb-5 rounded'>
-        <center><h2>Novo Advogado</h2><br /></center>
+        <center><h2>Editar Advogado</h2><br /></center>
         
-        {error && (
-          <div className="alert alert-danger" role="alert">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleUpdate}>
           <div className="mb-2">
             <label htmlFor="nome"><b>Nome Completo</b></label>
-            <input
-              type="text"
-              name="nome"
-              className="form-control"
-              value={formData.nome}
-              onChange={handleChange}
-              minLength="1"
-              maxLength="150"
-              required
-            />
+            <input type="text" name="nome" className="form-control" minLength="1" maxLength="150"
+            value={advogado.nome}
+            onChange={handleChange} required/>
           </div>
 
           <div className="row">
             <div className="col-md-6 mb-2">
               <label htmlFor="cpf"><b>CPF</b></label>
-              <input
-                type="text"
-                name="cpf"
-                className="form-control"
-                value={formData.cpf}
-                onChange={handleChange}
-                placeholder="000-000-000.00"
-                maxLength="14"
-                required
-              />
+              <input type="text" name="cpf" className="form-control" maxLength="14"
+              value={advogado.cpf}
+              onChange={handleChange} required/>
             </div>
 
             <div className="col-md-6 mb-2">
               <label htmlFor="telefone"><b>Telefone</b></label>
-              <input
-                type="text"
-                name="telefone"
-                className="form-control"
-                value={formData.telefone}
-                onChange={handleChange}
-                placeholder="(00) 00000-0000"
-                maxLength="15"
-                required
-              />
+              <input type="text" name="telefone" className="form-control" maxLength="15"
+              value={advogado.telefone}
+              onChange={handleChange} required/>
             </div>
           </div>
 
           <div className="mb-2">
             <label htmlFor="email"><b>E-mail</b></label>
-            <input
-              type="email"
-              name="email"
-              className="form-control"
-              value={formData.email}
-              onChange={handleChange}
-              maxLength="150"
-              required
-            />
+            <input type="email" name="email" className="form-control" maxLength="150"
+            value={advogado.email}
+            onChange={handleChange} required/>
           </div>
 
           <div className="row">
-            <div className="col-md-6 mb-2">
-              <label htmlFor="senha"><b>Senha</b></label>
-              <input
-                type="password"
-                name="senha"
-                className="form-control"
-                value={formData.senha}
-                onChange={handleChange}
-                minLength="6"
-                maxLength="30"
-                required
-              />
-              <small className="text-muted">Mínimo de 6 caracteres</small>
-            </div>
-
-            <div className="col-md-6 mb-2">
-              <label htmlFor="confirmarSenha"><b>Confirmar Senha</b></label>
-              <input
-                type="password"
-                name="confirmarSenha"
-                className="form-control"
-                value={formData.confirmarSenha}
-                onChange={handleChange}
-                minLength="6"
-                maxLength="30"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="row">
-            <div className="col-md-6 mb-3">
+            <div className="col-md-4 mb-3">
               <label htmlFor="numeroOAB"><b>Número OAB</b></label>
-              <input
-                type="text"
-                name="numeroOAB"
-                className="form-control"
-                value={formData.numeroOAB}
-                onChange={handleChange}
-                maxLength="6"
-                required
-              />
+              <input type="text" name="numeroOAB" className="form-control" maxLength="6"
+              value={advogado.numeroOAB}
+              onChange={handleChange} required/>
             </div>
 
             <div className="col-md-6 mb-3">
               <label htmlFor="seccional"><b>Seccional</b></label>
-              <input
-                type="text"
-                name="seccional"
-                className="form-control"
-                value={formData.seccional}
-                onChange={handleChange}
-                maxLength="2"
-                required
-              />
+              <select type="text" name="seccional" className="form-select"
+              value={advogado.seccional}
+              onChange={handleChange} required>
+              {EstadosBrasileiros.map((seccional) => (
+                    <option key={seccional.sigla} value={seccional.sigla}>
+                      {seccional.sigla} - {seccional.nome}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            <div className="col-md-4 mb-3">
+              <label htmlFor="role"><b>Role</b></label>
+              <select name='role' className='form-select'
+              value={advogado.role}
+              onChange={handleChange} required>
+                <option value="USER">Usuário</option>
+                <option value="ADMIN">Administrador</option>
+              </select>
             </div>
           </div>
 
-          <center><br />
-            <button className='btn btn-success'>Cadastrar</button>
+          <center><br/>
+            <button className='btn btn-success'>Atualizar</button>
             <Link to="/advogados" className='btn btn-primary ms-3'>Voltar</Link>
           </center>
         </form>

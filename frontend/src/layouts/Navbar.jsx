@@ -1,14 +1,26 @@
-import React from 'react';
-import { logout, login } from '../services/API';
+import { useEffect, useState } from 'react'
+import { logout } from '../services/API'
 
 function Navbar() {
+    const [user, setUser] = useState({ nome: '', role: '' });
+
+  useEffect(() => {
+    const stored = localStorage.getItem('user_data');
+    
+    if (stored) {
+      const parsedUser = JSON.parse(stored);
+      setUser(parsedUser);
+      console.log("Dados do usuário na Navbar:", parsedUser);
+    }
+  }, []);
+
   return (
     <nav className="navbar navbar-expand-lg navbar-light sticky-top bg-white shadow-sm px-4">
         <div className="d-flex container-fluid justify-content-between">
             <span className="navbar-text fw-bold">Gerenciamento de Processos Jurídicos</span>
 
             <div className="d-flex align-items-center gap-3">
-                <span className="badge bg-warning text-dark px-3 py-2 rounded-2" style={{ fontSize: '13px' }}>{login?.role}</span>
+                <span className="badge bg-warning text-dark px-3 py-2 rounded-2" style={{ fontSize: '13px' }}>{user.role}</span>
 
                 <div className="dropdown">
                     <button type="button" 
@@ -16,7 +28,7 @@ function Navbar() {
                         data-bs-toggle="dropdown" 
                         aria-expanded="false">
                         <i className="bi bi-person-circle me-3"></i>
-                        <span>{login?.name}</span>
+                        <span>{user.nome}</span>
                     </button>
 
                     <ul className="dropdown-menu dropdown-menu-end">

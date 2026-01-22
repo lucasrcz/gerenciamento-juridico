@@ -62,7 +62,7 @@ function Create() {
 
               <div className='mb-2'>
                 <label htmlFor="status"><b>Status</b></label>
-                <select name='status' className='form-control' value={processo.status}
+                <select name='status' className='form-select' value={processo.status}
                 onChange={e => setProcesso({...processo, status: e.target.value})} required>
                   <option value="">Selecionar</option>
                   <option value="EM_ANDAMENTO">Em Andamento</option>
@@ -73,7 +73,7 @@ function Create() {
 
               <div className='mb-2'>
                 <label htmlFor="estado"><b>Estado</b></label>
-                <select name='estado' className='form-control' value={processo.estado}
+                <select name='estado' className='form-select' value={processo.estado}
                 onChange={e => setProcesso({...processo, estado: e.target.value})} required>
                   <option value="">Selecionar</option>
                   {EstadosBrasileiros.map((estado) => (
