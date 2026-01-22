@@ -60,7 +60,7 @@ public class AuthenticationRestController {
         var auth = this.authenticationManager.authenticate(userNamePassword);
         Advogado advogado = (Advogado) auth.getPrincipal();
         var token = tokenService.generateToken(advogado);
-        return ResponseEntity.ok(new TokenOutDTO(token,advogado.getId(), advogado.getCpf(), advogado.getRole()));
+        return ResponseEntity.ok(new TokenOutDTO(token,advogado.getId(), advogado.getCpf(), advogado.getRole(),advogado.getNome()));
     }
 
     @Operation(description = "Endpoint de criação de usuário(advogado)")
