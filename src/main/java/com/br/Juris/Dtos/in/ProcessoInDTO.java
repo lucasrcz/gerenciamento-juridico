@@ -27,6 +27,8 @@ public record ProcessoInDTO(
         @NotNull(message = "Estado é obrigatório")
         EstadoBrasil estado,
 
+        String advogadoPrincipalId,
+
         String observacoes,
 
         MultipartFile contrato,

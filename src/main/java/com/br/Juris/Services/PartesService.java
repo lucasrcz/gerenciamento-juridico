@@ -102,10 +102,6 @@ public class PartesService {
     @Transactional
     public List<ClientesSelectDTO> buscarParaSelect(String query) {
 
-        if (query == null || query.isBlank()) {
-            return List.of();
-        }
-
         return repository.buscarParaSelect(query.trim());
     }
 }

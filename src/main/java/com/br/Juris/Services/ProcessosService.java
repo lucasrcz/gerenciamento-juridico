@@ -48,6 +48,7 @@ public class ProcessosService {
         Processo processo = ProcessoInDTO.toEntity(dto);
         if(dto.partes() != null && !dto.partes().isEmpty())vincularPartes(dto.partes(),processo);
         if(dto.advogadosIds() != null && !dto.advogadosIds().isEmpty())vincularAdvogados(dto.advogadosIds(),processo);
+        if(dto.advogadoPrincipalId() != null) processo.setAdvogadoResponsavel(authorizationService.findById(dto.advogadoPrincipalId()));
         processo = repository.save(processo);
         return new MessageOutDTO(processo.getId(),String.format("Processo Nº %s criado com sucesso",processo.getNumero()));
     }
@@ -110,6 +111,8 @@ public class ProcessosService {
             }
         }
 
+        if(dto.advogadoPrincipalId() != null) vincularAdvogadoPrincipal(dto.advogadoPrincipalId(),processoExistente);
+
         processoExistente = repository.save(processoExistente);
 
         return new MessageOutDTO(processoExistente.getId(), String.format("Processo Nº %s atualizado com sucesso", processoExistente.getNumero()));
@@ -137,5 +140,9 @@ public class ProcessosService {
     private void vincularAdvogados(List<String> ids, Processo processo){
         List<Advogado> advogados = authorizationService.findAllByCpf(ids);
         processo.getAdvogados().addAll(advogados);
+    }
+
+    private void vincularAdvogadoPrincipal(String id,Processo processo){
+        processo.setAdvogadoResponsavel(authorizationService.findById(id));
     }
 }

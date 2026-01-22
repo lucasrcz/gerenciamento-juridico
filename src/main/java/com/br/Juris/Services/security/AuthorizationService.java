@@ -54,7 +54,9 @@ public class AuthorizationService implements UserDetailsService {
 
 
         advogado.setNome(dto.nome());
-        advogado.setSenha(passwordEncoder.encode(dto.senha()));
+        if (dto.senha() != null && !dto.senha().isBlank()) {
+            advogado.setSenha(passwordEncoder.encode(dto.senha()));
+        }
         advogado.setRole(dto.role());
         advogado.setNumeroOAB(dto.numeroOAB());
         advogado.setSeccional(dto.seccional());
@@ -69,10 +71,6 @@ public class AuthorizationService implements UserDetailsService {
 
     @Transactional(readOnly = true)
     public List<AdvogadoSelectOutDTO> buscarParaSelect(String query) {
-
-        if (query == null || query.isBlank()) {
-            return List.of();
-        }
 
         return repository.buscarAdvogadosParaSelect(query.trim());
     }

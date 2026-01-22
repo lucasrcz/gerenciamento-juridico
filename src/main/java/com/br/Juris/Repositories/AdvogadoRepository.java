@@ -34,9 +34,11 @@ public interface AdvogadoRepository extends JpaRepository<Advogado, String> {
     )
     from Advogado u
     where lower(u.nome) like lower(concat('%', :q, '%'))
+    and u.ativo == TRUE 
     order by u.nome
 """)
    List<AdvogadoSelectOutDTO> buscarAdvogadosParaSelect(@Param("q") String q);
+
 
    @Query("""
     SELECT a FROM Advogado a
