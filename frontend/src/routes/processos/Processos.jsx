@@ -29,7 +29,7 @@ const handleClear = () => {
             numero: query.numero || null,
             status: query.status || null,
             estado: query.estado || undefined,
-            advogadoId: query.advogadoId || null,
+            advogadoPrincipalId: query.advogadoPrincipalId || null,
             advogadosIds: query.advogadosIds || null,
             partesIds: query.partesIds || null
           }

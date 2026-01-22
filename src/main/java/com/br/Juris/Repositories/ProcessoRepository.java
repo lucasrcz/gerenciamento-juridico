@@ -15,7 +15,7 @@ public interface ProcessoRepository extends JpaRepository<Processo, Long> {
 
 
     @Query("""
-    SELECT DISTINCT p
+    SELECT p
     FROM Processo p
     LEFT JOIN p.advogados a
     LEFT JOIN p.processoPartes pp
@@ -36,7 +36,4 @@ public interface ProcessoRepository extends JpaRepository<Processo, Long> {
             @Param("partesIds") List<Long> partesIds,
             Pageable pageable
     );
-
-
-
 }
