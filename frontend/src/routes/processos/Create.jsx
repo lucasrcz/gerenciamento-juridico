@@ -30,11 +30,13 @@ function Create() {
     const fetchAdvogados = async () => {
       try {
         setLoading(true);
-        const res = await api.get('/auth/advogados/select');
+        const res = await api.get('/auth/advogados/select', {
+          params: {q: ''}
+        });
         console.log('Advogados recebidos:', res.data); // DEBUG
 
         // Verifica se é array ou objeto com content
-        const advogadosData = Array.isArray(res.data) ? res.data : (res.data.content || []);
+        const advogadosData = Array.isArray(res.data) ? res.data : [];
 
         setAdvogados(advogadosData);
         setFilteredAdvogados(advogadosData);
@@ -146,7 +148,7 @@ function Create() {
     .then(res => {
       console.log(res);
       alert('Processo cadastrado com sucesso!');
-      navigate('/processos/read/' + id);
+      navigate('/processos/read/' + res.data.id);
     })
     .catch(err => {
       console.error(err);
@@ -195,7 +197,10 @@ function Create() {
                   name='advogadoPrincipalId' 
                   className='form-select' 
                   value={processo.advogadoPrincipalId}
-                  onChange={e => setProcesso({...processo, advogadoPrincipalId: e.target.value})} 
+                  onChange={(e) => {
+                    console.log('Selecionou advogado:', e.target.value); // DEBUG
+                    setProcesso({...processo, advogadoPrincipalId: e.target.value});
+                  }} 
                   required
                   disabled={loading}>
                   <option value="">Selecionar</option>
@@ -225,14 +230,21 @@ function Create() {
                   
                   {/* Lista de advogados disponíveis */}
                   {showDropdown && !loading && (
-                    <div className="border rounded bg-white position-absolute w-100" style={{maxHeight: '200px', overflowY: 'auto', zIndex: 1000}}>
+                    <div className="border rounded bg-white position-absolute w-100"
+                    style={{
+                      maxHeight: '200px',
+                      overflowY: 'auto',
+                      zIndex: 9999,
+                      boxShadow: '0 4px 6px rgba(0,0,0,0.1)'}}>
                       {Array.isArray(filteredAdvogados) && filteredAdvogados.length > 0 ? (
                         filteredAdvogados.map(advogado => (
                           <div 
                             key={advogado.id}
                             className={`p-2 border-bottom cursor-pointer ${isAdvogadoSelected(advogado.id) ? 'bg-success text-white' : 'hover-bg-light'}`}
-                            onClick={() => toggleAdvogado(advogado.id)}
-                            style={{cursor: 'pointer'}}
+                            onClick={() => {
+                              console.log('Clicou no advogado:', advogado.id); // DEBUG
+                              toggleAdvogado(advogado.id)}}
+                            style={{cursor: 'pointer', userSelect: 'none', pointerEvents: 'auto'}}
                             onMouseEnter={(e) => {
                               if (!isAdvogadoSelected(advogado.id)) {
                                 e.currentTarget.style.backgroundColor = '#f8f9fa';
@@ -249,6 +261,7 @@ function Create() {
                               checked={isAdvogadoSelected(advogado.id)}
                               onChange={() => {}}
                               className="me-2"
+                              style={{ pointerEvents: 'none' }}
                             />
                             {advogado.nome} - {advogado.cpf}
                           </div>
