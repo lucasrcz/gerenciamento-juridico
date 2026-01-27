@@ -10,7 +10,6 @@ function Navbar() {
     if (stored) {
       const parsedUser = JSON.parse(stored);
       setUser(parsedUser);
-      console.log("Dados do usuário na Navbar:", parsedUser);
     }
   }, []);
 
