@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../services/API';
 import { EstadosBrasileiros } from '../../constants/EstadosBrasileiros';
-import { validarCPF } from '../../utils/Validations';
+import { validarCPF, validarCNPJ } from '../../utils/Validations';
 
 function Create() {
   const [parte, setParte] = useState({
@@ -68,16 +68,27 @@ function Create() {
       .replace(/(-\d{2})\d+?$/, '$1');
   };
 
-  // Só valida se for Pessoa Física e tiver algo digitado
+  // Mensagem de validação CPF/CNPJ
   const handleBlurDocumento = () => {
-    if (parte.tipoPessoa === 'FISICA' && parte.documento.length > 0) {
-      const isValid = validarCPF(parte.documento);
+    if (parte.documento.length === 0) return;
+
+    let isValid = true;
+
+    if (parte.tipoPessoa === 'FISICA') {
+      isValid = validarCPF(parte.documento);
       if (!isValid) {
         setDocumentoError('CPF inválido.');
-      } else {
-        setDocumentoError('');
+        return;
+      }
+    } 
+    else if (parte.tipoPessoa === 'JURIDICA') {
+      isValid = validarCNPJ(parte.documento);
+      if (!isValid) {
+        setDocumentoError('CNPJ inválido.');
+        return;
       }
     }
+    setDocumentoError('');
   };
 
   // Integração ViaCEP (preencher campos a partir do CEP)
@@ -197,6 +208,11 @@ function Create() {
 
     if (parte.tipoPessoa === 'FISICA' && !validarCPF(parte.documento)) {
         setDocumentoError('Corrija o CPF antes de continuar.');
+        return;
+    }
+
+    if (parte.tipoPessoa === 'JURIDICA' && !validarCNPJ(parte.documento)) {
+        setDocumentoError('Corrija o CNPJ antes de continuar.');
         return;
     }
 
