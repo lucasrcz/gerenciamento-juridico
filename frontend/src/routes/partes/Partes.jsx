@@ -36,19 +36,21 @@ function Partes() {
 
   // Lógica de deletar processo (Tabela)
   const handleDelete = (id, tipoPessoa) => {
+    let confirm;
     if(tipoPessoa == "FISICA"){
-      const confirm = window.confirm("Tem certeza que deseja desativar a pessoa física?" );
+      confirm = window.confirm("Tem certeza que deseja desativar a pessoa física?");
     } else {
-        const confirm = window.confirm("Tem certeza que deseja desativar a pessoa jurídica?" );
-            if(confirm) {
-            api.delete('/partes/' + id)
-            .then(res => {
-                setPartes(partes.filter(p => p.id !== id));
-            })
-            .catch(err => console.log(err));
-            }
-        }
+        confirm = window.confirm("Tem certeza que deseja desativar a pessoa jurídica?");
     }
+    if(confirm) {
+      api.delete('/partes/' + id)
+      .then(res => {
+          setPartes(partes.filter(p => p.id !== id));
+          alert('Parte desativada com sucesso!');
+      })
+      .catch(err => console.log(err));
+    }
+  }
 
   return (
     <div className='d-flex flex-column justify-content-center align-items-center bg-light vh-100'>

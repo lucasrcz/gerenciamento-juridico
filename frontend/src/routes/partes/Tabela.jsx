@@ -25,7 +25,7 @@ function Tabela({partes, handleDelete}) {
                   <td>
                     <Link to={`/partes/read/${parte.id}`} className='btn btn-opaque bi bi-eye-fill me-1' title='Visualizar'></Link>
                     <Link to={`/update/${parte.id}`} className='btn btn-opaque bi bi-pencil-fill me-1' title='Editar'></Link>
-                    <button onClick={e => handleDelete(parte.id)} className='btn btn-opaque text-danger bi bi-trash3-fill' title='Deletar'></button>
+                    <button onClick={e => handleDelete(parte.id, parte.tipoPessoa)} className='btn btn-opaque text-danger bi bi-trash3-fill' title='Desativar'></button>
                   </td>
                 </tr>
               ))
