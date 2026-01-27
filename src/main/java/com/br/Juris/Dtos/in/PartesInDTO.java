@@ -16,7 +16,7 @@ public record PartesInDTO(
         String email,
         String telefone,
         String observacoes,
-        List<EnderecoInDTO> enderecos
+        EnderecoInDTO endereco
 ) implements Serializable {
 
     public static Partes toEntity(PartesInDTO dto) {
@@ -28,8 +28,8 @@ public record PartesInDTO(
         parte.setTelefone(dto.telefone());
         parte.setObservacoes(dto.observacoes());
 
-        if (dto.enderecos() != null) {
-            dto.enderecos().forEach(e -> {
+        if (dto.endereco() != null) {
+                EnderecoInDTO e = dto.endereco;
                 Endereco endereco = new Endereco();
                 endereco.setParte(parte);
                 endereco.setLogradouro(e.logradouro());
@@ -39,10 +39,8 @@ public record PartesInDTO(
                 endereco.setCidade(e.cidade());
                 endereco.setEstado(e.estado());
                 endereco.setCep(e.cep());
-                parte.getEnderecos().add(endereco);
-            });
-        }
-
+                parte.setEndereco((endereco));
+            }
         return parte;
     }
 }

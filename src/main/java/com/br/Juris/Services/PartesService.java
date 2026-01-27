@@ -1,6 +1,7 @@
 package com.br.Juris.Services;
 
 import com.br.Juris.Dtos.in.ClientesSelectDTO;
+import com.br.Juris.Dtos.in.EnderecoInDTO;
 import com.br.Juris.Dtos.in.PartesInDTO;
 import com.br.Juris.Dtos.out.MessageOutDTO;
 import com.br.Juris.Dtos.out.PartesOutDTO;
@@ -49,11 +50,8 @@ public class PartesService {
         parte.setEmail(dto.email());
         parte.setTelefone(dto.telefone());
         parte.setObservacoes(dto.observacoes());
-
-        parte.getEnderecos().clear();
-
-        if (dto.enderecos() != null) {
-            dto.enderecos().forEach(e -> {
+        if (dto.endereco() != null) {
+                EnderecoInDTO e = dto.endereco();
                 Endereco endereco = new Endereco();
                 endereco.setParte(parte);
                 endereco.setLogradouro(e.logradouro());
@@ -63,8 +61,7 @@ public class PartesService {
                 endereco.setCidade(e.cidade());
                 endereco.setEstado(e.estado());
                 endereco.setCep(e.cep());
-                parte.getEnderecos().add(endereco);
-            });
+                parte.setEndereco(endereco);
         }
 
         repository.save(parte);
