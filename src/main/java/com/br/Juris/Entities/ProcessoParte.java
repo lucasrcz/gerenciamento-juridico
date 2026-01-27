@@ -31,8 +31,7 @@ public class ProcessoParte {
     @Column(name = "tipo_parte", nullable = false)
     private TipoParte tipoParte;
 
-    @Lob
-    @Column(name = "observacoes")
+    @Column(name = "observacoes", columnDefinition = "text")
     private String observacoes;
 
     public ProcessoParte(Processo processo,

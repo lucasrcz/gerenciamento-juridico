@@ -10,20 +10,21 @@ import com.br.Juris.Entities.Processo;
 import com.br.Juris.Entities.ProcessoParte;
 import com.br.Juris.Enums.EstadoBrasil;
 import com.br.Juris.Enums.StatusProcesso;
-import com.br.Juris.Repositories.PartesRepository;
 import com.br.Juris.Repositories.ProcessoRepository;
 import com.br.Juris.Services.security.AuthorizationService;
 import jakarta.annotation.Resource;
-import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 
 @Service
@@ -68,6 +69,7 @@ public class ProcessosService {
                         String.format("Processo de ID: %s não encontrado", id)));
     }
 
+    @Transactional(readOnly = true)
     public Page<ProcessoOutDTO> listAllPageable(
             String numero,
             StatusProcesso status,
@@ -78,16 +80,39 @@ public class ProcessosService {
             Pageable pageable
     ) {
 
+        UUID advogadoUUID = advogadoId != null && !advogadoId.isBlank()
+                ? UUID.fromString(advogadoId)
+                : null;
+
+        List<UUID> advogadosUUIDs =
+                advogadosIds == null || advogadosIds.isEmpty()
+                        ? null
+                        : advogadosIds.stream()
+                        .filter(Objects::nonNull)
+                        .map(UUID::fromString)
+                        .toList();
+
+        List<Long> partesIdsFiltro =
+                partesIds == null || partesIds.isEmpty()
+                        ? null
+                        : partesIds;
+
+        String numeroFiltro =
+                numero == null || numero.isBlank()
+                        ? null
+                        : numero.trim();
+
         return repository.buscarComFiltros(
-                numero,
+                numeroFiltro,
                 status,
                 estado,
-                advogadoId,
-                advogadosIds,
-                partesIds,
+                advogadoUUID,
+                advogadosUUIDs,
+                partesIdsFiltro,
                 pageable
         ).map(ProcessoOutDTO::fromEntity);
     }
+
 
 
     @Transactional

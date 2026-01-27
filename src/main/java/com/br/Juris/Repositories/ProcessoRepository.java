@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface ProcessoRepository extends JpaRepository<Processo, Long> {
 
@@ -20,7 +21,7 @@ public interface ProcessoRepository extends JpaRepository<Processo, Long> {
     LEFT JOIN p.advogados a
     LEFT JOIN p.processoPartes pp
     LEFT JOIN pp.parte parte
-    WHERE (:numero IS NULL OR LOWER(p.numero) LIKE LOWER(CONCAT('%', :numero, '%')))
+    WHERE (LOWER(p.numero) LIKE LOWER(CONCAT('%', :numero, '%')) OR :numero IS NULL)
       AND (:status IS NULL OR p.status = :status)
       AND (:estado IS NULL OR p.estado = :estado)
       AND (:advogadoId IS NULL OR a.id = :advogadoId)
@@ -31,8 +32,8 @@ public interface ProcessoRepository extends JpaRepository<Processo, Long> {
             @Param("numero") String numero,
             @Param("status") StatusProcesso status,
             @Param("estado") EstadoBrasil estado,
-            @Param("advogadoId") String advogadoId,
-            @Param("advogadosIds") List<String> advogadosIds,
+            @Param("advogadoId") UUID advogadoId,
+            @Param("advogadosIds") List<UUID> advogadosIds,
             @Param("partesIds") List<Long> partesIds,
             Pageable pageable
     );

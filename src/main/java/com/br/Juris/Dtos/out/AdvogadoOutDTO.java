@@ -18,7 +18,7 @@ public record AdvogadoOutDTO(
 
     public static AdvogadoOutDTO fromEntity(Advogado advogado) {
         return new AdvogadoOutDTO(
-                advogado.getId(),
+                advogado.getId().toString(),
                 advogado.getCpf(),
                 advogado.getNome(),
                 advogado.getEmail(),

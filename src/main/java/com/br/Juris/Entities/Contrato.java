@@ -30,9 +30,8 @@ public class Contrato {
     @Column(name = "nome",nullable = false)
     private String nome;
 
-    @Lob
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "dados", nullable = false)
+    @Column(name = "dados", nullable = false,columnDefinition = "bytea")
     private byte[] dados;
 
     @OneToOne(fetch = FetchType.LAZY)

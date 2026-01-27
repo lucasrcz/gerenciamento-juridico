@@ -3,6 +3,8 @@ package com.br.Juris.Dtos.out;
 import com.br.Juris.Enums.UserRole;
 import lombok.Data;
 
+import java.util.UUID;
+
 @Data
 public class AdvogadoSelectOutDTO {
 
@@ -11,8 +13,8 @@ public class AdvogadoSelectOutDTO {
     private String cpf;
     private UserRole role;
 
-    public AdvogadoSelectOutDTO(String id, String nome, String cpf, UserRole role) {
-        this.id = id;
+    public AdvogadoSelectOutDTO(UUID id, String nome, String cpf, UserRole role) {
+        this.id = id.toString();
         this.nome = nome;
         this.cpf  = cpf;
         this.role = role;
