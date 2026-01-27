@@ -37,11 +37,7 @@ public class Partes {
     @Column(name = "observacoes")
     private String observacoes;
 
-    @OneToMany(
-            mappedBy = "parte",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
-    )
-    private List<Endereco> enderecos = new ArrayList<>();
-
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "endereco_id", nullable = false)
+    private Endereco endereco;
 }

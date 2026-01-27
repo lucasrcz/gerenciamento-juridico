@@ -12,8 +12,7 @@ function Create() {
     telefone: '',
     documento: '',
     observacoes: '',
-    enderecos: [
-      {
+    endereco: {
         logradouro: '',
         numero: '',
         complemento: '',
@@ -22,10 +21,9 @@ function Create() {
         estado: '',
         cep: ''
       }
-    ]
   });
 
-  const [cepErrors, setCepErrors] = useState({});
+  const [cepError, setCepError] = useState('');
   const [documentoError, setDocumentoError] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -92,7 +90,7 @@ function Create() {
   };
 
   // Integração ViaCEP (preencher campos a partir do CEP)
-  const buscaCEP = async (index, cepValue) => {
+  const buscaCEP = async (cepValue) => {
     const cepLimpo = cepValue.replace(/\D/g, '');
 
     if (cepLimpo.length === 8) {
@@ -101,33 +99,22 @@ function Create() {
         const data = await response.json();
 
         if (!data.erro) {
-          const newEnderecos = [...parte.enderecos];
-          
-          // Atualiza os campos com o retorno da API
-          newEnderecos[index] = {
-            ...newEnderecos[index],
-            logradouro: data.logradouro,
-            bairro: data.bairro,
-            cidade: data.localidade,
-            estado: data.uf
-          };
-
-          setParte({
-            ...parte,
-            enderecos: newEnderecos
-          });
-
-          setCepErrors(prev => {
-            const newErrors = { ...prev };
-            delete newErrors[index];
-            return newErrors;
-          });
-
+          setParte(prev => ({
+            ...prev,
+            endereco: {
+              ...prev.endereco,
+              logradouro: data.logradouro,
+              bairro: data.bairro,
+              cidade: data.localidade,
+              estado: data.uf
+            }
+          }));
+          setCepError('');
         } else {
-          setCepErrors(prev => ({ ...prev, [index]: 'CEP não encontrado.' }));
+          setCepError('CEP não encontrado.');
         }
       } catch (error) {
-        setCepErrors(prev => ({ ...prev, [index]: 'Erro ao buscar CEP.' }));
+        setCepError('Erro ao buscar CEP.');
       }
     }
   };
@@ -163,41 +150,39 @@ function Create() {
   };
 
   // Endereço
-  const handleAddressChange = (e, index) => {
+  const handleAddressChange = (e) => {
     const { name, value } = e.target;
-    const newEnderecos = [...parte.enderecos];
-
     let finalValue = value;
+
     if (name === 'cep') {
         finalValue = value.replace(/\D/g, '').replace(/^(\d{5})(\d)/, '$1-$2');
-    if (cepErrors[index]) {
-            setCepErrors(prev => {
-                const newErrors = { ...prev };
-                delete newErrors[index];
-                return newErrors;
-            });
-        }
-    if (finalValue === '') {
-            newEnderecos[index] = {
-                ...newEnderecos[index],
-                logradouro: '',
-                numero: '',
-                complemento: '',
-                bairro: '',
-                cidade: '',
-                estado: ''
-            };
-        }
+      if (cepError) setCepError('');
     }
-
-    newEnderecos[index] = {
-      ...newEnderecos[index],
-      [name]: finalValue
-    };
-
-    setParte({
-      ...parte,
-      enderecos: newEnderecos
+        
+    setParte(prev => {
+        if (name === 'cep' && finalValue === '') {
+          return {
+              ...prev,
+              endereco: {
+                  ...prev.endereco,
+                  logradouro: '',
+                  numero: '',
+                  complemento: '',
+                  bairro: '',
+                  cidade: '',
+                  estado: '',
+                  cep: ''
+              }
+          };
+        }
+        
+        return {
+          ...prev,
+          endereco: {
+              ...prev.endereco,
+              [name]: finalValue
+          }
+        };
     });
   };
 
@@ -216,15 +201,20 @@ function Create() {
         return;
     }
 
+    if (!parte.endereco) {
+        setError('Erro interno: Endereço não inicializado.');
+        return;
+    }
+
     try {
       const dataToSend = {
         ...parte,
         telefone: parte.telefone.replace(/\D/g, ''),
         documento: parte.documento.replace(/\D/g, ''),
-        enderecos: parte.enderecos.map(end => ({
-            ...end,
-            cep: end.cep.replace(/\D/g, '')
-        }))
+        endereco: {
+            ...parte.endereco,
+            cep: parte.endereco.cep.replace(/\D/g, '')
+        }
       };
 
       console.log('Dados enviados:', dataToSend);
@@ -349,100 +339,100 @@ function Create() {
 
         <h5 className="text-secondary mt-4 mb-3 border-bottom pb-2">Endereço</h5>
 
-        {parte.enderecos.map((endereco, index) => (
-            <div key={index}>
-              <div className="row">
-                <div className="col-md-3 mb-2">
-                  <label><b>CEP</b></label>
-                  <input
-                    type="text"
-                    name="cep"
-                    className="form-control"
-                    value={endereco.cep}
-                    onChange={(e) => handleAddressChange(e, index)}
-                    onBlur={() => buscaCEP(index, endereco.cep)}
-                    placeholder="00000-000"
-                    maxLength="9"
-                  />
-                  {cepErrors[index] && (
-                    <small className="text-danger">
-                      {cepErrors[index]}
-                    </small>
-                  )}
-                </div>
-                <div className="col-md-7 mb-2">
-                  <label><b>Logradouro</b></label>
-                  <input
-                    type="text"
-                    name="logradouro"
-                    className="form-control"
-                    value={endereco.logradouro}
-                    onChange={(e) => handleAddressChange(e, index)}
-                    required
-                  />
-                </div>
-                <div className="col-md-2 mb-2">
-                  <label><b>Número</b></label>
-                  <input
-                    type="text"
-                    name="numero"
-                    className="form-control"
-                    value={endereco.numero}
-                    onChange={(e) => handleAddressChange(e, index)}
-                  />
-                </div>
-              </div>
-
-              <div className="row">
-                <div className="col-md-4 mb-2">
-                  <label><b>Bairro</b></label>
-                  <input
-                    type="text"
-                    name="bairro"
-                    className="form-control"
-                    value={endereco.bairro}
-                    onChange={(e) => handleAddressChange(e, index)}
-                  />
-                </div>
-                <div className="col-md-4 mb-2">
-                  <label><b>Complemento</b></label>
-                  <input
-                    type="text"
-                    name="complemento"
-                    className="form-control"
-                    value={endereco.complemento}
-                    onChange={(e) => handleAddressChange(e, index)}
-                  />
-                </div>
-              </div>
-              
-              <div className="row">
-                <div className="col-md-3 mb-2">
-                  <label><b>Cidade</b></label>
-                  <input
-                    type="text"
-                    name="cidade"
-                    className="form-control"
-                    value={endereco.cidade}
-                    onChange={(e) => handleAddressChange(e, index)}
-                    required
-                  />
-                </div>
-                <div className="col-md-6 mb-2">
-                  <label><b>UF</b></label>
-                  <select name='estado' className='form-select' value={endereco.estado}
-                    onChange={(e) => handleAddressChange(e, index)} required>
-                    <option value="">Selecionar</option>
-                    {EstadosBrasileiros.map((estado) => (
-                      <option key={estado.sigla} value={estado.sigla}>
-                        {estado.sigla} - {estado.nome}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+        <div>
+          <div className="row">
+            <div className="col-md-3 mb-2">
+              <label><b>CEP</b></label>
+              <input
+                type="text"
+                name="cep"
+                className={`form-control ${cepError ? 'is-invalid' : ''}`}
+                value={parte.endereco.cep}
+                onChange={handleAddressChange}
+                onBlur={() => buscaCEP(parte.endereco.cep)}
+                placeholder="00000-000"
+                maxLength="9"
+              />
+              {cepError && <small className="text-danger">{cepError}</small>}
             </div>
-          ))}
+
+            <div className="col-md-7 mb-2">
+              <label><b>Logradouro</b></label>
+              <input
+                type="text"
+                name="logradouro"
+                className="form-control"
+                value={parte.endereco.logradouro}
+                onChange={handleAddressChange}
+                required
+              />
+            </div>
+
+            <div className="col-md-2 mb-2">
+              <label><b>Número</b></label>
+              <input
+                type="text"
+                name="numero"
+                className="form-control"
+                value={parte.endereco.numero}
+                onChange={handleAddressChange}
+                required
+              />
+            </div>
+          </div>
+
+          <div className="row">
+            <div className="col-md-4 mb-2">
+              <label><b>Bairro</b></label>
+              <input
+                type="text"
+                name="bairro"
+                className="form-control"
+                value={parte.endereco.bairro}
+                onChange={handleAddressChange}
+                required
+              />
+            </div>
+
+            <div className="col-md-4 mb-2">
+              <label><b>Complemento</b></label>
+              <input
+                type="text"
+                name="complemento"
+                className="form-control"
+                value={parte.endereco.complemento}
+                onChange={handleAddressChange}
+              />
+            </div>
+          </div>
+          
+          <div className="row">
+            <div className="col-md-3 mb-2">
+              <label><b>Cidade</b></label>
+              <input
+                type="text"
+                name="cidade"
+                className="form-control"
+                value={parte.endereco.cidade}
+                onChange={handleAddressChange}
+                required
+              />
+            </div>
+
+            <div className="col-md-6 mb-2">
+              <label><b>UF</b></label>
+              <select name='estado' className='form-select' value={parte.endereco.estado}
+                onChange={handleAddressChange} required>
+                <option value="">Selecionar</option>
+                {EstadosBrasileiros.map((estado) => (
+                  <option key={estado.sigla} value={estado.sigla}>
+                    {estado.sigla} - {estado.nome}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
 
         <center><br />
           <button className='btn btn-success'>Cadastrar</button>

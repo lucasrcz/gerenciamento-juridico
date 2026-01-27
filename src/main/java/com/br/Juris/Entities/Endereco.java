@@ -14,10 +14,6 @@ public class Endereco {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parte_id", nullable = false)
-    private Partes parte;
-
     @Column(name = "logradouro", length = 150, nullable = false)
     private String logradouro;
 
@@ -38,4 +34,8 @@ public class Endereco {
 
     @Column(name = "cep", length = 9)
     private String cep;
+
+    @OneToOne(mappedBy = "endereco", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Partes parte;
+
 }

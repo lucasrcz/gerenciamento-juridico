@@ -13,7 +13,7 @@ public record PartesOutDTO(
         String email,
         String telefone,
         String observacoes,
-        List<EnderecoOutDTO> enderecos
+        EnderecoOutDTO endereco
 ) {
 
     public static PartesOutDTO fromEntity(Partes entity) {
@@ -25,10 +25,7 @@ public record PartesOutDTO(
                 entity.getEmail(),
                 entity.getTelefone(),
                 entity.getObservacoes(),
-                entity.getEnderecos()
-                        .stream()
-                        .map(EnderecoOutDTO::fromEntity)
-                        .toList()
+                EnderecoOutDTO.fromEntity(entity.getEndereco())
         );
     }
 }

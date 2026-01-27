@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, NavigationType } from "react-router-dom"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import Login from "./routes/Login"
 import ProtectedRoute from "./routes/ProtectedRoute"
 import Layout from "./layouts/Layout"
@@ -13,6 +13,8 @@ import ReadAdvogados from "./routes/advogados/Read"
 import UpdateAdvogados from "./routes/advogados/Update"
 import Partes from "./routes/partes/Partes"
 import CreatePartes from "./routes/partes/Create"
+import ReadPartes from "./routes/partes/Read"
+// import UpdatePartes from "./routes/partes/Update"
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
@@ -47,6 +49,8 @@ function App() {
           {/* Partes */}
           <Route path='partes' element={<Partes />}/>
           <Route path='partes/create' element={<CreatePartes />}/>
+          {/* <Route path='partes/update/:id' element={<UpdatePartes />}/> */}
+          <Route path='partes/read/:id' element={<ReadPartes />}/>
         </Route>
 
         {/* Login */}
@@ -55,6 +59,5 @@ function App() {
     </BrowserRouter>
   )
 }
-
 
 export default App
