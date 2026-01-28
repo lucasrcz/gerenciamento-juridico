@@ -11,8 +11,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.UUID;
 
-public interface AdvogadoRepository extends JpaRepository<Advogado, String> {
+public interface AdvogadoRepository extends JpaRepository<Advogado, UUID> {
 
 
    Advogado findAdvogadoByCpf(String cpf);
@@ -42,8 +43,8 @@ public interface AdvogadoRepository extends JpaRepository<Advogado, String> {
 
    @Query("""
     SELECT a FROM Advogado a
-    WHERE (:nome IS NULL OR LOWER(a.nome) LIKE LOWER(CONCAT('%', :nome, '%')))
-      AND (:email IS NULL OR LOWER(a.email) LIKE LOWER(CONCAT('%', :email, '%')))
+    WHERE (LOWER(a.nome) LIKE LOWER(CONCAT('%', :nome, '%')) OR :nome IS NULL)
+      AND (LOWER(a.email) LIKE LOWER(CONCAT('%', :email, '%')) OR :email IS NULL)
       AND (:role IS NULL OR a.role = :role)
       AND (:numeroOAB IS NULL OR a.numeroOAB = :numeroOAB)
       AND (:seccional IS NULL OR a.seccional = :seccional)

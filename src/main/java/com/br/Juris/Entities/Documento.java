@@ -28,9 +28,8 @@ public class Documento {
     @Column(nullable = false)
     private String nome;
 
-    @Lob
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "arquivo", nullable = false)
+    @Column(name = "arquivo", nullable = false, columnDefinition = "bytea")
     private byte[] arquivo;
 
     @CreationTimestamp

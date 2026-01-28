@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class AuthorizationService implements UserDetailsService {
@@ -121,7 +122,7 @@ public class AuthorizationService implements UserDetailsService {
     }
 
     public Advogado findById(String id){
-        return repository.findById(id).orElseThrow(()-> new ResponseStatusException(
+        return repository.findById(UUID.fromString(id)).orElseThrow(()-> new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
                 "Advogado não encontrado"));
     }

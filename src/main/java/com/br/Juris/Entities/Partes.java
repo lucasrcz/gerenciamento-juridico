@@ -33,8 +33,7 @@ public class Partes {
     @Column(name = "telefone", length = 20)
     private String telefone;
 
-    @Lob
-    @Column(name = "observacoes")
+    @Column(name = "observacoes", columnDefinition = "text")
     private String observacoes;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)

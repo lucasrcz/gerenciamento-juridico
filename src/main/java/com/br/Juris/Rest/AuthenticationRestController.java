@@ -10,6 +10,7 @@ import com.br.Juris.Dtos.out.TokenOutDTO;
 import com.br.Juris.Entities.Advogado;
 import com.br.Juris.Enums.EstadoBrasil;
 import com.br.Juris.Enums.UserRole;
+import com.br.Juris.Repositories.AdvogadoRepository;
 import com.br.Juris.Services.security.AuthorizationService;
 import com.br.Juris.Services.security.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,6 +46,9 @@ public class AuthenticationRestController {
     private AuthenticationManager authenticationManager;
 
     @Resource
+    private AdvogadoRepository repository;
+
+    @Resource
     private AuthorizationService authorizationService;
 
     @Resource
@@ -60,7 +64,7 @@ public class AuthenticationRestController {
         var auth = this.authenticationManager.authenticate(userNamePassword);
         Advogado advogado = (Advogado) auth.getPrincipal();
         var token = tokenService.generateToken(advogado);
-        return ResponseEntity.ok(new TokenOutDTO(token,advogado.getId(), advogado.getCpf(), advogado.getRole(),advogado.getNome()));
+        return ResponseEntity.ok(new TokenOutDTO(token,advogado.getId().toString(), advogado.getCpf(), advogado.getRole(),advogado.getNome()));
     }
 
     @Operation(description = "Endpoint de criação de usuário(advogado)")
