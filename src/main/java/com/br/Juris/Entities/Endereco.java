@@ -35,7 +35,8 @@ public class Endereco {
     @Column(name = "cep", length = 9)
     private String cep;
 
-    @OneToOne(mappedBy = "endereco", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "endereco")
     private Partes parte;
+
 
 }

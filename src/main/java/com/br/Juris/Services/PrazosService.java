@@ -7,7 +7,7 @@ import com.br.Juris.Entities.Prazo;
 import com.br.Juris.Entities.Processo;
 import com.br.Juris.Repositories.PrazoRepository;
 import jakarta.annotation.Resource;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
