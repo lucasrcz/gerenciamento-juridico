@@ -166,7 +166,7 @@ function Read() {
                     </div>
                 </div>
 
-                <Link to={`/update/${id}`} className='btn btn-success'>Editar</Link>
+                <Link to={`/partes/update/${id}`} className='btn btn-success'>Editar</Link>
                 <Link to="/partes" className='btn btn-primary ms-3'>Voltar</Link>
             </div>
         </div>
