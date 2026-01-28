@@ -35,7 +35,7 @@ function Read() {
                           <span className="file-missing">Sem contrato</span>
                       )}
             </div>
-            <Link to={`/update/${id}`} className='btn btn-success'>Editar</Link>
+            <Link to={`/processos/update/${id}`} className='btn btn-success'>Editar</Link>
             <Link to="/processos" className='btn btn-primary ms-3'>Voltar</Link>
         </div>
     </div>

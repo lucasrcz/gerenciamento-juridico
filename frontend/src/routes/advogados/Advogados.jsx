@@ -43,6 +43,7 @@ function Advogados() {
       api.delete('/auth/advogados/' + id)
       .then(res => {
         setAdvogados(advogados.filter(p => p.id !== id));
+        alert('Advogado desativado com sucesso!');
       })
       .catch(err => console.log(err));
     }

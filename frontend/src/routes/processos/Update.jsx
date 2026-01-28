@@ -54,7 +54,7 @@ function Update() {
     })
     .then(res => {
       console.log(res);
-      alert('Processo cadastrado com sucesso!');
+      alert('Processo atualizado com sucesso!');
       navigate('/processos/read/' + id);
     })
     .catch(err => console.log(err));

@@ -4,7 +4,7 @@ import com.br.Juris.Dtos.out.MessageOutDTO;
 import com.br.Juris.Entities.Contrato;
 import com.br.Juris.Repositories.ContratosRepository;
 import jakarta.annotation.Resource;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

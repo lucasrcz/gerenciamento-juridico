@@ -33,7 +33,7 @@ function Read() {
                 <strong>Número OAB:</strong> {advogado.numeroOAB}/{advogado.seccional}
             </div>
 
-            <Link to={`/update/${id}`} className='btn btn-success'>Editar</Link>
+            <Link to={`/advogados/update/${id}`} className='btn btn-success'>Editar</Link>
             <Link to="/advogados" className='btn btn-primary ms-3'>Voltar</Link>
         </div>
     </div>

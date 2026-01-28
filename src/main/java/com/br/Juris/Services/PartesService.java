@@ -9,7 +9,7 @@ import com.br.Juris.Entities.Endereco;
 import com.br.Juris.Entities.Partes;
 import com.br.Juris.Repositories.PartesRepository;
 import jakarta.annotation.Resource;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -51,17 +51,15 @@ public class PartesService {
         parte.setTelefone(dto.telefone());
         parte.setObservacoes(dto.observacoes());
         if (dto.endereco() != null) {
-                EnderecoInDTO e = dto.endereco();
-                Endereco endereco = new Endereco();
-                endereco.setParte(parte);
-                endereco.setLogradouro(e.logradouro());
-                endereco.setNumero(e.numero());
-                endereco.setComplemento(e.complemento());
-                endereco.setBairro(e.bairro());
-                endereco.setCidade(e.cidade());
-                endereco.setEstado(e.estado());
-                endereco.setCep(e.cep());
-                parte.setEndereco(endereco);
+            EnderecoInDTO e = dto.endereco();
+            Endereco endereco = parte.getEndereco();
+            endereco.setLogradouro(e.logradouro());
+            endereco.setNumero(e.numero());
+            endereco.setComplemento(e.complemento());
+            endereco.setBairro(e.bairro());
+            endereco.setCidade(e.cidade());
+            endereco.setEstado(e.estado());
+            endereco.setCep(e.cep());
         }
 
         repository.save(parte);

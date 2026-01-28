@@ -30,7 +30,7 @@ function Tabela({processos, handleDelete}) {
                       )}</td>
                   <td>
                     <Link to={`/processos/read/${processo.id}`} className='btn btn-opaque bi bi-eye-fill me-1' title='Visualizar'></Link>
-                    <Link to={`/update/${processo.id}`} className='btn btn-opaque bi bi-pencil-fill me-1' title='Editar'></Link>
+                    <Link to={`/processos/update/${processo.id}`} className='btn btn-opaque bi bi-pencil-fill me-1' title='Editar'></Link>
                     <button onClick={e => handleDelete(processo.id)} className='btn btn-opaque text-danger bi bi-trash3-fill' title='Deletar'></button>
                   </td>
                 </tr>

@@ -8,7 +8,7 @@ import com.br.Juris.Entities.Documento;
 import com.br.Juris.Entities.Processo;
 import com.br.Juris.Repositories.DocumentoRepository;
 import jakarta.annotation.Resource;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;

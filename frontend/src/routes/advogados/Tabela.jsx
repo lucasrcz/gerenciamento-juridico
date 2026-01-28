@@ -27,7 +27,7 @@ function Tabela({advogados, handleDelete}) {
                   <td>
                     <Link to={`/advogados/read/${advogado.id}`} className='btn btn-opaque bi bi-eye-fill me-1' title='Visualizar'></Link>
                     <Link to={`/advogados/update/${advogado.id}`} className='btn btn-opaque bi bi-pencil-fill me-1' title='Editar'></Link>
-                    <button onClick={e => handleDelete(advogado.id)} className='btn btn-opaque text-danger bi bi-trash3-fill' title='Deletar'></button>
+                    <button onClick={e => handleDelete(advogado.id)} className='btn btn-opaque text-danger bi bi-trash3-fill' title='Desativar'></button>
                   </td>
                 </tr>
               ))

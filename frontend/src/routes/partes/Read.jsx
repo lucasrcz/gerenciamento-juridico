@@ -119,14 +119,15 @@ function Read() {
                         </div>
 
                         <div className="col-md-8 mb-2">
-                            <strong>{parte.tipoPessoa === 'JURIDICA' ? 'CNPJ' : 'CPF'}:</strong>
-                            {formatDocumento(parte.documento, parte.tipoPessoa)}
+                            <strong>{parte.tipoPessoa === 'JURIDICA' ? 'CNPJ' : 'CPF'}:</strong> {formatDocumento(parte.documento, parte.tipoPessoa)}
                         </div>
                     </div>
 
+                    {parte.observacoes ? (
                     <div className="mb-3">
                         <strong>Observações:</strong> {parte.observacoes}
                     </div>
+                    ) : null}
                 </div>
 
                 <h5 className="text-secondary mt-4 mb-3 border-bottom pb-2">Endereço</h5>

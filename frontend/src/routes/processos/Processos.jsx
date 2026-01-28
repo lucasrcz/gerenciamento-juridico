@@ -58,6 +58,7 @@ const handleClear = () => {
       api.delete('/processos/' + id)
       .then(res => {
         setProcessos(processos.filter(p => p.id !== id));
+        alert('Processo deletado com sucesso!');
       })
       .catch(err => console.log(err));
     }

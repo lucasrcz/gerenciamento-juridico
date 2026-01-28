@@ -17,6 +17,15 @@ function Create() {
   const navigate = useNavigate();
   const [contrato, setContrato] = useState(null);
 
+  // --- ESTADOS PARA PRAZOS E DOCUMENTOS ---
+  const [prazos, setPrazos] = useState([
+    { descricao: '', dataVencimento: '' }
+  ]);
+
+  const [documentosExtras, setDocumentosExtras] = useState([
+    { id: Date.now(), file: null } 
+  ]);
+  
   // Estados para Advogados
   const [advogados, setAdvogados] = useState([]);
   const [advTerm, setAdvTerm] = useState('');
@@ -36,30 +45,21 @@ function Create() {
 
   const tiposParte = ["AUTOR", "REU", "TERCEIRO", "ASSISTENTE", "INTERESSADO"];
 
-  // Buscar advogados ao carregar o componente
+  // --- EFFECTS (Busca de dados) ---
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
 
-        const resAdv = await api.get('/auth/advogados/select', {
-          params: {q: ''}
-        });
+        const resAdv = await api.get('/auth/advogados/select', { params: {q: ''} });
         const advData = resAdv.data.content || resAdv.data;
-        const advList = Array.isArray(advData) ? advData : [];
-
-        setAdvogados(advList);
-        setFilteredAdvogados(advList);
+        setAdvogados(Array.isArray(advData) ? advData : []);
+        setFilteredAdvogados(Array.isArray(advData) ? advData : []);
         
-        const resPartes = await api.get('/partes/select', {
-          params: {q: ''}
-        }); 
-        
+        const resPartes = await api.get('/partes/select', { params: {q: ''} }); 
         const partesData = resPartes.data.content || resPartes.data;
-        const partesList = Array.isArray(partesData) ? partesData : [];
-
-        setTodasPartes(partesList);
-        setFilteredPartes(partesList);
+        setTodasPartes(Array.isArray(partesData) ? partesData : []);
+        setFilteredPartes(Array.isArray(partesData) ? partesData : []);
 
       } catch (err) {
         console.error('Erro ao buscar dados:', err);
@@ -70,7 +70,7 @@ function Create() {
     fetchData();
   }, []);
 
-  // Filtrar Advogados
+  // Filtros
   useEffect(() => {
       if (!advTerm.trim()) {
         setFilteredAdvogados(advogados);
@@ -83,7 +83,6 @@ function Create() {
       }
   }, [advTerm, advogados]);
 
-  // Filtrar Partes
   useEffect(() => {
     if (!partesTerm.trim()) {
       setFilteredPartes(todasPartes);
@@ -95,8 +94,8 @@ function Create() {
     }
   }, [partesTerm, todasPartes]);
 
-    // Fechar dropdown ao clicar fora
-    useEffect(() => {
+  // Click Outside
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (advDropdownRef.current && !advDropdownRef.current.contains(event.target)) {
         setShowAdvDropdown(false);
@@ -108,8 +107,46 @@ function Create() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-  
-  const handleFileChange = (e) => {
+
+  // --- HANDLERS ---
+
+  // Prazos
+  const handleAddPrazo = () => {
+    setPrazos([...prazos, { descricao: '', dataVencimento: '' }]);
+  };
+  const handleRemovePrazo = (index) => {
+    const values = [...prazos];
+    values.splice(index, 1);
+    setPrazos(values);
+  };
+  const handlePrazoChange = (index, field, value) => {
+    const values = [...prazos];
+    values[index][field] = value;
+    setPrazos(values);
+  };
+
+  // Documentos
+  const handleAddDocumento = () => {
+    setDocumentosExtras([...documentosExtras, { id: Date.now(), file: null }]);
+  };
+  const handleRemoveDocumento = (index) => {
+    const values = [...documentosExtras];
+    values.splice(index, 1);
+    setDocumentosExtras(values);
+  };
+  const handleDocumentoFileChange = (index, e) => {
+    const file = e.target.files[0];
+    if (file && file.type === 'application/pdf') {
+      const values = [...documentosExtras];
+      values[index].file = file;
+      setDocumentosExtras(values);
+    } else {
+      alert('Por favor, selecione um arquivo PDF');
+      e.target.value = '';
+    }
+  };
+
+  const handleContratoChange = (e) => {
     const file = e.target.files[0];
     if (file && file.type === 'application/pdf') {
       setContrato(file);
@@ -119,50 +156,40 @@ function Create() {
     }
   }
 
-  // Lógicas de Advogados
+  // Advogados
   const toggleAdvogado = (advogadoId) => {
     setProcesso(prev => {
       const isSelected = prev.advogadosIds.includes(advogadoId);
       const novosIds = isSelected 
           ? prev.advogadosIds.filter(id => id !== advogadoId)
           : [...prev.advogadosIds, advogadoId];
-      
       return { ...prev, advogadosIds: novosIds };
     });
   };
-
   const getAdvogadoNome = (id) => {
     const adv = advogados.find(a => a.id === id);
     return adv ? adv.nome : 'Desconhecido';
   };
 
-  // Lógicas de Partes
+  // Partes
   const isParteSelected = (parteId) => {
     return processo.partes.some(p => p.parteId === parteId);
   };
-
   const toggleParte = (parte) => {
     setProcesso(prev => {
       const exists = prev.partes.some(p => p.parteId === parte.id);
-      
       if (exists) {
-        return {
-          ...prev,
-          partes: prev.partes.filter(p => p.parteId !== parte.id)
-        };
+        return { ...prev, partes: prev.partes.filter(p => p.parteId !== parte.id) };
       } else {
         return {
           ...prev,
-          partes: [...prev.partes, { 
-            parteId: parte.id, 
-            tipoParte: 'AUTOR',
-            nome: parte.nomeCpf
-          }]
+          partes: [...prev.partes, { parteId: parte.id, tipoParte: 'AUTOR', nome: parte.nomeCpf }]
         };
       }
     });
+    setPartesTerm(''); // Limpar busca após selecionar
+    setShowPartesDropdown(false);
   };
-
   const updateTipoParte = (parteId, novoTipo) => {
     setProcesso(prev => ({
       ...prev,
@@ -172,6 +199,7 @@ function Create() {
     }));
   };
 
+  // Submit
   const handleSubmit = (event) => {
     event.preventDefault();
 
@@ -187,22 +215,28 @@ function Create() {
     formData.append('observacoes', processo.observacoes);
     formData.append('advogadoPrincipalId', processo.advogadoPrincipalId);
 
-    processo.advogadosIds.forEach(id => {
-      formData.append('advogadosIds', id);
-    });
-
+    processo.advogadosIds.forEach(id => formData.append('advogadosIds', id));
+    
     processo.partes.forEach((p, index) => {
         formData.append(`partes[${index}].parteId`, p.parteId);
         formData.append(`partes[${index}].tipoParte`, p.tipoParte);
     });
     
-    if (contrato) {
-      formData.append('contrato', contrato);
-    }
+    if (contrato) formData.append('contrato', contrato);
+
+    prazos.forEach((p, index) => {
+      if (p.descricao && p.dataVencimento) {
+        formData.append(`prazos[${index}].descricao`, p.descricao);
+        formData.append(`prazos[${index}].dataVencimento`, p.dataVencimento);
+      }
+    });
+
+    documentosExtras.forEach((doc) => {
+      if (doc.file) formData.append('documentos', doc.file); 
+    });
 
     api.post('/processos', formData)
     .then(res => {
-      console.log(res);
       alert('Processo cadastrado com sucesso!');
       navigate('/processos/read/' + res.data.id);
     })
@@ -212,198 +246,306 @@ function Create() {
     });
   }
 
+  // --- RENDER ---
   return (
-    <div className='d-flex w-100 vh-100 justify-content-center align-items-center bg-light'>
-      <div className='w-50 border bg-white shadow px-5 pt-3 pb-5 rounded'>
-          <center><h2>Novo Processo</h2><br></br></center>
+    <div className='container-fluid bg-light min-vh-100 p-4'>
+      <div className='card border-0 shadow-sm rounded-3 bg-white'>
+          
+        <div className="card-header bg-white border-bottom py-3">
+            <h4 className="mb-0 fw-bold">Novo Processo</h4>
+        </div>
+
+        <div className="card-body p-4">
           <form onSubmit={handleSubmit}>
-              <div className='mb-2'>
-                <label htmlFor="numero"><b>Nº Processo:</b></label>
-                <input type="text" name='numero' className='form-control'
-                onChange={e => setProcesso({...processo, numero:e.target.value})} required/>
-              </div>
-
-              <div className='mb-2'>
-                <label htmlFor="status"><b>Status</b></label>
-                <select name='status' className='form-select' value={processo.status}
-                onChange={e => setProcesso({...processo, status: e.target.value})} required>
-                  <option value="">Selecionar</option>
-                  <option value="EM_ANDAMENTO">Em Andamento</option>
-                  <option value="ARQUIVADO">Arquivado</option>
-                  <option value="FINALIZADO">Finalizado</option>
-                </select>
-              </div>
-
-              <div className='mb-2'>
-                <label htmlFor="estado"><b>Estado</b></label>
-                <select name='estado' className='form-select' value={processo.estado}
-                onChange={e => setProcesso({...processo, estado: e.target.value})} required>
-                  <option value="">Selecionar</option>
-                  {EstadosBrasileiros.map((estado) => (
-                    <option key={estado.sigla} value={estado.sigla}>
-                      {estado.sigla} - {estado.nome}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className='mb-2'>
-                <label htmlFor="advogadoPrincipalId"><b>Advogado Responsável *</b></label>
-                <select 
-                  name='advogadoPrincipalId' 
-                  className='form-select' 
-                  value={processo.advogadoPrincipalId}
-                  onChange={(e) => {
-                    console.log('Selecionou advogado:', e.target.value); // DEBUG
-                    setProcesso({...processo, advogadoPrincipalId: e.target.value});
-                  }} 
-                  required
-                  disabled={loading}>
-                  <option value="">Selecionar</option>
-                  {Array.isArray(advogados) && advogados.map((advogado) => (
-                    <option key={advogado.id} value={advogado.id}>
-                      {advogado.nome} - {advogado.cpf}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className='mb-3' ref={advDropdownRef}>
-                <label htmlFor="advogados"><b>Advogados Associados</b></label>
-                <div className="position-relative">
-                  <input 
-                    type="text" 
-                    className='form-control mb-2' 
-                    placeholder='Buscar advogado por nome ou CPF'
-                    value={advTerm}
-                    onChange={e => setAdvTerm(e.target.value)}
-                    onFocus={() => setShowAdvDropdown(true)}
-                  />
-                  
-                  {/* Lista de advogados disponíveis */}
-                  {showAdvDropdown && !loading && (
-                      <div className="border rounded bg-white position-absolute w-100"
-                        style={{
-                          maxHeight: '200px',
-                          overflowY: 'auto',
-                          zIndex: 1050,
-                          boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-                        }}>
-                        {filteredAdvogados.length > 0 ? (
-                        filteredAdvogados.map(adv => (
-                          <div 
-                            key={adv.id}
-                            className={`p-2 border-bottom cursor-pointer ${processo.advogadosIds.includes(adv.id) ? 'bg-success text-white' : 'hover-bg-light'}`}
-                            onClick={() => toggleAdvogado(adv.id)}
-                            style={{cursor: 'pointer'}}>
-                            <small>{adv.nome} ({adv.cpf})</small>
-                          </div>
-                        ))
-                        ) : <div className="p-2 text-muted">Não encontrado.</div>}
-                      </div>
-                  )}
-
-                  {/* Chips Advogados Selecionados */}
-                  <div className="d-flex flex-wrap gap-2 mt-1">
-                    {processo.advogadosIds.map(id => (
-                    <span key={id} className="badge bg-secondary d-flex align-items-center gap-1">
-                        {getAdvogadoNome(id)}
-                        <button type="button" className="btn-close btn-close-white btn-sm" onClick={() => toggleAdvogado(id)} style={{fontSize: '0.5rem'}}></button>
-                    </span>
-                    ))}
+              
+              {/* --- 1. DADOS DO PROCESSO --- */}
+              <h5 className="text-muted mb-3">Dados do Processo</h5>
+              <div className="row mb-3">
+                  <div className='col-12 col-md-4 mb-3'>
+                    <label className="form-label fw-bold">Número do Processo *</label>
+                    <input type="text" name='numero' className='form-control'
+                    onChange={e => setProcesso({...processo, numero:e.target.value})} required/>
                   </div>
+
+                  <div className='col-12 col-md-4 mb-3'>
+                    <label className="form-label fw-bold">Status *</label>
+                    <select name='status' className='form-select' value={processo.status}
+                    onChange={e => setProcesso({...processo, status: e.target.value})} required>
+                      <option value="">Selecionar</option>
+                      <option value="EM_ANDAMENTO">Em Andamento</option>
+                      <option value="ARQUIVADO">Arquivado</option>
+                      <option value="FINALIZADO">Finalizado</option>
+                    </select>
+                  </div>
+
+                  <div className='col-12 col-md-4 mb-3'>
+                    <label className="form-label fw-bold">Estado *</label>
+                    <select name='estado' className='form-select' value={processo.estado}
+                    onChange={e => setProcesso({...processo, estado: e.target.value})} required>
+                      <option value="">Selecionar</option>
+                      {EstadosBrasileiros.map((estado) => (
+                        <option key={estado.sigla} value={estado.sigla}>
+                          {estado.sigla} - {estado.nome}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className='col-12 mb-3'>
+                    <label className="form-label fw-bold">Contrato</label>
+                    <small className="text-muted">Arquivo (PDF)</small>                    
+                    <input type="file" name='contrato' className='form-control' accept='.pdf'
+                    onChange={handleContratoChange}/>
+                  </div>
+              </div>
+
+              {/* Prazos dentro de Dados do Processo */}
+              <div className="mb-4">
+                <label className="form-label fw-bold d-block mb-2">Prazos e Vencimentos</label>
+                {prazos.map((prazo, index) => (
+                  <div key={index} className="row g-2 mb-2 align-items-end">
+                    <div className="col-12 col-md-7">
+                      {index === 0 && <small className="text-muted">Descrição</small>}
+                      <input 
+                        type="text" 
+                        className="form-control" 
+                        value={prazo.descricao}
+                        onChange={(e) => handlePrazoChange(index, 'descricao', e.target.value)}
+                        placeholder="Ex: Audiência preliminar"
+                      />
+                    </div>
+                    <div className="col-12 col-md-4">
+                      {index === 0 && <small className="text-muted">Data Vencimento</small>}
+                      <input 
+                        type="datetime-local" 
+                        className="form-control"
+                        value={prazo.dataVencimento}
+                        onChange={(e) => handlePrazoChange(index, 'dataVencimento', e.target.value)}
+                      />
+                    </div>
+                    <div className="col-12 col-md-1">
+                      {index === 0 ? (
+                        <button type="button" className="btn btn-success w-100" onClick={handleAddPrazo} title="Adicionar Prazo">
+                          <i className="bi bi-plus-lg"></i>
+                        </button>
+                      ) : (
+                        <button type="button" className="btn btn-danger w-100" onClick={() => handleRemovePrazo(index)} title="Remover Prazo">
+                           <i className="bi bi-trash"></i>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <hr className="my-4" />
+
+              {/* --- 2. ADVOGADOS --- */}
+              <h5 className="text-muted mb-3">Advogados</h5>
+              <div className="row mb-3">
+                <div className='col-12 col-md-6 mb-3'>
+                    <label className="form-label fw-bold">Advogado Responsável *</label>
+                    <select 
+                      className='form-select' 
+                      value={processo.advogadoPrincipalId}
+                      onChange={(e) => setProcesso({...processo, advogadoPrincipalId: e.target.value})} 
+                      required
+                      disabled={loading}>
+                      <option value="">Selecionar</option>
+                      {Array.isArray(advogados) && advogados.map((advogado) => (
+                        <option key={advogado.id} value={advogado.id}>
+                          {advogado.nome} - {advogado.cpf}
+                        </option>
+                      ))}
+                    </select>
+                </div>
+
+                <div className='col-12 col-md-6 mb-3' ref={advDropdownRef}>
+                    <label className="form-label fw-bold">Advogados Associados</label>
+                    <div className="position-relative">
+                        {/* Input de Busca */}
+                        <input 
+                            type="text" 
+                            className='form-control mb-2' 
+                            placeholder='Buscar para adicionar...'
+                            value={advTerm}
+                            onChange={e => setAdvTerm(e.target.value)}
+                            onFocus={() => setShowAdvDropdown(true)}
+                        />
+                        {/* Dropdown de Resultados */}
+                        {showAdvDropdown && !loading && (
+                            <div className="list-group position-absolute w-100 shadow" 
+                                style={{maxHeight: '200px', overflowY: 'auto', zIndex: 1050}}>
+                                {filteredAdvogados.map(adv => (
+                                <button 
+                                    key={adv.id} type="button"
+                                    className={`list-group-item list-group-item-action ${processo.advogadosIds.includes(adv.id) ? 'active' : ''}`}
+                                    onClick={() => toggleAdvogado(adv.id)}>
+                                    {adv.nome} ({adv.cpf})
+                                </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Lista Estilizada de Advogados Selecionados */}
+                    {processo.advogadosIds.length > 0 ? (
+                      <div className="mt-2">
+                         {processo.advogadosIds.map((id, index) => (
+                            <div key={id} className="row g-2 mb-2 align-items-center">
+                                <div className="col-12 col-md-11">
+                                    <input 
+                                        type="text" 
+                                        className="form-control bg-light" 
+                                        value={getAdvogadoNome(id)} 
+                                        readOnly 
+                                        disabled 
+                                    />
+                                </div>
+                                <div className="col-12 col-md-1">
+                                    <button 
+                                        type="button" 
+                                        className="btn btn-danger w-100" 
+                                        onClick={() => toggleAdvogado(id)}
+                                        title="Remover Advogado">
+                                        <i className="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                         ))}
+                      </div>
+                      ) : (
+                        <div className="alert alert-light text-center border border-dashed">
+                            Nenhum advogado selecionado. Utilize a busca acima para adicionar.
+                        </div>
+                      )
+                    }
                 </div>
               </div>
 
               <hr className="my-4" />
 
-              <div className='mb-3' ref={partesDropdownRef}>
-                <label><b>Envolvidos (Partes)</b></label>
-                <div className="position-relative">
-                  <input 
-                    type="text" 
-                    className='form-control mb-2' 
-                    placeholder='Buscar parte por nome ou documento...'
-                    value={partesTerm}
-                    onChange={e => setPartesTerm(e.target.value)}
-                    onFocus={() => setShowPartesDropdown(true)}
-                  />
-                  
-                  {/* Dropdown de Busca de Partes */}
-                  {showPartesDropdown && !loading && (
-                    <div className="border rounded bg-white position-absolute w-100"
-                    style={{maxHeight: '200px', overflowY: 'auto', zIndex: 1050, boxShadow: '0 4px 6px rgba(0,0,0,0.1)'}}>
-                      {filteredPartes.length > 0 ? (
-                        filteredPartes.map(parte => (
-                          <div 
-                            key={parte.id}
-                            className={`p-2 border-bottom cursor-pointer ${isParteSelected(parte.id) ? 'bg-primary text-white' : 'hover-bg-light'}`}
-                            onClick={() => toggleParte(parte)}
-                            style={{cursor: 'pointer'}}
-                          >
-                            <small>{parte.nomeCpf}</small>
-                          </div>
-                        ))
-                      ) : <div className="p-2 text-muted">Parte não encontrada.</div>}
-                    </div>
-                  )}
+              {/* --- 3. PARTES (Estilo Tabela/Prazos) --- */}
+              <h5 className="text-muted mb-3">Partes Envolvidas</h5>
+              
+              {/* Seção de Busca (Mecanismo de Adição) */}
+              <div className="row mb-3" ref={partesDropdownRef}>
+                <div className="col-12">
+                   <label className="form-label fw-bold">Adicionar Parte</label>
+                   <div className="position-relative">
+                      <input 
+                        type="text" 
+                        className='form-control' 
+                        placeholder='Digite para buscar e adicionar...'
+                        value={partesTerm}
+                        onChange={e => setPartesTerm(e.target.value)}
+                        onFocus={() => setShowPartesDropdown(true)}
+                      />
+                       {showPartesDropdown && !loading && (
+                        <div className="list-group position-absolute w-100 shadow"
+                        style={{maxHeight: '200px', overflowY: 'auto', zIndex: 1050}}>
+                          {filteredPartes.length > 0 ? (
+                            filteredPartes.map(parte => (
+                              <button 
+                                key={parte.id} type="button"
+                                className={`list-group-item list-group-item-action ${isParteSelected(parte.id) ? 'active' : ''}`}
+                                onClick={() => toggleParte(parte)}>
+                                {parte.nomeCpf}
+                              </button>
+                            ))
+                          ) : <div className="p-2 bg-white border text-muted">Parte não encontrada.</div>}
+                        </div>
+                      )}
+                   </div>
                 </div>
+              </div>
 
-                {/* Lista de Partes Selecionadas com Classificação */}
-                {processo.partes.length > 0 && (
-                  <div className="mt-2 border rounded p-2 bg-light">
-                     <small className="text-muted mb-2 d-block">Partes selecionadas:</small>
-                     {processo.partes.map((p, idx) => (
-                       <div key={p.parteId} className="d-flex align-items-center justify-content-between mb-2 border-bottom pb-1">
-                          <span className="fw-bold text-truncate w-50" title={p.nome}>
-                            {p.nome || "Parte " + p.parteId}
-                          </span>
-                          
-                          <div className="d-flex gap-2">
-                            {/* Select do Tipo da Parte */}
-                            <select 
-                                className="form-select form-select-sm" 
-                                value={p.tipoParte}
-                                onChange={(e) => updateTipoParte(p.parteId, e.target.value)}
-                                style={{width: '130px'}}
-                            >
-                                {tiposParte.map(tipo => (
-                                    <option key={tipo} value={tipo}>{tipo}</option>
-                                ))}
-                            </select>
+              <div className="mb-3">
+                 {processo.partes.length > 0 ? (
+                     processo.partes.map((p, idx) => (
+                        <div key={p.parteId} className="row g-2 mb-2 align-items-end">
+                            <div className="col-12 col-md-7">
+                                {idx === 0 && <small className="text-muted">Nome da Parte</small>}
+                                <input type="text" className="form-control bg-light" value={p.nome} readOnly disabled />
+                            </div>
+                            <div className="col-12 col-md-4">
+                                {idx === 0 && <small className="text-muted">Tipo de Parte</small>}
+                                <select 
+                                    className="form-select" 
+                                    value={p.tipoParte}
+                                    onChange={(e) => updateTipoParte(p.parteId, e.target.value)}>
+                                    {tiposParte.map(tipo => (
+                                        <option key={tipo} value={tipo}>{tipo}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="col-12 col-md-1">
+                                <button type="button" className="btn btn-danger w-100" onClick={() => toggleParte({id: p.parteId})}>
+                                    <i className="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                     ))
+                 ) : (
+                    <div className="alert alert-light text-center border border-dashed">
+                        Nenhuma parte selecionada. Utilize a busca acima para adicionar.
+                    </div>
+                 )}
+              </div>
 
-                            <button 
-                                type="button" 
-                                className="btn btn-outline-danger btn-sm"
-                                onClick={() => toggleParte({id: p.parteId})}
-                            >
-                                X
-                            </button>
-                          </div>
-                       </div>
-                     ))}
+              <hr className="my-4" />
+
+              {/* --- 4. DOCUMENTOS --- */}
+              <h5 className="text-muted mb-3">Documentos Extras</h5>
+              <div className="mb-4">
+                {documentosExtras.map((doc, index) => (
+                  <div key={doc.id} className="row g-2 mb-2 align-items-end">
+                    <div className="col-12 col-md-11">
+                      {index === 0 && <small className="text-muted">Arquivo (PDF)</small>}
+                      <input 
+                        type="file" 
+                        className="form-control" 
+                        accept=".pdf"
+                        onChange={(e) => handleDocumentoFileChange(index, e)}
+                      />
+                    </div>
+                    <div className="col-12 col-md-1">
+                      {index === 0 ? (
+                        <button type="button" className="btn btn-success w-100" onClick={handleAddDocumento}>
+                          <i className="bi bi-plus-lg"></i>
+                        </button>
+                      ) : (
+                        <button type="button" className="btn btn-danger w-100" onClick={() => handleRemoveDocumento(index)}>
+                          <i className="bi bi-trash"></i>
+                        </button>
+                      )}
+                    </div>
                   </div>
-                )}
+                ))}
               </div>
 
-              <div className='mb-3'>
-                <label htmlFor="observacoes"><b>Observações</b></label>
-                <input type="text" name='observacoes' className='form-control'
-                onChange={e => setProcesso({...processo, observacoes:e.target.value})}/>
+              <hr className="my-4" />
+
+              {/* --- 5. OBSERVAÇÕES (RODAPÉ) --- */}
+              <div className='mb-4'>
+                <label className="form-label fw-bold">Observações</label>
+                <textarea 
+                    rows="4"
+                    name='observacoes' 
+                    className='form-control'
+                    placeholder="Digite aqui, caso houver, observações adicionais sobre o processo."
+                    onChange={e => setProcesso({...processo, observacoes:e.target.value})}>
+                </textarea>
               </div>
 
-              <div className='mb-3'>
-                <label htmlFor="contrato"><b>Contrato</b></label>
-                <input type="file" name='contrato' className='form-control' accept='.pdf'
-                onChange={handleFileChange}/>
+              <div className="d-flex justify-content-end gap-3 mt-5">
+                <Link to="/processos" className='btn btn-outline-secondary px-4'>Cancelar</Link>
+                <button className='btn btn-success px-5 fw-bold'>Cadastrar Processo</button>
               </div>
 
-              <center><br></br>
-                <button className='btn btn-success'>Cadastrar</button>
-                <Link to="/processos" className='btn btn-primary ms-3'>Voltar</Link>
-              </center>
            </form>
        </div>
+    </div>
     </div>
   )
 }
