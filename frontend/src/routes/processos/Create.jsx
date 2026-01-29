@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../../services/API';
-import { EstadosBrasileiros } from '../../constants/EstadosBrasileiros';
+import { EstadosBrasileiros } from '../../constants/EstadosBrasileiros'
+import { Colors } from '../../constants/Colors';
 
 function Create() {
   const [processo, setProcesso] = useState({
@@ -23,7 +24,7 @@ function Create() {
   ]);
 
   const [documentosExtras, setDocumentosExtras] = useState([
-    { id: Date.now(), file: null } 
+    { id: Date.now(), file: null, descricao: '', dataCriacao: new Date().toISOString() } 
   ]);
   
   // Estados para Advogados
@@ -125,13 +126,27 @@ function Create() {
 
   // Documentos
   const handleAddDocumento = () => {
-    setDocumentosExtras([...documentosExtras, { id: Date.now(), file: null }]);
+    setDocumentosExtras([...documentosExtras, {
+      id: Date.now(),
+      file: null,
+      descricao: '',
+      dataCriacao: new Date().toISOString()
+      }
+    ]);
   };
+
   const handleRemoveDocumento = (index) => {
     const values = [...documentosExtras];
     values.splice(index, 1);
     setDocumentosExtras(values);
   };
+
+  const handleDocumentoDescChange = (index, value) => {
+    const values = [...documentosExtras];
+    values[index].descricao = value;
+    setDocumentosExtras(values);
+  };
+
   const handleDocumentoFileChange = (index, e) => {
     const file = e.target.files[0];
     if (file && file.type === 'application/pdf') {
@@ -223,8 +238,14 @@ function Create() {
       }
     });
 
-    documentosExtras.forEach((doc) => {
-      if (doc.file) formData.append('documentos', doc.file); 
+    documentosExtras.forEach((doc, index) => {
+      if (doc.file) {
+        formData.append(`documentos[${index}].arquivo`, doc.file);
+        formData.append(`documentos[${index}].descricao`, doc.descricao || '');
+        formData.append(`documentos[${index}].dataCriacao`, doc.dataCriacao);
+        formData.append(`documentos[${index}].nome`, doc.file.name);
+        formData.append(`documentos[${index}].formatoArquivo`, doc.file.type);
+      } 
     });
 
     api.post('/processos', formData)
@@ -238,26 +259,20 @@ function Create() {
     });
   }
 
-  // --- PALETA DE CORES (Extraída da imagem) ---
-  const colors = {
-    primaryDark: '#2C2966', // Azul Roxo Escuro (Títulos)
-    primaryDeep: '#131047', // Azul Quase Preto (Detalhes ou Textos Fortes)
-    secondary:   '#6C6C94', // Azul Acinzentado (Subtextos)
-    accent:      '#FFA051'  // Laranja (Botão de Ação)
-  };
-
-  // Estilo para os Títulos das Seções (Estilo "NUCLEUS")
   const headerStyle = {
     letterSpacing: '0.05em', 
-    color: colors.primaryDark,
-    borderColor: colors.primaryDark 
+    color: Colors.primaryDark,
+    borderColor: Colors.primaryDark,
+    backgroundColor: '#f8f9fa',
+    padding: '10px 15px',
+    borderRadius: '8px',
+    marginTop: '20px'
   };
 
-  // Estilo para o Botão de Cadastro (Destaque)
   const actionBtnStyle = {
-    backgroundColor: colors.accent,
-    borderColor: colors.accent,
-    color: colors.primaryDeep,
+    backgroundColor: Colors.accent,
+    borderColor: Colors.accent,
+    color: Colors.primaryDeep,
     fontWeight: 'bold'
   };
 
@@ -275,13 +290,13 @@ function Create() {
               
               <div className="row mb-3">
                   <div className='col-12 col-md-4 mb-3'>
-                    <label className="form-label fw-bold" style={{color: colors.primaryDeep}}>Nº Processo *</label>
+                    <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>Número do Processo *</label>
                     <input type="text" name='numero' className='form-control'
                     onChange={e => setProcesso({...processo, numero:e.target.value})} required/>
                   </div>
 
                   <div className='col-12 col-md-4 mb-3'>
-                    <label className="form-label fw-bold" style={{color: colors.primaryDeep}}>Status *</label>
+                    <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>Status *</label>
                     <select name='status' className='form-select' value={processo.status}
                     onChange={e => setProcesso({...processo, status: e.target.value})} required>
                       <option value="">Selecionar</option>
@@ -292,7 +307,7 @@ function Create() {
                   </div>
 
                   <div className='col-12 col-md-4 mb-3'>
-                    <label className="form-label fw-bold" style={{color: colors.primaryDeep}}>Estado *</label>
+                    <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>Estado *</label>
                     <select name='estado' className='form-select' value={processo.estado}
                     onChange={e => setProcesso({...processo, estado: e.target.value})} required>
                       <option value="">Selecionar</option>
@@ -304,8 +319,10 @@ function Create() {
                     </select>
                   </div>
 
-                  <div className='col-12 mb-3'>
-                    <label className="form-label fw-bold" style={{color: colors.primaryDeep}}>Contrato Principal (PDF)</label>
+                  <div className='col-8 mb-2'>
+                    <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>Contrato</label>
+                    <br></br>
+                    <small className="text-muted">Arquivo (PDF)</small>
                     <input type="file" name='contrato' className='form-control' accept='.pdf'
                     onChange={handleContratoChange}/>
                   </div>
@@ -313,10 +330,32 @@ function Create() {
 
               {/* Prazos */}
               <div className="mb-5">
-                <label className="form-label fw-bold d-block mb-2" style={{color: colors.primaryDeep}}>Prazos e Vencimentos</label>
+                <label className="form-label fw-bold d-block mb-2" style={{color: Colors.primaryDeep}}>Prazos e Vencimentos</label>
                 {prazos.map((prazo, index) => (
-                  <div key={index} className="row g-2 mb-2 align-items-end">
-                    <div className="col-12 col-md-7">
+                  <div key={index} className="row g-2 mb-3 align-items-end">
+                    <div className='col-md-3'>
+                      {index === 0 && <small className="text-muted">Data de Vencimento</small>}
+                      <input 
+                        type="date" 
+                        className="form-control"
+                        value={prazo.dataVencimento}
+                        onChange={(e) => handlePrazoChange(index, 'dataVencimento', e.target.value)}
+                      />
+                    </div>
+
+                    <div className="col-md-1">
+                      {index === 0 ? (
+                        <button type="button" className="btn btn-success w-80" onClick={handleAddPrazo} title="Adicionar Prazo">
+                          <i className="bi bi-plus-lg"></i>
+                        </button>
+                      ) : (
+                        <button type="button" className="btn btn-danger w-80" onClick={() => handleRemovePrazo(index)} title="Remover Prazo">
+                           <i className="bi bi-trash"></i>
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="col-md-4">
                       {index === 0 && <small className="text-muted">Descrição</small>}
                       <input 
                         type="text" 
@@ -325,26 +364,6 @@ function Create() {
                         onChange={(e) => handlePrazoChange(index, 'descricao', e.target.value)}
                         placeholder="Ex: Audiência preliminar"
                       />
-                    </div>
-                    <div className="col-12 col-md-4">
-                      {index === 0 && <small className="text-muted">Data Vencimento</small>}
-                      <input 
-                        type="datetime-local" 
-                        className="form-control"
-                        value={prazo.dataVencimento}
-                        onChange={(e) => handlePrazoChange(index, 'dataVencimento', e.target.value)}
-                      />
-                    </div>
-                    <div className="col-12 col-md-1">
-                      {index === 0 ? (
-                        <button type="button" className="btn btn-success w-100" onClick={handleAddPrazo} title="Adicionar Prazo">
-                          <i className="bi bi-plus-lg">+</i>
-                        </button>
-                      ) : (
-                        <button type="button" className="btn btn-danger w-100" onClick={() => handleRemovePrazo(index)} title="Remover Prazo">
-                           <i className="bi bi-trash">-</i>
-                        </button>
-                      )}
                     </div>
                   </div>
                 ))}
@@ -355,9 +374,9 @@ function Create() {
                 Advogados
               </h5>
               
-              <div className="row mb-5">
+              <div className="row mb-3">
                 <div className='col-12 col-md-6 mb-3'>
-                    <label className="form-label fw-bold" style={{color: colors.primaryDeep}}>Advogado Responsável *</label>
+                    <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>Advogado Responsável *</label>
                     <select 
                       className='form-select' 
                       value={processo.advogadoPrincipalId}
@@ -372,41 +391,50 @@ function Create() {
                       ))}
                     </select>
                 </div>
+              </div>
 
-                <div className='col-12 col-md-6 mb-3' ref={advDropdownRef}>
-                    <label className="form-label fw-bold" style={{color: colors.primaryDeep}}>Advogados Associados</label>
+              <hr></hr>
+
+                <div className='row mb-4' ref={advDropdownRef}>
+                  <div className='col-6'>
+                    <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>Advogados Associados</label>
                     <div className="position-relative">
-                        {/* Input de Busca */}
-                        <input 
-                            type="text" 
-                            className='form-control mb-2' 
-                            placeholder='Buscar para adicionar...'
-                            value={advTerm}
-                            onChange={e => setAdvTerm(e.target.value)}
-                            onFocus={() => setShowAdvDropdown(true)}
-                        />
-                        {/* Dropdown de Resultados */}
-                        {showAdvDropdown && !loading && (
-                            <div className="list-group position-absolute w-100 shadow" 
-                                style={{maxHeight: '200px', overflowY: 'auto', zIndex: 1050}}>
-                                {filteredAdvogados.map(adv => (
-                                <button 
-                                    key={adv.id} type="button"
-                                    className={`list-group-item list-group-item-action ${processo.advogadosIds.includes(adv.id) ? 'active' : ''}`}
-                                    onClick={() => toggleAdvogado(adv.id)}>
-                                    {adv.nome} ({adv.cpf})
-                                </button>
-                                ))}
-                            </div>
-                        )}
+                      {/* Input de Busca */}
+                      <input 
+                          type="text" 
+                          className='form-control' 
+                          placeholder='Busca por nome, nº OAB ou CPF'
+                          value={advTerm}
+                          onChange={e => setAdvTerm(e.target.value)}
+                          onFocus={() => setShowAdvDropdown(true)}
+                      />
+                      {/* Dropdown de Resultados */}
+                      {showAdvDropdown && !loading && (
+                        <div className="list-group position-absolute w-100 shadow" 
+                          style={{maxHeight: '200px', overflowY: 'auto', zIndex: 1050}}>
+                          {filteredAdvogados.length > 0 ? (
+                            filteredAdvogados.map(adv => (
+                            <button 
+                              key={adv.id} type="button"
+                              className={`list-group-item list-group-item-action ${processo.advogadosIds.includes(adv.id) ? 'active' : ''}`}
+                              onClick={() => toggleAdvogado(adv.id)}>
+                              {adv.nome} ({adv.cpf})
+                            </button>
+                            ))
+                          ) : <div className="p-2 bg-white border text-muted">Advogado não encontrado.</div>}
+                        </div>
+                      )}
                     </div>
+                  </div>
+                </div>
 
+                <div className="mb-5">
                     {/* Lista Estilizada de Advogados Selecionados */}
-                    {processo.advogadosIds.length > 0 && (
+                    {processo.advogadosIds.length > 0 ? (
                       <div className="mt-2">
                          {processo.advogadosIds.map((id, index) => (
                             <div key={id} className="row g-2 mb-2 align-items-center">
-                                <div className="col-12 col-md-11">
+                                <div className="col-4 col-md-4">
                                     <input 
                                         type="text" 
                                         className="form-control bg-light" 
@@ -415,21 +443,24 @@ function Create() {
                                         disabled 
                                     />
                                 </div>
-                                <div className="col-12 col-md-1">
+                                <div className="col-6 col-md-1">
                                     <button 
                                         type="button" 
-                                        className="btn btn-danger w-100" 
+                                        className="btn btn-danger w-80" 
                                         onClick={() => toggleAdvogado(id)}
                                         title="Remover Advogado">
-                                        <i className="bi bi-trash">-</i>
+                                        <i className="bi bi-trash"></i>
                                     </button>
                                 </div>
                             </div>
                          ))}
                       </div>
-                    )}
+                    ) : (
+                    <div className="alert alert-light text-center border border-dashed text-muted">
+                        Nenhum advogado selecionado. Utilize a busca acima.
+                    </div>
+                 )}
                 </div>
-              </div>
 
               {/* --- 3. PARTES ENVOLVIDAS --- */}
               <h5 className="fw-bold border-bottom border-2 pb-2 mb-4" style={headerStyle}>
@@ -437,13 +468,13 @@ function Create() {
               </h5>
               
               <div className="row mb-3" ref={partesDropdownRef}>
-                <div className="col-12">
-                   <label className="form-label fw-bold" style={{color: colors.primaryDeep}}>Adicionar Parte</label>
+                <div className="col-6">
+                   <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>Adicionar Parte</label>
                    <div className="position-relative">
                       <input 
                         type="text" 
                         className='form-control' 
-                        placeholder='Digite para buscar e adicionar...'
+                        placeholder='Busca por nome ou CPF/CNPJ'
                         value={partesTerm}
                         onChange={e => setPartesTerm(e.target.value)}
                         onFocus={() => setShowPartesDropdown(true)}
@@ -468,46 +499,46 @@ function Create() {
               </div>
 
               <div className="mb-5">
-                 {processo.partes.length > 0 ? (
-                     processo.partes.map((p, idx) => (
-                        <div key={p.parteId} className="row g-2 mb-2 align-items-end">
-                            <div className="col-12 col-md-7">
-                                {idx === 0 && <small className="text-muted">Nome da Parte</small>}
-                                <input type="text" className="form-control bg-light" value={p.nome} readOnly disabled />
-                            </div>
-                            <div className="col-12 col-md-4">
-                                {idx === 0 && <small className="text-muted">Tipo de Parte</small>}
-                                <select 
-                                    className="form-select" 
-                                    value={p.tipoParte}
-                                    onChange={e => setProcesso({...tipoParte, status: e.target.value})}>
-                                  <option value="AUTOR">Autor</option>
-                                  <option value="EM_ANDAMENTO">Em Andamento</option>
-                                  <option value="ARQUIVADO">Arquivado</option>
-                                  <option value="FINALIZADO">Finalizado</option>
-                                </select>
+                {processo.partes.length > 0 ? (
+                  processo.partes.map((p, idx) => (
+                    <div key={p.parteId} className="row g-2 mb-2 align-items-end">
+                      <div className="col-4 col-md-4">
+                        {idx === 0 && <small className="text-muted">Nome da Parte</small>}
+                        <input type="text" className="form-control bg-light" value={p.nome} readOnly disabled />
+                      </div>
 
-                                <select name='status' className='form-select'
-                                  value={p.tipoParte}
-                                  onChange={e => setProcesso({...processo, status: e.target.value})} required>
-                                  <option value="">Selecionar</option>
-                                  <option value="EM_ANDAMENTO">Em Andamento</option>
-                                  <option value="ARQUIVADO">Arquivado</option>
-                                  <option value="FINALIZADO">Finalizado</option>
-                                </select>
-                            </div>
-                            <div className="col-12 col-md-1">
-                                <button type="button" className="btn btn-danger w-80" onClick={() => toggleParte({id: p.parteId})}>
-                                    <i className="bi bi-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                     ))
-                 ) : (
-                    <div className="alert alert-light text-center border border-dashed text-muted">
-                        Nenhuma parte selecionada. Utilize a busca acima.
+                      <div className="col-2 col-md-2">
+                        {idx === 0 && <small className="text-muted">Tipo de Parte</small>}
+                        <select 
+                          className="form-select" 
+                          value={p.tipoParte}
+                          onChange={e => {
+                            const novasPartes = [...processo.partes];
+                            novasPartes[idx].tipoParte = e.target.value;
+                            setProcesso({ ...processo, partes: novasPartes });
+                          }} 
+                          required
+                        >
+                          <option value="AUTOR">Autor</option>
+                          <option value="REU">Réu</option>
+                          <option value="TERCEIRO">Terceiro</option>
+                          <option value="ASSISTENTE">Assistente</option>
+                          <option value="INTERESSADO">Interessado</option>
+                        </select>
+                      </div>
+
+                      <div className="col-8 col-md-1">
+                        <button type="button" className="btn btn-danger w-80" onClick={() => toggleParte({id: p.parteId})}>
+                          <i className="bi bi-trash"></i>
+                        </button>
+                      </div>
                     </div>
-                 )}
+                  ))
+                ) : (
+                  <div className="alert alert-light text-center border border-dashed text-muted">
+                    Nenhuma parte selecionada. Utilize a busca acima.
+                  </div>
+                )}
               </div>
 
               {/* --- 4. DOCUMENTOS --- */}
@@ -518,7 +549,8 @@ function Create() {
               <div className="mb-5">
                 {documentosExtras.map((doc, index) => (
                   <div key={doc.id} className="row g-2 mb-2 align-items-end">
-                    <div className="col-12 col-md-11">
+                    
+                    <div className="col-12 col-md-5">
                       {index === 0 && <small className="text-muted">Arquivo (PDF)</small>}
                       <input 
                         type="file" 
@@ -527,6 +559,7 @@ function Create() {
                         onChange={(e) => handleDocumentoFileChange(index, e)}
                       />
                     </div>
+
                     <div className="col-12 col-md-1">
                       {index === 0 ? (
                         <button type="button" className="btn btn-success w-80" onClick={handleAddDocumento}>
@@ -538,16 +571,27 @@ function Create() {
                         </button>
                       )}
                     </div>
+
+                    <div className="col-8 col-md-4">
+                      {index === 0 && <small className="text-muted">Descrição</small>}
+                      <input 
+                        type="text" 
+                        className="form-control" 
+                        placeholder="Ex: Comprovante de Residência"
+                        value={doc.descricao}
+                        onChange={(e) => handleDocumentoDescChange(index, e.target.value)}
+                      />
+                    </div>
+
                   </div>
                 ))}
               </div>
 
+              <hr></hr>
+
               {/* --- 5. OBSERVAÇÕES (RODAPÉ) --- */}
-              <div className="fw-bold border-bottom border-2 pb-2 mb-4" style={headerStyle}>
-              </div>
-              
               <div className='mb-4'>
-                <label className="form-label fw-bold" style={{color: colors.primaryDeep}}>Observações</label>
+                <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>Observações</label>
                 <textarea 
                     rows="4"
                     name='observacoes' 
@@ -557,13 +601,11 @@ function Create() {
                 </textarea>
               </div>
 
-              {/* Botões */}
               <div className="d-flex justify-content-end gap-3 mt-5">
                 <Link to="/processos" className='btn btn-outline-secondary px-4'>Cancelar</Link>
                 
-                {/* Botão CADASTRAR PROCESSO com cor Laranja (Accent) e texto Escuro */}
                 <button className='btn px-4 fw-bold' style={actionBtnStyle}>
-                    Cadastrar Processo
+                  Cadastrar Processo
                 </button>
               </div>
 
