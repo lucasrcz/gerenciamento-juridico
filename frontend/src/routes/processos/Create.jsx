@@ -43,8 +43,6 @@ function Create() {
   const advDropdownRef = useRef(null);
   const partesDropdownRef = useRef(null);
 
-  const tiposParte = ["AUTOR", "REU", "TERCEIRO", "ASSISTENTE", "INTERESSADO"];
-
   // --- EFFECTS (Busca de dados) ---
   useEffect(() => {
     const fetchData = async () => {
@@ -165,10 +163,13 @@ function Create() {
           : [...prev.advogadosIds, advogadoId];
       return { ...prev, advogadosIds: novosIds };
     });
+    setAdvTerm(''); 
+    setShowAdvDropdown(false);
   };
+  
   const getAdvogadoNome = (id) => {
     const adv = advogados.find(a => a.id === id);
-    return adv ? adv.nome : 'Desconhecido';
+    return adv ? `${adv.nome} (${adv.cpf})` : 'Desconhecido';
   };
 
   // Partes
@@ -187,19 +188,10 @@ function Create() {
         };
       }
     });
-    setPartesTerm(''); // Limpar busca após selecionar
+    setPartesTerm('');
     setShowPartesDropdown(false);
   };
-  const updateTipoParte = (parteId, novoTipo) => {
-    setProcesso(prev => ({
-      ...prev,
-      partes: prev.partes.map(p => 
-        p.parteId === parteId ? { ...p, tipoParte: novoTipo } : p
-      )
-    }));
-  };
 
-  // Submit
   const handleSubmit = (event) => {
     event.preventDefault();
 
@@ -246,29 +238,50 @@ function Create() {
     });
   }
 
-  // --- RENDER ---
+  // --- PALETA DE CORES (Extraída da imagem) ---
+  const colors = {
+    primaryDark: '#2C2966', // Azul Roxo Escuro (Títulos)
+    primaryDeep: '#131047', // Azul Quase Preto (Detalhes ou Textos Fortes)
+    secondary:   '#6C6C94', // Azul Acinzentado (Subtextos)
+    accent:      '#FFA051'  // Laranja (Botão de Ação)
+  };
+
+  // Estilo para os Títulos das Seções (Estilo "NUCLEUS")
+  const headerStyle = {
+    letterSpacing: '0.05em', 
+    color: colors.primaryDark,
+    borderColor: colors.primaryDark 
+  };
+
+  // Estilo para o Botão de Cadastro (Destaque)
+  const actionBtnStyle = {
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
+    color: colors.primaryDeep,
+    fontWeight: 'bold'
+  };
+
   return (
     <div className='container-fluid bg-light min-vh-100 p-4'>
       <div className='card border-0 shadow-sm rounded-3 bg-white'>
-          
-        <div className="card-header bg-white border-bottom py-3">
-            <h4 className="mb-0 fw-bold">Novo Processo</h4>
-        </div>
 
         <div className="card-body p-4">
           <form onSubmit={handleSubmit}>
               
               {/* --- 1. DADOS DO PROCESSO --- */}
-              <h5 className="text-muted mb-3">Dados do Processo</h5>
+              <h5 className="fw-bold border-bottom border-2 pb-2 mb-4" style={headerStyle}>
+                Dados do Processo
+              </h5>
+              
               <div className="row mb-3">
                   <div className='col-12 col-md-4 mb-3'>
-                    <label className="form-label fw-bold">Número do Processo *</label>
+                    <label className="form-label fw-bold" style={{color: colors.primaryDeep}}>Nº Processo *</label>
                     <input type="text" name='numero' className='form-control'
                     onChange={e => setProcesso({...processo, numero:e.target.value})} required/>
                   </div>
 
                   <div className='col-12 col-md-4 mb-3'>
-                    <label className="form-label fw-bold">Status *</label>
+                    <label className="form-label fw-bold" style={{color: colors.primaryDeep}}>Status *</label>
                     <select name='status' className='form-select' value={processo.status}
                     onChange={e => setProcesso({...processo, status: e.target.value})} required>
                       <option value="">Selecionar</option>
@@ -279,7 +292,7 @@ function Create() {
                   </div>
 
                   <div className='col-12 col-md-4 mb-3'>
-                    <label className="form-label fw-bold">Estado *</label>
+                    <label className="form-label fw-bold" style={{color: colors.primaryDeep}}>Estado *</label>
                     <select name='estado' className='form-select' value={processo.estado}
                     onChange={e => setProcesso({...processo, estado: e.target.value})} required>
                       <option value="">Selecionar</option>
@@ -292,16 +305,15 @@ function Create() {
                   </div>
 
                   <div className='col-12 mb-3'>
-                    <label className="form-label fw-bold">Contrato</label>
-                    <small className="text-muted">Arquivo (PDF)</small>                    
+                    <label className="form-label fw-bold" style={{color: colors.primaryDeep}}>Contrato Principal (PDF)</label>
                     <input type="file" name='contrato' className='form-control' accept='.pdf'
                     onChange={handleContratoChange}/>
                   </div>
               </div>
 
-              {/* Prazos dentro de Dados do Processo */}
-              <div className="mb-4">
-                <label className="form-label fw-bold d-block mb-2">Prazos e Vencimentos</label>
+              {/* Prazos */}
+              <div className="mb-5">
+                <label className="form-label fw-bold d-block mb-2" style={{color: colors.primaryDeep}}>Prazos e Vencimentos</label>
                 {prazos.map((prazo, index) => (
                   <div key={index} className="row g-2 mb-2 align-items-end">
                     <div className="col-12 col-md-7">
@@ -326,11 +338,11 @@ function Create() {
                     <div className="col-12 col-md-1">
                       {index === 0 ? (
                         <button type="button" className="btn btn-success w-100" onClick={handleAddPrazo} title="Adicionar Prazo">
-                          <i className="bi bi-plus-lg"></i>
+                          <i className="bi bi-plus-lg">+</i>
                         </button>
                       ) : (
                         <button type="button" className="btn btn-danger w-100" onClick={() => handleRemovePrazo(index)} title="Remover Prazo">
-                           <i className="bi bi-trash"></i>
+                           <i className="bi bi-trash">-</i>
                         </button>
                       )}
                     </div>
@@ -338,13 +350,14 @@ function Create() {
                 ))}
               </div>
 
-              <hr className="my-4" />
-
               {/* --- 2. ADVOGADOS --- */}
-              <h5 className="text-muted mb-3">Advogados</h5>
-              <div className="row mb-3">
+              <h5 className="fw-bold border-bottom border-2 pb-2 mb-4" style={headerStyle}>
+                Advogados
+              </h5>
+              
+              <div className="row mb-5">
                 <div className='col-12 col-md-6 mb-3'>
-                    <label className="form-label fw-bold">Advogado Responsável *</label>
+                    <label className="form-label fw-bold" style={{color: colors.primaryDeep}}>Advogado Responsável *</label>
                     <select 
                       className='form-select' 
                       value={processo.advogadoPrincipalId}
@@ -361,7 +374,7 @@ function Create() {
                 </div>
 
                 <div className='col-12 col-md-6 mb-3' ref={advDropdownRef}>
-                    <label className="form-label fw-bold">Advogados Associados</label>
+                    <label className="form-label fw-bold" style={{color: colors.primaryDeep}}>Advogados Associados</label>
                     <div className="position-relative">
                         {/* Input de Busca */}
                         <input 
@@ -389,7 +402,7 @@ function Create() {
                     </div>
 
                     {/* Lista Estilizada de Advogados Selecionados */}
-                    {processo.advogadosIds.length > 0 ? (
+                    {processo.advogadosIds.length > 0 && (
                       <div className="mt-2">
                          {processo.advogadosIds.map((id, index) => (
                             <div key={id} className="row g-2 mb-2 align-items-center">
@@ -408,30 +421,24 @@ function Create() {
                                         className="btn btn-danger w-100" 
                                         onClick={() => toggleAdvogado(id)}
                                         title="Remover Advogado">
-                                        <i className="bi bi-trash"></i>
+                                        <i className="bi bi-trash">-</i>
                                     </button>
                                 </div>
                             </div>
                          ))}
                       </div>
-                      ) : (
-                        <div className="alert alert-light text-center border border-dashed">
-                            Nenhum advogado selecionado. Utilize a busca acima para adicionar.
-                        </div>
-                      )
-                    }
+                    )}
                 </div>
               </div>
 
-              <hr className="my-4" />
-
-              {/* --- 3. PARTES (Estilo Tabela/Prazos) --- */}
-              <h5 className="text-muted mb-3">Partes Envolvidas</h5>
+              {/* --- 3. PARTES ENVOLVIDAS --- */}
+              <h5 className="fw-bold border-bottom border-2 pb-2 mb-4" style={headerStyle}>
+                 Partes Envolvidas
+              </h5>
               
-              {/* Seção de Busca (Mecanismo de Adição) */}
               <div className="row mb-3" ref={partesDropdownRef}>
                 <div className="col-12">
-                   <label className="form-label fw-bold">Adicionar Parte</label>
+                   <label className="form-label fw-bold" style={{color: colors.primaryDeep}}>Adicionar Parte</label>
                    <div className="position-relative">
                       <input 
                         type="text" 
@@ -460,7 +467,7 @@ function Create() {
                 </div>
               </div>
 
-              <div className="mb-3">
+              <div className="mb-5">
                  {processo.partes.length > 0 ? (
                      processo.partes.map((p, idx) => (
                         <div key={p.parteId} className="row g-2 mb-2 align-items-end">
@@ -473,31 +480,42 @@ function Create() {
                                 <select 
                                     className="form-select" 
                                     value={p.tipoParte}
-                                    onChange={(e) => updateTipoParte(p.parteId, e.target.value)}>
-                                    {tiposParte.map(tipo => (
-                                        <option key={tipo} value={tipo}>{tipo}</option>
-                                    ))}
+                                    onChange={e => setProcesso({...tipoParte, status: e.target.value})}>
+                                  <option value="AUTOR">Autor</option>
+                                  <option value="EM_ANDAMENTO">Em Andamento</option>
+                                  <option value="ARQUIVADO">Arquivado</option>
+                                  <option value="FINALIZADO">Finalizado</option>
+                                </select>
+
+                                <select name='status' className='form-select'
+                                  value={p.tipoParte}
+                                  onChange={e => setProcesso({...processo, status: e.target.value})} required>
+                                  <option value="">Selecionar</option>
+                                  <option value="EM_ANDAMENTO">Em Andamento</option>
+                                  <option value="ARQUIVADO">Arquivado</option>
+                                  <option value="FINALIZADO">Finalizado</option>
                                 </select>
                             </div>
                             <div className="col-12 col-md-1">
-                                <button type="button" className="btn btn-danger w-100" onClick={() => toggleParte({id: p.parteId})}>
+                                <button type="button" className="btn btn-danger w-80" onClick={() => toggleParte({id: p.parteId})}>
                                     <i className="bi bi-trash"></i>
                                 </button>
                             </div>
                         </div>
                      ))
                  ) : (
-                    <div className="alert alert-light text-center border border-dashed">
-                        Nenhuma parte selecionada. Utilize a busca acima para adicionar.
+                    <div className="alert alert-light text-center border border-dashed text-muted">
+                        Nenhuma parte selecionada. Utilize a busca acima.
                     </div>
                  )}
               </div>
 
-              <hr className="my-4" />
-
               {/* --- 4. DOCUMENTOS --- */}
-              <h5 className="text-muted mb-3">Documentos Extras</h5>
-              <div className="mb-4">
+              <h5 className="fw-bold border-bottom border-2 pb-2 mb-4" style={headerStyle}>
+                Documentos Extras
+              </h5>
+              
+              <div className="mb-5">
                 {documentosExtras.map((doc, index) => (
                   <div key={doc.id} className="row g-2 mb-2 align-items-end">
                     <div className="col-12 col-md-11">
@@ -511,11 +529,11 @@ function Create() {
                     </div>
                     <div className="col-12 col-md-1">
                       {index === 0 ? (
-                        <button type="button" className="btn btn-success w-100" onClick={handleAddDocumento}>
+                        <button type="button" className="btn btn-success w-80" onClick={handleAddDocumento}>
                           <i className="bi bi-plus-lg"></i>
                         </button>
                       ) : (
-                        <button type="button" className="btn btn-danger w-100" onClick={() => handleRemoveDocumento(index)}>
+                        <button type="button" className="btn btn-danger w-80" onClick={() => handleRemoveDocumento(index)}>
                           <i className="bi bi-trash"></i>
                         </button>
                       )}
@@ -524,23 +542,29 @@ function Create() {
                 ))}
               </div>
 
-              <hr className="my-4" />
-
               {/* --- 5. OBSERVAÇÕES (RODAPÉ) --- */}
+              <div className="fw-bold border-bottom border-2 pb-2 mb-4" style={headerStyle}>
+              </div>
+              
               <div className='mb-4'>
-                <label className="form-label fw-bold">Observações</label>
+                <label className="form-label fw-bold" style={{color: colors.primaryDeep}}>Observações</label>
                 <textarea 
                     rows="4"
                     name='observacoes' 
                     className='form-control'
-                    placeholder="Digite aqui, caso houver, observações adicionais sobre o processo."
+                    placeholder="Digite aqui, se houver, observações adicionais sobre o processo."
                     onChange={e => setProcesso({...processo, observacoes:e.target.value})}>
                 </textarea>
               </div>
 
+              {/* Botões */}
               <div className="d-flex justify-content-end gap-3 mt-5">
                 <Link to="/processos" className='btn btn-outline-secondary px-4'>Cancelar</Link>
-                <button className='btn btn-success px-5 fw-bold'>Cadastrar Processo</button>
+                
+                {/* Botão CADASTRAR PROCESSO com cor Laranja (Accent) e texto Escuro */}
+                <button className='btn px-4 fw-bold' style={actionBtnStyle}>
+                    Cadastrar Processo
+                </button>
               </div>
 
            </form>
