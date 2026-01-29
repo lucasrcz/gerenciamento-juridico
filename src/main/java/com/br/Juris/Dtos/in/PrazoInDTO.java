@@ -4,9 +4,10 @@ package com.br.Juris.Dtos.in;
 import com.br.Juris.Entities.Prazo;
 import com.br.Juris.Entities.Processo;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public record PrazoInDTO(LocalDateTime dataVencimento, String descricao, Long idProcesso) {
+public record PrazoInDTO(LocalDate dataVencimento, String descricao, Long idProcesso) {
 
     public static Prazo toEntity(PrazoInDTO prazo, Processo processo) {
         Prazo entity = new Prazo();

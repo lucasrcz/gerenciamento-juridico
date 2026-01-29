@@ -110,12 +110,13 @@ CREATE TABLE documento (
 -- Depende de Processos.
 CREATE TABLE prazos (
                         id BIGSERIAL NOT NULL,
-                        data_vencimento TIMESTAMP NOT NULL,
+                        data_vencimento DATE NOT NULL,
                         descricao VARCHAR(255),
                         processo_id BIGINT,
 
                         PRIMARY KEY (id),
-                        CONSTRAINT fk_prazos_processo FOREIGN KEY (processo_id) REFERENCES processos (id)
+                        CONSTRAINT fk_prazos_processo
+                            FOREIGN KEY (processo_id) REFERENCES processos (id)
 );
 
 

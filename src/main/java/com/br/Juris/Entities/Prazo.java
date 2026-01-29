@@ -26,7 +26,7 @@ public class Prazo {
     private Long id;
 
     @Column(name = "data_vencimento",nullable = false)
-    private LocalDateTime dataVencimento;
+    private LocalDate dataVencimento;
 
     @Column(name = "descricao", length = 255)
     private String descricao;
@@ -40,7 +40,7 @@ public class Prazo {
 
         return ChronoUnit.DAYS.between(
                 LocalDate.now(),
-                this.dataVencimento.toLocalDate()
+                this.dataVencimento
         );
     }
 
