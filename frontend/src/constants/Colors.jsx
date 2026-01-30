@@ -10,3 +10,20 @@ export const Colors = {
     danger: '#c24c58',
     textLight: '#F8F9FA'
 };
+
+export const headerStyle = {
+    letterSpacing: '0.05em', 
+    color: Colors.primaryDark,
+    borderColor: Colors.primaryDark,
+    backgroundColor: '#f8f9fa',
+    padding: '10px 15px',
+    borderRadius: '8px',
+    marginTop: '20px'
+  };
+
+  export const actionBtnStyle = {
+    backgroundColor: Colors.accent,
+    borderColor: Colors.accent,
+    color: Colors.primaryDeep,
+    fontWeight: 'bold'
+  };
