@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -61,5 +60,13 @@ public class PrazosService {
         Prazo prazo = findById(id);
         repository.delete(prazo);
         return new MessageOutDTO(id,"Prazo deletado com sucesso");
+    }
+
+    @Transactional(readOnly = true)
+    public List<PrazosOutDTO> listarPrazosProximosExpirarPorProcesso(Long id){
+        LocalDate dataAtual = LocalDate.now();
+        LocalDate dataFinal = dataAtual.plusDays(15);
+        List<Prazo> prazos = repository.buscarPrazosProximosParaProcesso(dataAtual,dataFinal,id);
+        return prazos.stream().map(PrazosOutDTO::fromEntity).toList();
     }
 }

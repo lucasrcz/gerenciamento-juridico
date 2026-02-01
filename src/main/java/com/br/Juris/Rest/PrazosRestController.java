@@ -50,4 +50,9 @@ public class PrazosRestController {
         return ResponseEntity.ok(service.deletePrazo(id));
     }
 
+    @Operation(description = "Retorna Prazos perto de expirar para um determinado processo")
+    @GetMapping("processo/{idProcesso}")
+    public ResponseEntity<List<PrazosOutDTO>> getPrazosProcesso(@PathVariable Long idProcesso){
+        return ResponseEntity.ok(service.listarPrazosProximosExpirarPorProcesso(idProcesso));
+    }
 }
