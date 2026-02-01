@@ -11,7 +11,7 @@ import java.util.List;
  * DTO for {@link com.br.Juris.Entities.Processo}
  */
 public record ProcessoOutDTO(Long id, String numero, StatusProcesso status, String observacoes,
-                             EstadoBrasil estado, ContratoOutDTO contrato, List<String> advogadosIds, List<Long> partesIds) implements Serializable {
+                             EstadoBrasil estado, ContratoOutDTO contrato, List<String> advogadosIds, List<Long> partesIds,String advogadoResponsavelId) implements Serializable {
 
     public static ProcessoOutDTO fromEntity(Processo processo){
         ContratoOutDTO contratoOut = null;
@@ -29,6 +29,7 @@ public record ProcessoOutDTO(Long id, String numero, StatusProcesso status, Stri
                 processo.getEstado(),
                 contratoOut,
                 advogadosIds,
-                partesIds);
+                partesIds,
+                processo.getAdvogadoResponsavel().getId().toString());
     }
 }
