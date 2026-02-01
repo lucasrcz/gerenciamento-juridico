@@ -2,9 +2,10 @@ package com.br.Juris.Dtos.out;
 
 import com.br.Juris.Entities.Prazo;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public record PrazosOutDTO(LocalDateTime dataVencimento, String descricao, Long diasFimPrazo,
+public record PrazosOutDTO(LocalDate dataVencimento, String descricao, Long diasFimPrazo,
                            Long idProcesso, String numeroProcesso) {
 
     public static PrazosOutDTO fromEntity(Prazo entity) {
