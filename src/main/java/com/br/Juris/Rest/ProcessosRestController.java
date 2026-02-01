@@ -2,6 +2,7 @@ package com.br.Juris.Rest;
 
 import com.br.Juris.Dtos.in.ProcessoInDTO;
 import com.br.Juris.Dtos.out.MessageOutDTO;
+import com.br.Juris.Dtos.out.PrazosOutDTO;
 import com.br.Juris.Dtos.out.ProcessoOutDTO;
 import com.br.Juris.Enums.EstadoBrasil;
 import com.br.Juris.Enums.StatusProcesso;
@@ -83,6 +84,12 @@ public class ProcessosRestController {
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageOutDTO> update(@PathVariable Long id, @ModelAttribute ProcessoInDTO processo) throws IOException {
         return ResponseEntity.ok(processosService.update(id, processo));
+    }
+
+    @Operation(description = "Retorna os prazos de um determinado processo")
+    @GetMapping("{id}/prazos")
+    public ResponseEntity<List<PrazosOutDTO>> prazos(@PathVariable Long id){
+        return ResponseEntity.ok(processosService.listPrazos(id));
     }
 
 

@@ -90,6 +90,7 @@ public class DocumentoService {
                 documento.setArquivo(dtos.get(i).arquivo().getBytes());
                 documento.setDescricao(dtos.get(i).descricao().isBlank() ? null : dtos.get(i).descricao());
                 documento.setFormatoArquivo(dtos.get(i).arquivo().getContentType());
+                documento.setNome(dtos.get(i).arquivo().getOriginalFilename());
                 repository.save(documento);
             }catch (IOException e){
                 throw  new ResponseStatusException(HttpStatus.BAD_REQUEST,"Erro ao processar arquivo: " + dtos.get(i).arquivo().getOriginalFilename());

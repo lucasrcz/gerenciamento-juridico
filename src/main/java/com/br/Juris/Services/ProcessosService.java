@@ -3,6 +3,7 @@ package com.br.Juris.Services;
 import com.br.Juris.Dtos.in.ProcessoInDTO;
 import com.br.Juris.Dtos.in.ProcessoParteInDTO;
 import com.br.Juris.Dtos.out.MessageOutDTO;
+import com.br.Juris.Dtos.out.PrazosOutDTO;
 import com.br.Juris.Dtos.out.ProcessoOutDTO;
 import com.br.Juris.Entities.Advogado;
 import com.br.Juris.Entities.Partes;
@@ -143,6 +144,12 @@ public class ProcessosService {
         return new MessageOutDTO(processoExistente.getId(), String.format("Processo Nº %s atualizado com sucesso", processoExistente.getNumero()));
     }
 
+    @Transactional(readOnly = true)
+    public List<PrazosOutDTO> listPrazos(Long id){
+        Processo processo = this.findById(id);
+        return processo.getPrazos().stream().map(PrazosOutDTO::fromEntity).toList();
+    }
+
     private void atualizarDadosSimples(Processo processo, ProcessoInDTO dto) throws IOException {
         Processo edit = ProcessoInDTO.toEntity(dto);
         processo.setNumero(edit.getNumero());
@@ -170,4 +177,5 @@ public class ProcessosService {
     private void vincularAdvogadoPrincipal(String id,Processo processo){
         processo.setAdvogadoResponsavel(authorizationService.findById(id));
     }
+
 }
