@@ -1,9 +1,3 @@
-package com.br.Juris.Dtos.out;
-
-import com.br.Juris.Entities.Advogado;
-import com.br.Juris.Entities.Partes;
-import com.br.Juris.Entities.Processo;
-import com.br.Juris.Enums.EstadoBrasil;
 import com.br.Juris.Enums.StatusProcesso;
 
 import java.io.Serializable;

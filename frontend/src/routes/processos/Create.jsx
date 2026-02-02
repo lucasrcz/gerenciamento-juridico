@@ -424,7 +424,8 @@ function Create() {
 
             <div className='mb-4'>
               <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>Observações</label>
-              <textarea rows="3" className='form-control' onChange={e => setProcesso({...processo, observacoes:e.target.value})}></textarea>
+              <textarea rows="3" className='form-control' onChange={e => setProcesso({...processo, observacoes:e.target.value})}
+                placeholder='Adicione aqui, caso houver, observações adicionais sobre o Processo'></textarea>
             </div>
 
             <div className="d-flex justify-content-end gap-3 mt-5 border-top pt-4">

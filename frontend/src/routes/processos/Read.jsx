@@ -3,11 +3,13 @@ import { api } from '../../services/API';
 import { Link, useParams } from 'react-router-dom';
 import { Colors } from '../../constants/Colors';
 import { EstadosBrasileiros } from '../../constants/EstadosBrasileiros';
+import DocumentosModal from '../../components/DocumentosModal';
+import PrazosModal from '../../components/PrazosModal';
 
 function Read() {
   const { id } = useParams();
   
-  // --- ESTADOS ---
+  // Estados
   const [processo, setProcesso] = useState(null);
   const [prazosList, setPrazosList] = useState([]);
   const [documentosList, setDocumentosList] = useState([]);
@@ -16,7 +18,10 @@ function Read() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  // --- BUSCA DE DADOS ---
+  const [showDocumentosModal, setShowDocumentosModal] = useState(false);
+  const [showPrazosModal, setShowPrazosModal] = useState(false);
+
+  // Busca de dados na API
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -55,7 +60,7 @@ function Read() {
     if (id) fetchData();
   }, [id]);
 
-  // --- DOWNLOAD DO CONTRATO ---
+  // Download do Contrato
   useEffect(() => {
     const fetchContractBlob = async () => {
         if (!processo || !processo.contrato) return;
@@ -73,7 +78,6 @@ function Read() {
     fetchContractBlob();
   }, [processo]);
 
-  // --- HELPERS ---
   const formatDate = (dateString) => {
     try { return new Date(dateString).toLocaleDateString('pt-BR'); } 
     catch { return dateString || '-'; }
@@ -177,7 +181,42 @@ function Read() {
     return cores[tipoParte] || 'bg-secondary';
   };
 
-  // --- TIMELINE ---
+  // Retorna badge de status do prazo
+  const getStatusBadgePrazo = (diasRestantes) => {
+    if (diasRestantes == null) return null;
+    if (diasRestantes < 0) return { badge: 'Vencido', class: 'bg-secondary' };
+    if (diasRestantes <= 3) return { badge: 'Urgente', class: 'bg-danger' };
+    if (diasRestantes <= 7) return { badge: 'Atenção', class: 'bg-warning text-dark' };
+    return { badge: 'No Prazo', class: 'bg-success' };
+  };
+
+  // Formata texto de dias restantes
+  const formatDiasRestantes = (diasRestantes) => {
+    if (diasRestantes == null) return '';
+    if (diasRestantes < 0) return `Vencido há ${Math.abs(diasRestantes)} dia(s)`;
+    return `${diasRestantes} dia(s) restante(s)`;
+  };
+
+  // Função para atualizar dados após CRUD nos modals
+  const handleUpdateData = () => {
+    const fetchData = async () => {
+      try {
+        // Recarrega Prazos
+        const resPrazos = await api.get(`/processos/${id}/prazos`);
+        setPrazosList(resPrazos.data || []);
+
+        // Recarrega Documentos
+        const resDocs = await api.get(`/documentos/list/${id}`); 
+        const docsData = Array.isArray(resDocs.data) ? resDocs.data : (resDocs.data.content || []);
+        setDocumentosList(docsData);
+      } catch (e) {
+        console.warn("Erro ao atualizar dados:", e);
+      }
+    };
+    fetchData();
+  };
+
+  // Timeline de Prazos e Documentos
   const timelineEvents = useMemo(() => {
     const eventsPrazos = prazosList.map(p => ({
       type: 'PRAZO',
@@ -233,6 +272,28 @@ function Read() {
             <div className="d-flex gap-2">
               <Link to="/processos" className='btn btn-outline-secondary btn-sm'>Voltar</Link>
               <Link to={`/processos/update/${id}`} className='btn btn-success btn-sm'>Editar</Link>
+            </div>
+          </div>
+
+          {/* Botões de Gerenciamento */}
+          <div className="row mb-4">
+            <div className="col-md-6">
+              <button 
+                className="btn btn-primary w-100 shadow-sm"
+                onClick={() => setShowDocumentosModal(true)}
+              >
+                <i className="bi bi-file-earmark-text me-2"></i>
+                Gerenciar Documentos ({documentosList.length})
+              </button>
+            </div>
+            <div className="col-md-6">
+              <button 
+                className="btn btn-danger w-100 shadow-sm"
+                onClick={() => setShowPrazosModal(true)}
+              >
+                <i className="bi bi-calendar-event me-2"></i>
+                Gerenciar Prazos ({prazosList.length})
+              </button>
             </div>
           </div>
 
@@ -323,31 +384,51 @@ function Read() {
 
           {/* Timeline */}
           <div className="mt-4">
-            <h5 className="fw-bold mb-4 ps-2 border-start border-4 border-primary">Histórico</h5>
+            <h5 className="fw-bold mb-4 ps-2 border-start border-4 border-primary">Histórico de Prazos e Documentos</h5>
             <hr/><br/>
             {timelineEvents.length > 0 ? (
               <div className="position-relative ps-4 pb-5">
                 <div className="position-absolute h-100 border-start border-2 bg-secondary opacity-25" style={{left: '1.4rem', top: 0}}></div>
-                {timelineEvents.map((event) => (
+                {timelineEvents.map((event) => {
+                  const statusBadge = event.type === 'PRAZO' ? getStatusBadgePrazo(event.diasRestantes) : null;
+                  
+                  return (
                     <div key={event.id} className="card border-0 shadow-sm mb-3 position-relative">
                       <div className={`position-absolute top-0 start-0 translate-middle rounded-circle d-flex align-items-center justify-content-center text-white shadow-sm ${event.type === 'PRAZO' ? 'bg-danger' : 'bg-primary'}`} 
                            style={{width: '40px', height: '40px', left: '-22px', zIndex: 1}}>
                         <i className={`bi ${event.type === 'PRAZO' ? 'bi-calendar-event' : 'bi-paperclip'}`}></i>
                       </div>
                       <div className="card-body ms-2 py-2">
-                        <div className="d-flex justify-content-between">
-                          <h6 className={`fw-bold mb-0 ${event.type === 'PRAZO' ? 'text-danger' : 'text-primary'}`}>{event.title}</h6>
-                          <span className="badge bg-light text-secondary border">{formatDate(event.date)}</span>
+                        <div className="d-flex justify-content-between align-items-center">
+                          <h6 className={`fw-bold mb-0 ${event.type === 'PRAZO' ? 'text-danger' : 'text-primary'}`}>
+                            {event.title}
+                          </h6>
+                          <div className="d-flex align-items-center gap-2">
+                            {/* Badge de Status (somente para Prazos) */}
+                            {statusBadge && (
+                              <span className={`badge ${statusBadge.class}`}>
+                                {statusBadge.badge}
+                              </span>
+                            )}
+                            {/* Data */}
+                            <span className="badge bg-light text-secondary border">
+                              {formatDate(event.date)}
+                            </span>
+                          </div>
                         </div>
-                        <p className="card-text mb-1 small">{event.description}</p>
-                        {event.type === 'DOC' && (
-                          <button onClick={() => handleDownloadDoc(event.originalId, event.description)} className="btn btn-sm btn-link px-0 text-decoration-none">
-                             <i className="bi bi-download me-1"></i> Baixar
-                          </button>
+                        
+                        <p className="card-text mb-1 small mt-2">{event.description}</p>
+                        
+                        {/* Dias restantes (somente para Prazos) */}
+                        {event.type === 'PRAZO' && event.diasRestantes != null && (
+                          <small className="text-muted d-block mt-1">
+                            {formatDiasRestantes(event.diasRestantes)}
+                          </small>
                         )}
                       </div>
                     </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <div className="text-center p-5 bg-light rounded">
@@ -363,7 +444,7 @@ function Read() {
           {processo.contrato ? (
             <>
               <div className="bg-dark text-white px-3 py-2 d-flex justify-content-between align-items-center shadow-sm">
-                 <span className="fw-bold"><i className="bi bi-file-earmark-pdf-fill me-2"></i>Contrato Principal</span>
+                 <span className="fw-bold"><i className="bi bi-file-earmark-pdf-fill me-2"></i>Contrato</span>
                  {pdfUrl && <a href={pdfUrl} download={`Contrato_${processo.numero}.pdf`} className="btn btn-sm btn-outline-light"><i className="bi bi-download"></i></a>}
               </div>
               <div className="flex-grow-1 bg-white position-relative d-flex flex-column justify-content-center align-items-center">
@@ -389,6 +470,21 @@ function Read() {
           )}
         </div>
       </div>
+      
+      {/* Modals */}
+      <DocumentosModal 
+        isOpen={showDocumentosModal}
+        onClose={() => setShowDocumentosModal(false)}
+        processoId={id}
+        onUpdate={handleUpdateData}
+      />
+
+      <PrazosModal 
+        isOpen={showPrazosModal}
+        onClose={() => setShowPrazosModal(false)}
+        processoId={id}
+        onUpdate={handleUpdateData}
+      />
     </div>
   )
 }
