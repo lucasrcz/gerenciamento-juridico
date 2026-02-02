@@ -17,4 +17,12 @@ public interface PrazoRepository extends JpaRepository<Prazo, Long> {
             "ORDER BY p.dataVencimento ASC")
     List<Prazo> buscarPrazosProximos(@Param("dataAtual") LocalDate dataAtual,
                                      @Param("dataFinal") LocalDate dataFinal);
+
+    @Query("SELECT p FROM Prazo p " +
+            "WHERE p.dataVencimento BETWEEN :dataAtual AND :dataFinal " +
+            "AND p.processo.id = :idProcesso " +
+            "ORDER BY p.dataVencimento ASC")
+    List<Prazo> buscarPrazosProximosParaProcesso(@Param("dataAtual") LocalDate dataAtual,
+                                     @Param("dataFinal") LocalDate dataFinal,
+                                     @Param("idProcesso") Long idProcesso);
 }

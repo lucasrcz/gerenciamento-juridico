@@ -92,8 +92,4 @@ public class ProcessosRestController {
         return ResponseEntity.ok(processosService.listPrazos(id));
     }
 
-
-
-
-
 }
