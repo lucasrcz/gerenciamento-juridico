@@ -21,8 +21,21 @@ public record ProcessoOutDTO(Long id, String numero, StatusProcesso status, Stri
         if (processo.getContrato() != null) {
             contratoOut = ContratoOutDTO.fromEntity(processo.getContrato());
         }
-        List<AdvogadoProcessoOutDTO> advogadosIds = processo.getAdvogados().stream().map(a-> new AdvogadoProcessoOutDTO(a.getId().toString(),a.getNome(),a.getNumeroOAB(),a.getSeccional())).toList();
-        List<ParteProcessoOutDTO> partesIds = processo.getProcessoPartes().stream().map(p-> new ParteProcessoOutDTO(p.getParte().getId(), p.getParte().getNome(),p.getParte().getDocumento(),p.getParte().getTipoPessoa().getDescricao())).toList();
+        List<AdvogadoProcessoOutDTO> advogadosIds = processo.getAdvogados().stream()
+            .map(a-> new AdvogadoProcessoOutDTO(a.getId().toString(), a.getNome(), a.getNumeroOAB(), a.getSeccional()))
+            .toList();
+        
+        // CORRIGIDO: Agora pega tanto tipoPessoa quanto tipoParte
+        List<ParteProcessoOutDTO> partesIds = processo.getProcessoPartes().stream()
+            .map(pp-> new ParteProcessoOutDTO(
+                pp.getParte().getId(), 
+                pp.getParte().getNome(),
+                pp.getParte().getDocumento(),
+                pp.getParte().getTipoPessoa().getDescricao(),  // "Pessoa Física" ou "Pessoa Jurídica"
+                pp.getTipoParte() != null ? pp.getTipoParte().name() : "PARTE"  // "AUTOR", "REU", etc
+            ))
+            .toList();
+        
         Advogado responsavel = processo.getAdvogadoResponsavel();
         return new ProcessoOutDTO(
                 processo.getId(),
@@ -33,6 +46,6 @@ public record ProcessoOutDTO(Long id, String numero, StatusProcesso status, Stri
                 contratoOut,
                 advogadosIds,
                 partesIds,
-                new AdvogadoProcessoOutDTO(responsavel.getId().toString(),responsavel.getNome(),responsavel.getNumeroOAB(),responsavel.getSeccional()));
+                new AdvogadoProcessoOutDTO(responsavel.getId().toString(), responsavel.getNome(), responsavel.getNumeroOAB(), responsavel.getSeccional()));
     }
 }

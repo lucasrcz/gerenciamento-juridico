@@ -27,15 +27,16 @@ public class Contrato {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nome",nullable = false)
+    @Column(name = "nome", length = 255)  // ✅ Deve estar mapeado corretamente
     private String nome;
 
+    @Lob
     @Basic(fetch = FetchType.LAZY)
-    @Column(name = "dados", nullable = false,columnDefinition = "bytea")
+    @Column(name = "dados")
     private byte[] dados;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "processo_id", nullable = false, unique = true)
+    @JoinColumn(name = "processo_id")
     private Processo processo;
 
     public void updateContrato(MultipartFile arquivo) throws IOException {

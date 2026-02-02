@@ -34,11 +34,8 @@ function Login() {
         login: credentials.login.replace(/\D/g, ''),
         senha: credentials.senha
       };
-
-      console.log('Tentando login com:', dataToSend);
       
       await login(dataToSend);
-      console.log('Login bem-sucedido!');
       navigate('/dashboard');
     } catch (err) {
       console.error('Erro completo:', err);

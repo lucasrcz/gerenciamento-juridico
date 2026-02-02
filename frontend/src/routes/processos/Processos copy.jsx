@@ -1,0 +1,88 @@
+import { useEffect, useState } from 'react'
+import { api } from '../../services/API';
+import { Link } from 'react-router-dom'
+import Search from './Search';
+import Tabela from './Tabela';
+
+function Processos() {
+  // GETTERS E SETTERS
+  const [processos, setProcessos] = useState([]);
+  const [query, setQuery] = useState({});
+  const [pendingQuery, setPendingQuery] = useState({});
+
+const handleSearch = () => {
+  setQuery(pendingQuery);
+};
+
+const handleClear = () => {
+  setPendingQuery({});
+  setQuery({});
+};
+
+  // Busca os dados de processos da API
+  useEffect(() => {
+    const fetchProcessos = async() => {
+      try {
+        console.log('Query enviada:', query); // DEBUG
+        const res = await api.get('/processos/list', {
+          params: {
+            numero: query.numero || null,
+            status: query.status || null,
+            estado: query.estado || undefined,
+            advogadoPrincipalId: query.advogadoPrincipalId || null,
+            advogadosIds: query.advogadosIds || null,
+            partesIds: query.partesIds || null
+          }
+          
+        }); 
+        console.log('Processos retornados:', res.data); // DEBUG
+        setProcessos(res.data.content || res.data);
+      } catch(err) {
+        console.log('Erro na requisição:', err.response?.data || err); // DEBUG
+      }
+    }
+    fetchProcessos()
+    console.log(query)
+  }, [query]);
+
+  // Armazena o filtro
+  const handleChange = (e) => {
+    setPendingQuery({ ...pendingQuery, [e.target.name]: e.target.value });
+  };
+
+  // Lógica de deletar processo (Tabela)
+
+  const handleDelete = (id) => {
+    const confirm = window.confirm("Tem certeza que deseja deletar o processo?" );
+    if(confirm) {
+      api.delete('/processos/' + id)
+      .then(res => {
+        setProcessos(processos.filter(p => p.id !== id));
+        alert('Processo deletado com sucesso!');
+      })
+      .catch(err => console.log(err));
+    }
+  }
+
+  return (
+    <div className='d-flex flex-column justify-content-center align-items-center bg-light vh-100'>
+      <h2>Pesquisa</h2>
+      <Search
+      handleChange={handleChange}
+      handleSearch={handleSearch}
+      handleClear={handleClear}
+      values={pendingQuery}
+      />
+
+      <h2>Lista de Processos Jurídicos</h2>
+      <div className='w-75 rounded bg-white border shadow p-4 m-3'>
+        <div className='d-flex gap-2 pb-3'>
+          <Link to="/processos/create" className='btn btn-success'>Cadastrar Processo</Link>
+        </div>
+        <Tabela processos={processos} handleDelete={handleDelete}/>
+      </div>
+    </div>
+  )
+}
+
+export default Processos
