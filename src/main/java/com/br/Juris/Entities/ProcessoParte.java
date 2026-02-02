@@ -2,14 +2,17 @@ package com.br.Juris.Entities;
 
 import com.br.Juris.Enums.TipoParte;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "processo_partes")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class ProcessoParte {
 
     @Id
@@ -25,20 +28,19 @@ public class ProcessoParte {
     private Partes parte;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "tipo_parte")
+    @Column(name = "tipo_parte", nullable = false)
     private TipoParte tipoParte;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ProcessoParte)) return false;
-        ProcessoParte that = (ProcessoParte) o;
-        return processo != null && processo.equals(that.processo) &&
-               parte != null && parte.equals(that.parte);
-    }
+    @Column(name = "observacoes", columnDefinition = "text")
+    private String observacoes;
 
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
+    public ProcessoParte(Processo processo,
+                         Partes parte,
+                         TipoParte tipoParte,
+                         String observacoes) {
+        this.processo = processo;
+        this.parte = parte;
+        this.tipoParte = tipoParte;
+        this.observacoes = observacoes;
     }
 }

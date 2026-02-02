@@ -1,9 +1,6 @@
 package com.br.Juris.Dtos.out;
 
-public record ParteProcessoOutDTO(
-    Long id, 
-    String nome, 
-    String documento, 
-    String tipoPessoa,
-    String tipoParte
-) {}
+import com.br.Juris.Enums.TipoParte;
+
+public record ParteProcessoOutDTO(Long id, String nome, String documento, String tipoParte) {
+}
