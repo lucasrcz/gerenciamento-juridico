@@ -39,7 +39,7 @@ public class Contrato {
     private Processo processo;
 
     public void updateContrato(MultipartFile arquivo) throws IOException {
-        this.nome = arquivo.getName();
+        this.nome = arquivo.getOriginalFilename();
         this.dados = arquivo.getBytes();
     }
 }

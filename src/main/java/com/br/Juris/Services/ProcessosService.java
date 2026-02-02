@@ -6,6 +6,7 @@ import com.br.Juris.Dtos.out.MessageOutDTO;
 import com.br.Juris.Dtos.out.PrazosOutDTO;
 import com.br.Juris.Dtos.out.ProcessoOutDTO;
 import com.br.Juris.Entities.Advogado;
+import com.br.Juris.Entities.Contrato;
 import com.br.Juris.Entities.Partes;
 import com.br.Juris.Entities.Processo;
 import com.br.Juris.Entities.ProcessoParte;
@@ -151,12 +152,13 @@ public class ProcessosService {
     }
 
     private void atualizarDadosSimples(Processo processo, ProcessoInDTO dto) throws IOException {
-        Processo edit = ProcessoInDTO.toEntity(dto);
-        processo.setNumero(edit.getNumero());
-        processo.setObservacoes(edit.getObservacoes());
-        processo.setStatus(edit.getStatus());
-        processo.setEstado(edit.getEstado());
-        processo.setContrato(edit.getContrato());
+        processo.setNumero(dto.numero());
+        processo.setObservacoes(dto.observacoes());
+        processo.setStatus(dto.status());
+        processo.setEstado(dto.estado());
+        if(!dto.contrato().isEmpty()){
+            processo.getContrato().updateContrato(dto.contrato());
+        }
     }
 
     private void vincularPartes(List<ProcessoParteInDTO> dtos , Processo processo){
