@@ -14,20 +14,21 @@ import java.util.UUID;
 
 public interface ProcessoRepository extends JpaRepository<Processo, Long> {
 
-
+    // Usando DISTINCT e subqueries para evitar duplicação
     @Query("""
-    SELECT p
-    FROM Processo p
-    LEFT JOIN p.advogados a
-    LEFT JOIN p.processoPartes pp
-    LEFT JOIN pp.parte parte
-    WHERE (LOWER(p.numero) LIKE LOWER(CONCAT('%', :numero, '%')) OR :numero IS NULL)
-      AND (:status IS NULL OR p.status = :status)
-      AND (:estado IS NULL OR p.estado = :estado)
-      AND (:advogadoId IS NULL OR a.id = :advogadoId)
-      AND (:advogadosIds IS NULL OR a.cpf IN :advogadosIds)
-      AND (:partesIds IS NULL OR parte.id IN :partesIds)
-""")
+        SELECT DISTINCT p FROM Processo p
+        WHERE (:numero IS NULL OR LOWER(p.numero) LIKE LOWER(CONCAT('%', :numero, '%')))
+          AND (:status IS NULL OR p.status = :status)
+          AND (:estado IS NULL OR p.estado = :estado)
+          AND (:advogadoId IS NULL OR p.advogadoResponsavel.id = :advogadoId)
+          AND (:advogadosIds IS NULL OR EXISTS (
+              SELECT 1 FROM p.advogados a WHERE a.id IN :advogadosIds
+          ))
+          AND (:partesIds IS NULL OR EXISTS (
+              SELECT 1 FROM p.processoPartes pp WHERE pp.parte.id IN :partesIds
+          ))
+        ORDER BY p.id DESC
+    """)
     Page<Processo> buscarComFiltros(
             @Param("numero") String numero,
             @Param("status") StatusProcesso status,

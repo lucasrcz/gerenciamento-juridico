@@ -156,9 +156,23 @@ public class ProcessosService {
         processo.setObservacoes(dto.observacoes());
         processo.setStatus(dto.status());
         processo.setEstado(dto.estado());
-        if(!dto.contrato().isEmpty()){
-            processo.getContrato().updateContrato(dto.contrato());
+        
+        // Verificar se contrato não é null e não está vazio antes de atualizar
+        if(dto.contrato() != null && !dto.contrato().isEmpty()){
+            // Se já existe um contrato, atualiza
+            if(processo.getContrato() != null) {
+                processo.getContrato().updateContrato(dto.contrato());
+            } 
+            // Se não existe, cria um novo
+            else {
+                Contrato novoContrato = new Contrato();
+                novoContrato.setNome(dto.contrato().getOriginalFilename());
+                novoContrato.setDados(dto.contrato().getBytes());
+                novoContrato.setProcesso(processo);
+                processo.setContrato(novoContrato);
+            }
         }
+        // Se contrato for null ou vazio, mantém o contrato existente
     }
 
     private void vincularPartes(List<ProcessoParteInDTO> dtos , Processo processo){
