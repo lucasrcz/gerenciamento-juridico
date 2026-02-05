@@ -64,7 +64,7 @@ function DocumentosModal({ isOpen, onClose, processoId, onUpdate }) {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       
-      alert("Documentos cadastrados com sucesso!");
+      alert("Documento cadastrado com sucesso!");
       setShowForm(false);
       setSelectedFiles([]);
       setFormData({ arquivos: [], descricoes: [] });
@@ -79,17 +79,17 @@ function DocumentosModal({ isOpen, onClose, processoId, onUpdate }) {
   };
 
   const handleDelete = async (ids) => {
-    if (!window.confirm("Deseja realmente excluir este(s) documento(s)?")) return;
+    if (!window.confirm("Deseja realmente excluir este documento?")) return;
     
     try {
       setLoading(true);
       await api.delete('/documentos', { data: Array.isArray(ids) ? ids : [ids] });
-      alert("Documento(s) excluído(s) com sucesso!");
+      alert("Documento excluído com sucesso!");
       fetchDocumentos();
       onUpdate?.();
     } catch (err) {
       console.error("Erro ao excluir:", err);
-      alert("Erro ao excluir documento(s)");
+      alert("Erro ao excluir documento");
     } finally {
       setLoading(false);
     }
@@ -165,7 +165,6 @@ function DocumentosModal({ isOpen, onClose, processoId, onUpdate }) {
                     <label className="form-label">Descrição do Arquivo</label>
                     {selectedFiles.map((file, idx) => (
                       <div key={idx} className="mb-2">
-                        <small className="text-muted d-block">{file.name}</small>
                         <input 
                           type="text"
                           className="form-control form-control-sm"

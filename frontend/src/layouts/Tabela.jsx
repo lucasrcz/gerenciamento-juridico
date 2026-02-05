@@ -14,7 +14,7 @@ function Tabela({
   const styles = {
     headerRow: { 
       backgroundColor: '#2C2966', // Primary Deep
-      color: '#fff', 
+      color: '#fff'
     },
     headerCell: {
       backgroundColor: 'inherit', 
@@ -23,7 +23,7 @@ function Tabela({
       userSelect: 'none',
       border: 'none',
       padding: '12px 16px',
-      verticalAlign: 'middle'
+      verticalAlign: 'middle',
     },
     // Botão de paginação inativo (outline)
     pageBtn: { 
@@ -44,7 +44,7 @@ function Tabela({
   };
 
   const getSortIcon = (columnKey) => {
-    if (sorting.orderBy !== columnKey) return <i className="bi bi-arrow-down-up ms-2 opacity-50" style={{fontSize: '0.7rem'}}></i>;
+    if (sorting.orderBy !== columnKey) return <i className="bi bi-arrow-down-up ms-2 opacity-50"></i>;
     if (sorting.direction === 'asc') return <i className="bi bi-sort-alpha-down ms-2 text-warning"></i>;
     return <i className="bi bi-sort-alpha-down-alt ms-2 text-warning"></i>;
   };
@@ -66,11 +66,11 @@ function Tabela({
               {headers.map((col, index) => (
                 <th 
                   key={index} 
-                  className="fw-normal text-uppercase small"
+                  className="fw-bold small"
                   style={styles.headerCell}
                   onClick={() => col.sortable && sorting.onSort(col.key)}
                 >
-                  <div className="d-flex align-items-center justify-content-between">
+                  <div className="d-flex align-items-center">
                     <span>{col.label}</span>
                     {col.sortable && getSortIcon(col.key)}
                   </div>

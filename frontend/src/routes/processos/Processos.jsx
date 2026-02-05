@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { api } from '../../services/API';
 import { Link } from 'react-router-dom';
 import Tabela from '../../layouts/Tabela';
@@ -8,7 +8,7 @@ import { EstadosBrasileiros } from '../../constants/EstadosBrasileiros';
 function Processos() {
   const [processos, setProcessos] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [showFilters, setShowFilters] = useState(true); // ✅ Sempre aberto inicialmente
+  const [showFilters, setShowFilters] = useState(true);
   
   // Filtros
   const [filters, setFilters] = useState({
@@ -16,19 +16,20 @@ function Processos() {
     status: '',
     estado: '',
     advogadoId: '',
-    partesIds: []
+    parteId: ''
   });
 
   // Estados para Advogado Responsável
   const [advogadoSearch, setAdvogadoSearch] = useState('');
   const [advogadoOptions, setAdvogadoOptions] = useState([]);
   const [showAdvogadoOptions, setShowAdvogadoOptions] = useState(false);
+  const advogadoDropdownRef = useRef(null);
 
-  // Estados para Partes
+  // Estados para Partes (SIMPLIFICADO)
   const [parteSearch, setParteSearch] = useState('');
   const [parteOptions, setParteOptions] = useState([]);
   const [showParteOptions, setShowParteOptions] = useState(false);
-  const [selectedPartes, setSelectedPartes] = useState([]);
+  const parteDropdownRef = useRef(null);
 
   // Paginação
   const [pagination, setPagination] = useState({
@@ -43,6 +44,21 @@ function Processos() {
     orderBy: 'id',
     direction: 'desc'
   });
+
+  // ✅ Detectar cliques fora dos dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (advogadoDropdownRef.current && !advogadoDropdownRef.current.contains(event.target)) {
+        setShowAdvogadoOptions(false);
+      }
+      if (parteDropdownRef.current && !parteDropdownRef.current.contains(event.target)) {
+        setShowParteOptions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // --- MÁSCARA CNJ ---
   const formatProcessoCNJ = (value) => {
@@ -66,6 +82,37 @@ function Processos() {
     return doc;
   };
 
+  // ✅ Formatar Data
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR');
+  };
+
+  // ✅ Formatar Estado (Sigla + Nome Completo)
+  const formatEstado = (sigla) => {
+    if (!sigla) return '-';
+    const estado = EstadosBrasileiros.find(e => e.sigla === sigla);
+    return estado ? `${sigla} - ${estado.nome}` : sigla;
+  };
+
+  // ✅ Badge de Status do Prazo
+  const getStatusBadgePrazo = (diasRestantes) => {
+    if (diasRestantes === null || diasRestantes === undefined) return null;
+    
+    if (diasRestantes < 0) {
+      return <span className="badge bg-danger">Vencido</span>;
+    } else if (diasRestantes === 0) {
+      return <span className="badge bg-warning text-dark">Vence Hoje</span>;
+    } else if (diasRestantes <= 3) {
+      return <span className="badge bg-warning text-dark">Urgente</span>;
+    } else if (diasRestantes <= 7) {
+      return <span className="badge bg-info text-dark">Próximo</span>;
+    } else {
+      return <span className="badge bg-success">No Prazo</span>;
+    }
+  };
+
   // Busca processos
   useEffect(() => {
     fetchProcessos();
@@ -74,18 +121,35 @@ function Processos() {
   const fetchProcessos = async () => {
     try {
       setLoading(true);
+      
       const params = {
         page: pagination.currentPage,
         size: pagination.size,
-        sort: `${sorting.orderBy},${sorting.direction}`,
-        numero: filters.numero || null,
-        status: filters.status || null,
-        estado: filters.estado || null,
-        advogadoId: filters.advogadoId ? String(filters.advogadoId) : null,
-        partesIds: filters.partesIds && filters.partesIds.length > 0 ? filters.partesIds : null
+        sort: `${sorting.orderBy},${sorting.direction}`
       };
 
+      if (filters.numero && filters.numero.trim() !== '') {
+        params.numero = filters.numero.trim();
+      }
+      if (filters.status && filters.status !== '') {
+        params.status = filters.status;
+      }
+      if (filters.estado && filters.estado !== '') {
+        params.estado = filters.estado;
+      }
+      if (filters.advogadoId && filters.advogadoId !== '') {
+        params.advogadoId = String(filters.advogadoId);
+      }
+
+      if (filters.parteId && filters.parteId !== '') {
+        params.partesIds = [filters.parteId];
+      }
+
+      console.log('📡 Parâmetros enviados:', params);
+
       const res = await api.get('/processos/list', { params });
+      
+      console.log('✅ Processos recebidos:', res.data);
       
       setProcessos(res.data.content || []);
       setPagination(prev => ({
@@ -94,14 +158,14 @@ function Processos() {
         totalElements: res.data.totalElements || 0
       }));
     } catch (err) {
-      console.error('Erro ao buscar processos:', err);
+      console.error('❌ Erro ao buscar processos:', err);
       alert('Erro ao carregar processos');
     } finally {
       setLoading(false);
     }
   };
 
-  // Buscar advogados
+  // ✅ Buscar advogados - CORRIGIDO
   const searchAdvogados = async (query) => {
     setAdvogadoSearch(query);
     
@@ -112,67 +176,83 @@ function Processos() {
       return;
     }
     
-    if (query.length > 2) {
+    // ✅ Busca a partir de 1 caractere
+    if (query.length >= 1) {
       try {
-        const res = await api.get(`/auth/advogados/select?q=${query}`);
-        setAdvogadoOptions(res.data);
-        setShowAdvogadoOptions(true);
+        const encodedQuery = encodeURIComponent(query);
+        const res = await api.get(`/auth/advogados/select?q=${encodedQuery}`);
+        console.log('✅ Advogados retornados COMPLETO:', res.data);
+        
+        // ✅ CORREÇÃO: Tratar array corretamente
+        let advogados = [];
+        if (Array.isArray(res.data)) {
+          advogados = res.data;
+        } else if (res.data && Array.isArray(res.data.content)) {
+          advogados = res.data.content;
+        }
+        
+        console.log('✅ Advogados processados:', advogados);
+        setAdvogadoOptions(advogados);
+        setShowAdvogadoOptions(advogados.length > 0);
       } catch (error) {
         console.error("Erro ao buscar advogados", error);
+        setAdvogadoOptions([]);
+        setShowAdvogadoOptions(false);
       }
     }
   };
 
-  // Selecionar advogado
   const handleSelectAdvogado = (advogado) => {
-    setAdvogadoSearch(`${advogado.nome} - OAB: ${advogado.numeroOAB || 'N/A'}`);
+    const displayText = `${advogado.nome}`;
+    setAdvogadoSearch(displayText);
     setFilters({ ...filters, advogadoId: advogado.id });
     setShowAdvogadoOptions(false);
   };
 
-  // Buscar partes
+  // ✅ Buscar partes - CORRIGIDO
   const searchPartes = async (query) => {
     setParteSearch(query);
     
     if (query.length === 0) {
+      setFilters({ ...filters, parteId: '' });
       setParteOptions([]);
       setShowParteOptions(false);
       return;
     }
     
-    if (query.length > 2) {
+    // ✅ Busca a partir de 1 caractere
+    if (query.length >= 1) {
       try {
-        const res = await api.get(`/partes/search?q=${query}`);
-        setParteOptions(res.data);
-        setShowParteOptions(true);
+        const encodedQuery = encodeURIComponent(query);
+        const res = await api.get(`/partes/select?q=${encodedQuery}`);
+        console.log('✅ Partes retornadas COMPLETO:', res.data);
+        
+        // ✅ CORREÇÃO: Tratar array corretamente
+        let partes = [];
+        if (Array.isArray(res.data)) {
+          partes = res.data;
+        } else if (res.data && Array.isArray(res.data.content)) {
+          partes = res.data.content;
+        }
+        
+        console.log('✅ Partes processadas:', partes);
+        setParteOptions(partes);
+        setShowParteOptions(partes.length > 0);
       } catch (error) {
         console.error("Erro ao buscar partes", error);
+        setParteOptions([]);
+        setShowParteOptions(false);
       }
     }
   };
 
-  // Adicionar parte selecionada
+  // ✅ Selecionar parte - SIMPLIFICADO (igual ao advogado)
   const handleSelectParte = (parte) => {
-    if (!selectedPartes.find(p => p.id === parte.id)) {
-      const newSelectedPartes = [...selectedPartes, parte];
-      setSelectedPartes(newSelectedPartes);
-      setFilters({ 
-        ...filters, 
-        partesIds: newSelectedPartes.map(p => p.id) 
-      });
-    }
-    setParteSearch('');
+    console.log('✅ Parte selecionada:', parte);
+    const displayText = parte.nomeCpf || parte.nome || 'Sem nome';
+    setParteSearch(displayText);
+    setFilters({ ...filters, parteId: parte.id });
     setShowParteOptions(false);
-  };
-
-  // Remover parte selecionada
-  const handleRemoveParte = (parteId) => {
-    const newSelectedPartes = selectedPartes.filter(p => p.id !== parteId);
-    setSelectedPartes(newSelectedPartes);
-    setFilters({ 
-      ...filters, 
-      partesIds: newSelectedPartes.map(p => p.id) 
-    });
   };
 
   const handleFilterChange = (e) => {
@@ -192,14 +272,31 @@ function Processos() {
       status: '',
       estado: '',
       advogadoId: '',
-      partesIds: []
+      parteId: ''
     });
     setAdvogadoSearch('');
     setParteSearch('');
-    setSelectedPartes([]);
     setPagination(prev => ({ ...prev, currentPage: 0 }));
-    // ✅ Reseta a tabela para estado inicial
-    fetchProcessos();
+    
+    setTimeout(() => {
+      const params = {
+        page: 0,
+        size: pagination.size,
+        sort: `${sorting.orderBy},${sorting.direction}`
+      };
+      
+      api.get('/processos/list', { params })
+        .then(res => {
+          setProcessos(res.data.content || []);
+          setPagination(prev => ({
+            ...prev,
+            currentPage: 0,
+            totalPages: res.data.totalPages || 0,
+            totalElements: res.data.totalElements || 0
+          }));
+        })
+        .catch(err => console.error('Erro ao limpar filtros:', err));
+    }, 0);
   };
 
   const handleSort = (columnKey) => {
@@ -230,16 +327,15 @@ function Processos() {
       });
   };
 
-  // COLUNAS
   const headers = [
     { key: 'numero', label: 'Nº Processo', sortable: true },
     { key: 'status', label: 'Status', sortable: true },
     { key: 'estado', label: 'Estado', sortable: true },
-    { key: 'advogadoResponsavelId', label: 'Advogado Principal', sortable: false },
+    { key: 'advogadoResponsavel', label: 'Advogado Principal', sortable: true },
+    { key: 'proximoPrazo', label: 'Próximo Prazo', sortable: true },
     { key: 'acoes', label: 'Ações', sortable: false }
   ];
 
-  // ✅ Renderizador de linhas - Botões no formato antigo
   const renderRow = (row) => (
     <tr key={row.id}>
       <td className="fw-semibold">{formatProcessoCNJ(row.numero)}</td>
@@ -255,13 +351,29 @@ function Processos() {
       </td>
       
       <td>
-        <span className="badge bg-light text-dark border">{row.estado}</span>
+        <span>
+          {formatEstado(row.estado)}
+        </span>
       </td>
       
       <td className="text-truncate" style={{maxWidth: '200px'}} 
           title={row.advogadoResponsavelId?.nome || 'Não informado'}>
-        <i className="bi bi-person-badge me-2 text-primary"></i>
         {row.advogadoResponsavelId?.nome || '-'}
+      </td>
+      
+      <td>
+        {row.proximoPrazo ? (
+          <div className="d-flex flex-column align-items-start">
+            <small className="text-muted fw-bold">
+              {formatDate(row.proximoPrazo.dataVencimento)}
+            </small>
+            <div className="mt-1">
+              {getStatusBadgePrazo(row.proximoPrazo.diasRestantes)}
+            </div>
+          </div>
+        ) : (
+          <span className="text-muted small">Sem prazos</span>
+        )}
       </td>
       
       <td>
@@ -391,13 +503,14 @@ function Processos() {
                 </div>
 
                 {/* Advogado Responsável */}
-                <div className="col-md-6 position-relative">
+                <div className="col-md-6 position-relative" ref={advogadoDropdownRef}>
                   <label className="form-label small fw-semibold">Advogado Responsável</label>
                   <input
                     type="text"
                     className="form-control"
                     placeholder="Busque por nome ou nº OAB"
                     onChange={(e) => searchAdvogados(e.target.value)}
+                    onFocus={() => advogadoOptions.length > 0 && setShowAdvogadoOptions(true)}
                     value={advogadoSearch}
                     autoComplete="off"
                   />
@@ -409,31 +522,25 @@ function Processos() {
                         <button 
                           key={adv.id} 
                           type="button"
-                          className="list-group-item list-group-item-action text-start d-flex justify-content-between align-items-center"
+                          className="list-group-item list-group-item-action text-start"
                           onClick={() => handleSelectAdvogado(adv)}
                         >
-                          <div>
-                            <strong>{adv.nome}</strong>
-                            <br />
-                            <small className="text-muted">
-                              OAB: {adv.numeroOAB || 'N/A'} | {adv.role}
-                            </small>
-                          </div>
-                          <i className="bi bi-arrow-right-circle text-primary"></i>
+                          <span className='fw-semibold'>{adv.nome}</span>
                         </button>
                       ))}
                     </ul>
                   )}
                 </div>
 
-                {/* Partes */}
-                <div className="col-md-6 position-relative">
-                  <label className="form-label small fw-semibold">Partes</label>
+                {/* Parte */}
+                <div className="col-md-6 position-relative" ref={parteDropdownRef}>
+                  <label className="form-label small fw-semibold">Parte</label>
                   <input
                     type="text"
                     className="form-control"
                     placeholder="Busque por nome ou CPF/CNPJ"
                     onChange={(e) => searchPartes(e.target.value)}
+                    onFocus={() => parteOptions.length > 0 && setShowParteOptions(true)}
                     value={parteSearch}
                     autoComplete="off"
                   />
@@ -445,38 +552,13 @@ function Processos() {
                         <button 
                           key={parte.id} 
                           type="button"
-                          className="list-group-item list-group-item-action text-start d-flex justify-content-between align-items-center"
+                          className="list-group-item list-group-item-action text-start"
                           onClick={() => handleSelectParte(parte)}
                         >
-                          <div>
-                            <strong>{parte.nome}</strong>
-                            <br />
-                            <small className="text-muted">
-                              {formatDocument(parte.cpfCnpj)} | {parte.tipo}
-                            </small>
-                          </div>
-                          <i className="bi bi-plus-circle text-success"></i>
+                          <span className='fw-semibold'>{parte.nomeCpf || parte.nome || 'Sem nome'}</span>
                         </button>
                       ))}
                     </ul>
-                  )}
-
-                  {/* Partes Selecionadas */}
-                  {selectedPartes.length > 0 && (
-                    <div className="mt-2 d-flex flex-wrap gap-2">
-                      {selectedPartes.map((parte) => (
-                        <span key={parte.id} className="badge bg-primary d-flex align-items-center gap-2 py-2 px-3">
-                          <span>{parte.nome}</span>
-                          <button 
-                            type="button"
-                            className="btn-close btn-close-white"
-                            style={{ fontSize: '0.6rem' }}
-                            onClick={() => handleRemoveParte(parte.id)}
-                            aria-label="Remover"
-                          ></button>
-                        </span>
-                      ))}
-                    </div>
                   )}
                 </div>
               </div>

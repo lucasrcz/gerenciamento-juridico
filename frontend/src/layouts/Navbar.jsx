@@ -19,7 +19,7 @@ function Navbar() {
             <span className="navbar-text fw-bold">Gerenciamento de Processos Jurídicos</span>
 
             <div className="d-flex align-items-center gap-3">
-                <span className="badge bg-warning text-dark px-3 py-2 rounded-3" style={{ fontSize: '15px' }}>{user.role}</span>
+                <span className="badge bg-light text-dark border" style={{ fontSize: '15px' }}>{user.role}</span>
 
                 <div className="dropdown">
                     <button type="button" 

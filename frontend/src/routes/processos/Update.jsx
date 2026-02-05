@@ -55,6 +55,9 @@ function Update() {
         const res = await api.get('/processos/' + id);
         const processoData = res.data;
         
+        console.log('=== DEBUG PROCESSO COMPLETO ===');
+        console.log(JSON.stringify(processoData, null, 2));
+        
         const advIds = processoData.advogadosIds?.map(adv => adv.id) || [];
         
         const partesData = processoData.partesIds?.map(p => ({
@@ -78,15 +81,16 @@ function Update() {
         }
 
         if (processoData.contrato) {
-          // ✅ CORREÇÃO: Armazenar objeto completo com nome correto
-          setContratoAtual({
-            id: processoData.contrato.id,
-            nome: processoData.contrato.nome || 'Contrato.pdf'
-          });
-          
           console.log('=== DEBUG CONTRATO ===');
           console.log('Contrato recebido:', processoData.contrato);
-          console.log('Nome do arquivo:', processoData.contrato.nome);
+          console.log('ID:', processoData.contrato.id);
+          console.log('Nome:', processoData.contrato.name);
+          
+          // ✅ CORREÇÃO: Salvar o nome correto do contrato
+          setContratoAtual({
+            id: processoData.contrato.id,
+            nome: processoData.contrato.name || 'Contrato.pdf'
+          });
           
           try {
             const response = await api.get(`/contratos/${processoData.contrato.id}`, { responseType: 'blob' });
@@ -585,25 +589,6 @@ function Update() {
                     </button>
                   )}
                 </div>
-                
-                <small className="text-muted d-block mt-2">
-                  {contrato ? (
-                    <span className="text-success">
-                      <i className="bi bi-info-circle me-1"></i>
-                      Novo arquivo será enviado ao salvar
-                    </span>
-                  ) : contratoAtual ? (
-                    <span>
-                      <i className="bi bi-info-circle me-1"></i>
-                      Contrato atual será mantido. Envie um novo arquivo para substituir.
-                    </span>
-                  ) : (
-                    <span>
-                      <i className="bi bi-info-circle me-1"></i>
-                      Apenas arquivos PDF são aceitos
-                    </span>
-                  )}
-                </small>
               </div>
             </div>
 
@@ -635,7 +620,7 @@ function Update() {
               <div className="bg-dark text-white px-3 py-2 d-flex justify-content-between align-items-center shadow-sm">
                 <span className="fw-bold">
                   <i className="bi bi-file-earmark-pdf-fill me-2"></i>
-                  {contrato ? 'Novo Contrato (Preview)' : 'Contrato Atual'}
+                  Contrato
                 </span>
               </div>
               <div className="flex-grow-1 bg-white position-relative">
