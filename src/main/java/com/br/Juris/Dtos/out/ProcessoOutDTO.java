@@ -25,7 +25,15 @@ public record ProcessoOutDTO(Long id, String numero, StatusProcesso status, Stri
             contratoOut = ContratoOutDTO.fromEntity(processo.getContrato());
         }
         List<AdvogadoProcessoOutDTO> advogadosIds = processo.getAdvogados().stream().map(a-> new AdvogadoProcessoOutDTO(a.getId().toString(),a.getNome(),a.getNumeroOAB(),a.getSeccional())).toList();
-        List<ParteProcessoOutDTO> partesIds = processo.getProcessoPartes().stream().map(p-> new ParteProcessoOutDTO(p.getParte().getId(), p.getParte().getNome(),p.getParte().getDocumento(),p.getParte().getTipoPessoa().getDescricao())).toList();
+        List<ParteProcessoOutDTO> partesIds = processo.getProcessoPartes().stream()
+            .map(p-> new ParteProcessoOutDTO(
+                p.getParte().getId(), 
+                p.getParte().getNome(),
+                p.getParte().getDocumento(),
+                p.getParte().getTipoPessoa().getDescricao(),
+                p.getTipoParte()
+            ))
+            .toList();
         Advogado responsavel = processo.getAdvogadoResponsavel();
 
         PrazosOutDTO proximoPrazo = processo.getPrazos().stream()

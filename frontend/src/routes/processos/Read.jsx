@@ -110,14 +110,9 @@ function Read() {
   const getDocLabel = (tipoPessoa) => {
       if (!tipoPessoa) return "Doc";
       
-      // Se for string, converte para minúsculo
       const tipo = typeof tipoPessoa === 'string' 
         ? tipoPessoa.toLowerCase() 
         : String(tipoPessoa).toLowerCase();
-      
-      console.log('=== DEBUG getDocLabel ===');
-      console.log('tipoPessoa recebido:', tipoPessoa);
-      console.log('tipo após conversão:', tipo);
       
       if (tipo.includes("física") || tipo.includes("fisica")) return "CPF";
       if (tipo.includes("jurídica") || tipo.includes("juridica")) return "CNPJ";
@@ -351,30 +346,22 @@ function Read() {
                   <h6 className="fw-bold text-secondary mb-3 border-bottom pb-2">Partes Envolvidas</h6>
                   {partes.length > 0 ? (
                     <ul className="list-group list-group-flush">
-                      {partes.map((p, idx) => {
-                        // DEBUG: Verificar dados
-                        console.log('=== PARTE DEBUG ===', idx);
-                        console.log('Parte completa:', p);
-                        console.log('tipoPessoa:', p.tipoPessoa, 'tipo:', typeof p.tipoPessoa);
-                        console.log('tipoParte:', p.tipoParte);
-                        
-                        return (
-                          <li key={idx} className="list-group-item px-0 d-flex flex-column">
-                            <div className="d-flex justify-content-between align-items-center">
+                      {partes.map((p, idx) => (
+                          <li key={idx} className="list-group-item px-0 py-2">
+                            <div className="d-flex justify-content-between align-items-center mb-1">
                                 <span className="fw-bold text-dark">{p.nome}</span>
                                 <span className={`badge ${getCorBadgeParte(p.tipoParte)}`}>
                                   {traduzirTipoParte(p.tipoParte)}
                                 </span>
                             </div>
-                            <div className="d-flex justify-content-between mt-1">
+                            <div className="d-flex justify-content-between align-items-center">
                                 <small className="text-muted">
                                     {getDocLabel(p.tipoPessoa)}: {formatDocumento(p.documento, p.tipoPessoa)}
                                 </small>
                                 <small className="text-muted fst-italic">{p.tipoPessoa}</small>
                             </div>
                           </li>
-                        );
-                      })}
+                      ))}
                     </ul>
                   ) : <span className="text-muted small">Nenhuma parte vinculada.</span>}
                 </div>
