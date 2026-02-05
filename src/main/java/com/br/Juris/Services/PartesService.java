@@ -7,6 +7,7 @@ import com.br.Juris.Dtos.out.MessageOutDTO;
 import com.br.Juris.Dtos.out.PartesOutDTO;
 import com.br.Juris.Entities.Endereco;
 import com.br.Juris.Entities.Partes;
+import com.br.Juris.Enums.TipoPessoa;
 import com.br.Juris.Repositories.PartesRepository;
 import jakarta.annotation.Resource;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,8 +82,22 @@ public class PartesService {
         );
     }
 
-    public Page<PartesOutDTO> listAllPageable(Pageable pageable) {
-        return repository.findAll(pageable)
+    public Page<PartesOutDTO> filtrar(
+            String nome,
+            String email,
+            String estado,
+            TipoPessoa tipoPessoa,
+            String documento,
+            Pageable pageable
+    ) {
+        return repository.buscarComFiltros(
+                        nome,
+                        email,
+                        estado,
+                        tipoPessoa,
+                        documento,
+                        pageable
+                )
                 .map(PartesOutDTO::fromEntity);
     }
 

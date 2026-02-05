@@ -44,4 +44,8 @@ public class Prazo {
         );
     }
 
+    public boolean isVencido() {
+        return dataVencimento != null && dataVencimento.isBefore(LocalDate.now());
+    }
+
 }

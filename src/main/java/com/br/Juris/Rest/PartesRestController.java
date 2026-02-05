@@ -4,13 +4,13 @@ import com.br.Juris.Dtos.in.ClientesSelectDTO;
 import com.br.Juris.Dtos.in.PartesInDTO;
 import com.br.Juris.Dtos.out.MessageOutDTO;
 import com.br.Juris.Dtos.out.PartesOutDTO;
+import com.br.Juris.Enums.TipoPessoa;
 import com.br.Juris.Services.PartesService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -61,13 +61,26 @@ public class PartesRestController {
         return ResponseEntity.ok(partesService.delete(id));
     }
 
-    @Operation(description = "Listagem páginada de Partes")
-    @GetMapping
-    public ResponseEntity<Page<PartesOutDTO>> listAll(
-            @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.ASC)
-            Pageable pageable
+    @Operation(description = "Filtro de partes")
+    @GetMapping("/filtro")
+    public ResponseEntity<Page<PartesOutDTO>> filtrar(
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String estado,
+            @RequestParam(required = false) TipoPessoa tipoPessoa,
+            @RequestParam(required = false) String documento,
+            @PageableDefault(size = 10, sort = "nome") Pageable pageable
     ) {
-        return ResponseEntity.ok(partesService.listAllPageable(pageable));
+        return ResponseEntity.ok(
+                partesService.filtrar(
+                        nome,
+                        email,
+                        estado,
+                        tipoPessoa,
+                        documento,
+                        pageable
+                )
+        );
     }
 
     @GetMapping("/select")

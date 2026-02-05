@@ -7,7 +7,7 @@ import { Colors } from '../../constants/Colors';
 function Advogados() {
   const [advogados, setAdvogados] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(true); // ✅ Sempre aberto inicialmente
   
   // Filtros
   const [filters, setFilters] = useState({
@@ -90,6 +90,8 @@ function Advogados() {
       ativo: true
     });
     setPagination(prev => ({ ...prev, currentPage: 0 }));
+    // ✅ Reseta a tabela para estado inicial
+    fetchAdvogados();
   };
 
   const handleSort = (columnKey) => {
@@ -138,7 +140,7 @@ function Advogados() {
     { key: 'acoes', label: 'Ações', sortable: false }
   ];
 
-  // Renderização de cada linha
+  // ✅ Renderização de cada linha - Botões no formato antigo
   const renderRow = (advogado) => (
     <tr key={advogado.id}>
       <td className="fw-semibold">{advogado.nome}</td>
@@ -150,29 +152,29 @@ function Advogados() {
       </td>
       <td>{getRoleBadge(advogado.role)}</td>
       <td>
-        <div className="btn-group btn-group-sm">
-          <Link 
-            to={`/advogados/read/${advogado.id}`} 
-            className="btn btn-outline-primary"
-            title="Visualizar"
-          >
-            <i className="bi bi-eye-fill"></i>
-          </Link>
-          <Link 
-            to={`/advogados/update/${advogado.id}`} 
-            className="btn btn-outline-success"
-            title="Editar"
-          >
-            <i className="bi bi-pencil-fill"></i>
-          </Link>
-          <button 
-            onClick={() => handleDelete(advogado.id)} 
-            className="btn btn-outline-danger"
-            title="Desativar"
-          >
-            <i className="bi bi-trash3-fill"></i>
-          </button>
-        </div>
+        <Link 
+          to={`/advogados/read/${advogado.id}`} 
+          className='btn btn-sm border-0 me-1' 
+          style={{color: Colors.primaryDeep || '#2C2966'}} 
+          title='Visualizar'
+        >
+          <i className="bi bi-eye-fill fs-5"></i>
+        </Link>
+        <Link 
+          to={`/advogados/update/${advogado.id}`} 
+          className='btn btn-sm border-0 me-1' 
+          style={{color: Colors.primaryDeep || '#2C2966'}} 
+          title='Editar'
+        >
+          <i className="bi bi-pencil-fill fs-5"></i>
+        </Link>
+        <button 
+          onClick={() => handleDelete(advogado.id)} 
+          className='btn btn-sm text-danger border-0' 
+          title='Desativar'
+        >
+          <i className="bi bi-trash3-fill fs-5"></i>
+        </button>
       </td>
     </tr>
   );
@@ -187,7 +189,7 @@ function Advogados() {
                 Advogados
               </h2>
               <p className="text-muted mb-0">
-                Cadastre, edite e gerencie os advogados do sistema
+                Cadastre, edite e gerencie os advogados do sistema.
               </p>
             </div>
             <Link 
