@@ -3,6 +3,7 @@ package com.br.Juris.Rest;
 import com.br.Juris.Dtos.in.ProcessoInDTO;
 import com.br.Juris.Dtos.out.MessageOutDTO;
 import com.br.Juris.Dtos.out.PrazosOutDTO;
+import com.br.Juris.Dtos.out.ProcessoDashboardDTO;
 import com.br.Juris.Dtos.out.ProcessoOutDTO;
 import com.br.Juris.Enums.EstadoBrasil;
 import com.br.Juris.Enums.StatusProcesso;
@@ -90,6 +91,11 @@ public class ProcessosRestController {
     @GetMapping("{id}/prazos")
     public ResponseEntity<List<PrazosOutDTO>> prazos(@PathVariable Long id){
         return ResponseEntity.ok(processosService.listPrazos(id));
+    }
+
+    @GetMapping("/dashboard")
+    public ResponseEntity<ProcessoDashboardDTO> getDashboard() {
+        return ResponseEntity.ok(processosService.getDashboard());
     }
 
 }

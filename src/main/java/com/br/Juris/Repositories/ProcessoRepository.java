@@ -1,5 +1,6 @@
 package com.br.Juris.Repositories;
 
+import com.br.Juris.Dtos.out.ProcessoStatusCountDTO;
 import com.br.Juris.Entities.Processo;
 import com.br.Juris.Enums.EstadoBrasil;
 import com.br.Juris.Enums.StatusProcesso;
@@ -38,6 +39,14 @@ public interface ProcessoRepository extends JpaRepository<Processo, Long> {
             Pageable pageable
     );
 
-
+    @Query("""
+        SELECT new com.br.Juris.Dtos.out.ProcessoStatusCountDTO(
+            p.status,
+            COUNT(p)
+        )
+        FROM Processo p
+        GROUP BY p.status
+    """)
+    List<ProcessoStatusCountDTO> countByStatus();
 
 }

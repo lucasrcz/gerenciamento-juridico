@@ -4,7 +4,9 @@ import com.br.Juris.Dtos.in.ProcessoInDTO;
 import com.br.Juris.Dtos.in.ProcessoParteInDTO;
 import com.br.Juris.Dtos.out.MessageOutDTO;
 import com.br.Juris.Dtos.out.PrazosOutDTO;
+import com.br.Juris.Dtos.out.ProcessoDashboardDTO;
 import com.br.Juris.Dtos.out.ProcessoOutDTO;
+import com.br.Juris.Dtos.out.ProcessoStatusCountDTO;
 import com.br.Juris.Entities.Advogado;
 import com.br.Juris.Entities.Contrato;
 import com.br.Juris.Entities.Partes;
@@ -149,6 +151,17 @@ public class ProcessosService {
     public List<PrazosOutDTO> listPrazos(Long id){
         Processo processo = this.findById(id);
         return processo.getPrazos().stream().map(PrazosOutDTO::fromEntity).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public ProcessoDashboardDTO getDashboard() {
+
+        Long totalProcessos = repository.count();
+
+        List<ProcessoStatusCountDTO> porStatus =
+                repository.countByStatus();
+
+        return new ProcessoDashboardDTO(totalProcessos, porStatus);
     }
 
     private void atualizarDadosSimples(Processo processo, ProcessoInDTO dto) throws IOException {
