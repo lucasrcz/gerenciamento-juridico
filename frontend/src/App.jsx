@@ -7,6 +7,7 @@ import Processos from "./routes/processos/Processos"
 import CreateProcessos from "./routes/processos/Create"
 import ReadProcessos from "./routes/processos/Read"
 import UpdateProcessos from "./routes/processos/Update"
+import RelatorioProcessosPDF from "./components/RelatorioProcessosPDF"
 import Advogados from "./routes/advogados/Advogados"
 import CreateAdvogados from "./routes/advogados/Create"
 import ReadAdvogados from "./routes/advogados/Read"
@@ -52,6 +53,13 @@ function App() {
           <Route path='partes/update/:id' element={<UpdatePartes />}/>
           <Route path='partes/read/:id' element={<ReadPartes />}/>
         </Route>
+
+        {/* Relatório de Processos */}
+        <Route path='processos/relatorio' element={
+          <ProtectedRoute>
+            <RelatorioProcessosPDF/>
+          </ProtectedRoute>
+        }/>
 
         {/* Login */}
         <Route path='/login' element={<Login />}/>
