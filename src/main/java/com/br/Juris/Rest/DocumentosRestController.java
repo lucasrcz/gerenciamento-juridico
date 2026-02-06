@@ -67,16 +67,16 @@ public class DocumentosRestController {
         return ResponseEntity.ok(service.deleteBatch(ids));
     }
 
-    @Operation(description = "Edição em Batch dos documentos conforme os IDS enviados")
-    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MessageOutDTO> editDocumentos(@RequestParam("ids") List<Long> ids,
-                                                        @RequestParam("arquivos") List<MultipartFile> arquivos,
-                                                        @RequestParam("descricoes")List<String> descricoes){
-        ProjectUtils.checkListFiles(arquivos,descricoes);
-        List<DocumentoInDTO> dtos = DocumentoInDTO.fromList(arquivos,descricoes);
-        ProjectUtils.checkListFiles(dtos,ids);
-        return ResponseEntity.ok(service.updateDocumento(ids,dtos));
+    @Operation(description = "Edição de um documento")
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<MessageOutDTO> editDocumento(
+            @PathVariable Long id,
+            @RequestParam(value = "arquivo", required = false) MultipartFile arquivo,
+            @RequestParam(value = "descricao", required = false) String descricao) {
+        DocumentoInDTO dto = new DocumentoInDTO(descricao, arquivo);
+        return ResponseEntity.ok(service.updateDocumento(id, dto));
     }
+
 
 
 

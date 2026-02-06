@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
@@ -83,19 +84,26 @@ public class DocumentoService {
     }
 
     @Transactional
-    public MessageOutDTO updateDocumento(List<Long> id, List<DocumentoInDTO> dtos) {
-        for (int i = 0; i < id.size(); i++) {
-            Documento documento = findById(id.get(i));
-            try{
-                documento.setArquivo(dtos.get(i).arquivo().getBytes());
-                documento.setDescricao(dtos.get(i).descricao().isBlank() ? null : dtos.get(i).descricao());
-                documento.setFormatoArquivo(dtos.get(i).arquivo().getContentType());
-                documento.setNome(dtos.get(i).arquivo().getOriginalFilename());
-                repository.save(documento);
-            }catch (IOException e){
-                throw  new ResponseStatusException(HttpStatus.BAD_REQUEST,"Erro ao processar arquivo: " + dtos.get(i).arquivo().getOriginalFilename());
+    public MessageOutDTO updateDocumento(Long id, DocumentoInDTO dto) {
+        Documento documento = findById(id);
+
+        try {
+            MultipartFile arquivo = dto.arquivo();
+            if (arquivo != null && !arquivo.isEmpty()) {
+                documento.setArquivo(arquivo.getBytes());
+                documento.setFormatoArquivo(arquivo.getContentType());
+                documento.setNome(arquivo.getOriginalFilename());
             }
+            if (dto.descricao() != null) {
+                documento.setDescricao(
+                        dto.descricao().isBlank() ? null : dto.descricao()
+                );
+            }
+            repository.save(documento);
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Erro ao processar arquivo");
         }
-        return new MessageOutDTO(null,String.format("Documentos editados com sucesso"));
+        return new MessageOutDTO(null, "Documento editado com sucesso");
     }
+
 }
