@@ -7,7 +7,7 @@ function Sidebar({ collapsed, onToggle }) {
     <aside className={`sidebar d-flex flex-column text-white ${collapsed ? 'sidebar-collapsed d-flex align-items-center gap-2' : ''}`}>
       {/* Header com logo e toggle */}
       <div className="sidebar-header">
-        <div className="d-flex align-items-center gap-2">
+        <div className="d-flex align-items-center gap-2 ms-3">
           <img src="/logo.png" alt="Juris" className="sidebar-logo-img" />
           {!collapsed && <span className="fw-bold fs-5">Juris</span>}
         </div>
@@ -19,9 +19,9 @@ function Sidebar({ collapsed, onToggle }) {
         ></i>
       </div>
 
-      {/* Menu */}
+      {/* Menu© */}
       <nav className="flex-grow-1 py-2">
-        <ul className="nav flex-column">
+        <ul className="nav flex-column ms-3">
           <li className="nav-item">
             <NavLink to="/dashboard" className={({ isActive }) => `nav-link sidebar-link ${isActive ? 'active' : ''}`} title="Dashboard">
               <i className="bi bi-house-door sidebar-icon"></i>
@@ -48,6 +48,9 @@ function Sidebar({ collapsed, onToggle }) {
           </li>
         </ul>
       </nav>
+      <footer className="d-flex align-items-center px-3 fixed-bottom ">
+        {!collapsed && <span className="sidebar-label py-2">Juris © 2026</span>}
+      </footer>
     </aside>
   );
 }

@@ -15,7 +15,7 @@ function Navbar() {
   }, []);
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-juris sticky-top px-4">
+    <nav className="navbar navbar-expand-lg navbar-juris sticky-top px-4 py-3">
         <div className="d-flex container-fluid justify-content-between">
             <span className="navbar-text">Gerenciamento de Processos Jurídicos</span>
 

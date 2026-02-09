@@ -2,7 +2,7 @@
   background-color: #ffffff;
   border-bottom: 1px solid #e0e0e0;
   padding: 8px 20px;
-  color: #2C2966;
+  color: #131047;
 }
 
 .top-navbar .badge-role {
@@ -36,7 +36,7 @@
 }
 
 .navbar.navbar-juris {
-  background-color: #2C2966 !important;
+  background-color: #131047 !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding: 8px 20px;
 }
