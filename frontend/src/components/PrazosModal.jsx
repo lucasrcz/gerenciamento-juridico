@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../services/API';
+import { Colors } from '../constants/Colors';
 
 function PrazosModal({ isOpen, onClose, processoId, onUpdate }) {
   const [prazos, setPrazos] = useState([]);
@@ -151,7 +152,7 @@ function PrazosModal({ isOpen, onClose, processoId, onUpdate }) {
         <div className="modal-content">
           
           {/* Header */}
-          <div className="modal-header bg-danger text-white">
+          <div className="modal-header text-white" style={{ backgroundColor: Colors.primaryDark }}>
             <h5 className="modal-title">
               <i className="bi bi-calendar-event me-2"></i>
               Prazos do Processo
@@ -165,7 +166,8 @@ function PrazosModal({ isOpen, onClose, processoId, onUpdate }) {
             {/* Botão Novo Prazo */}
             {!showForm && (
               <button 
-                className="btn btn-danger mb-3 w-100"
+                className="btn mb-3 w-100 text-white fw-bold"
+                style={{ backgroundColor: Colors.success }}
                 onClick={() => setShowForm(true)}
               >
                 <i className="bi bi-plus-circle me-2"></i>
@@ -176,12 +178,12 @@ function PrazosModal({ isOpen, onClose, processoId, onUpdate }) {
             {/* Formulário */}
             {showForm && (
               <form onSubmit={handleSubmit} className="border rounded p-3 mb-3 bg-light">
-                <h6 className="fw-bold mb-3">
+                <h6 className="fw-bold mb-3" style={{ color: Colors.primaryDark }}>
                   {editingId ? 'Editar Prazo' : 'Novo Prazo'}
                 </h6>
                 
                 <div className="mb-3">
-                  <label className="form-label">Descrição *</label>
+                  <label className="form-label">Descrição<span className='fw-bold text-danger'> *</span></label>
                   <textarea 
                     className="form-control"
                     rows="3"
@@ -194,7 +196,7 @@ function PrazosModal({ isOpen, onClose, processoId, onUpdate }) {
                 </div>
 
                 <div className="mb-3">
-                  <label className="form-label">Data de Vencimento *</label>
+                  <label className="form-label">Data de Vencimento<span className='fw-bold text-danger'> *</span></label>
                   <input 
                     type="date"
                     className="form-control"
@@ -205,12 +207,17 @@ function PrazosModal({ isOpen, onClose, processoId, onUpdate }) {
                 </div>
 
                 <div className="d-flex gap-2">
-                  <button type="submit" className="btn btn-primary" disabled={loading}>
+                  <button 
+                    type="submit" 
+                    className="btn text-white" 
+                    style={{ backgroundColor: Colors.primaryDark }}
+                    disabled={loading}
+                  >
                     {loading ? 'Salvando...' : 'Salvar'}
                   </button>
                   <button 
                     type="button" 
-                    className="btn btn-secondary" 
+                    className="btn btn-outline-secondary"
                     onClick={resetForm}
                   >
                     Cancelar
@@ -222,7 +229,7 @@ function PrazosModal({ isOpen, onClose, processoId, onUpdate }) {
             {/* Lista de Prazos */}
             {loading ? (
               <div className="text-center p-4">
-                <div className="spinner-border text-danger" role="status">
+                <div className="spinner-border" style={{ color: Colors.primaryDark }} role="status">
                   <span className="visually-hidden">Carregando...</span>
                 </div>
               </div>
@@ -233,7 +240,7 @@ function PrazosModal({ isOpen, onClose, processoId, onUpdate }) {
                     <div className="d-flex justify-content-between align-items-start">
                       <div className="flex-grow-1">
                         <div className="d-flex align-items-center gap-2 mb-2">
-                          <h6 className="mb-0 fw-bold">
+                          <h6 className="mb-0 fw-bold" style={{ color: Colors.primaryDark }}>
                             {formatDate(prazo.dataVencimento)}
                           </h6>
                           {getStatusBadge(prazo.diasFimPrazo)}
@@ -249,22 +256,24 @@ function PrazosModal({ isOpen, onClose, processoId, onUpdate }) {
                         )}
                       </div>
                       
-                      <div className="btn-group btn-group-sm">
-                        <button 
-                          className="btn btn-outline-primary"
+                      <div>
+                        <button
+                          className='btn btn-sm border-0 me-1' 
+                          style={{color: Colors.primaryDeep || '#2C2966'}}
                           onClick={() => handleEdit(prazo)}
                           title="Editar"
                           disabled={!prazo.id}
                         >
-                          <i className="bi bi-pencil"></i>
+                          <i className="bi bi-pencil fs-6"></i>
                         </button>
                         <button 
-                          className="btn btn-outline-danger"
+                          className='btn btn-sm border-0'
+                          style={{color: Colors.danger || '#c24c58'}}
                           onClick={() => handleDelete(prazo.id)}
                           title="Excluir"
                           disabled={!prazo.id}
                         >
-                          <i className="bi bi-trash"></i>
+                          <i className="bi bi-trash fs-6"></i>
                         </button>
                       </div>
                     </div>
@@ -281,7 +290,11 @@ function PrazosModal({ isOpen, onClose, processoId, onUpdate }) {
 
           {/* Footer */}
           <div className="modal-footer">
-            <button type="button" className="btn btn-secondary" onClick={onClose}>
+            <button 
+              type="button" 
+              className="btn btn-outline-secondary"
+              onClick={onClose}
+            >
               Fechar
             </button>
           </div>

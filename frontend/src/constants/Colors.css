@@ -1,0 +1,23 @@
+/* Botões de Filtrar e Limpar  */
+.btn-filtrar-limpar {
+  color: #2C2966;
+  border-color: #2C2966;
+  border: 1px solid #2C2966;
+  border-radius: 6px;
+  background-color: transparent;
+  padding: 5px 10px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-filtrar-limpar:hover {
+  background-color: #2C2966;
+  color: #fff;
+}
+
+.vencimento-prazo {
+  color:darkred;
+}
+
+.venc-prazo-icon {
+  background-color: darkred;
+}

@@ -27,6 +27,7 @@ public interface PartesRepository extends JpaRepository<Partes, Long> {
     )
     from Partes p
     where lower(p.nome) like lower(concat('%', :q, '%'))
+       or lower(p.documento) like lower(concat('%', :q, '%'))
     order by p.nome
 """)
     List<ClientesSelectDTO> buscarParaSelect(@Param("q") String q);

@@ -34,7 +34,8 @@ public interface AdvogadoRepository extends JpaRepository<Advogado, UUID> {
         u.role
     )
     from Advogado u
-    where lower(u.nome) like lower(concat('%', :q, '%'))
+    where (lower(u.nome) like lower(concat('%', :q, '%'))
+       or lower(u.numeroOAB) like lower(concat('%', :q, '%')))
     and u.ativo = TRUE 
     order by u.nome
 """)

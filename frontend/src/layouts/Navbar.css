@@ -1,0 +1,93 @@
+.top-navbar {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 8px 20px;
+  color: #2C2966;
+}
+
+.top-navbar .badge-role {
+  background-color: #2C2966;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.top-navbar .btn-user {
+  border: 1px solid #2C2966;
+  color: #2C2966;
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 0.85rem;
+  background-color: transparent;
+  transition: all 0.2s ease;
+}
+
+.top-navbar .btn-user:hover {
+  background-color: #2C2966;
+  color: #ffffff;
+}
+
+.navbar-title {
+  color: #2C2966;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.navbar.navbar-juris {
+  background-color: #2C2966 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 20px;
+}
+
+.navbar.navbar-juris .navbar-text {
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.navbar.navbar-juris .badge-role {
+  background-color: #FFA051 !important;
+  color: #2C2966 !important;
+  font-weight: 700;
+  padding: 5px 14px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  border: none !important;
+}
+
+.navbar.navbar-juris .btn-user {
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 0.85rem;
+  background-color: transparent;
+  transition: all 0.2s ease;
+}
+
+.navbar.navbar-juris .btn-user:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.6);
+  color: #ffffff;
+}
+
+.navbar.navbar-juris .btn-user::after {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.navbar.navbar-juris .dropdown-menu {
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.navbar.navbar-juris .dropdown-item {
+  font-size: 0.88rem;
+  color: #2C2966;
+}
+
+.navbar.navbar-juris .dropdown-item:hover {
+  background-color: #f0eff5;
+  color: #2C2966;
+}

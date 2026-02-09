@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '../services/API';
+import { Colors } from '../constants/Colors';
 
 function DocumentosModal({ isOpen, onClose, processoId, onUpdate }) {
   const [documentos, setDocumentos] = useState([]);
@@ -8,6 +9,7 @@ function DocumentosModal({ isOpen, onClose, processoId, onUpdate }) {
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({ arquivos: [], descricoes: [] });
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [editData, setEditData] = useState({ descricao: '' });
 
   useEffect(() => {
     if (isOpen) fetchDocumentos();
@@ -30,10 +32,10 @@ function DocumentosModal({ isOpen, onClose, processoId, onUpdate }) {
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     setSelectedFiles(files);
-    setFormData({ 
-      arquivos: files,
-      descricoes: files.map(() => '')
-    });
+    setFormData(prev => ({ 
+      ...prev,
+      arquivos: files
+    }));
   };
 
   const handleDescricaoChange = (index, value) => {
@@ -54,9 +56,10 @@ function DocumentosModal({ isOpen, onClose, processoId, onUpdate }) {
     selectedFiles.forEach((file) => {
       data.append('arquivos', file);
     });
-    formData.descricoes.forEach((desc) => {
-      data.append('descricoes', desc || 'Sem descrição');
-    });
+    
+    // ✅ Usa a descrição do formData ou 'Sem descrição' como fallback
+    const descricao = formData.descricoes[0] || 'Sem descrição';
+    data.append('descricoes', descricao);
 
     try {
       setLoading(true);
@@ -73,6 +76,42 @@ function DocumentosModal({ isOpen, onClose, processoId, onUpdate }) {
     } catch (err) {
       console.error("Erro ao cadastrar documentos:", err);
       alert("Erro ao cadastrar documentos");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEdit = (doc) => {
+    setEditingId(doc.id);
+    setEditData({ descricao: doc.descricao || '' });
+  };
+
+  const handleUpdateSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      setLoading(true);
+      
+      const formData = new FormData();
+      
+      const params = new URLSearchParams();
+      params.append('ids', editingId);
+      params.append('descricoes', editData.descricao);
+      
+      await api.put(`/documentos?${params.toString()}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      
+      alert("Documento atualizado com sucesso!");
+      setEditingId(null);
+      setEditData({ descricao: '' });
+      fetchDocumentos();
+      onUpdate?.();
+    } catch (err) {
+      console.error("Erro ao atualizar documento:", err);
+      alert("Erro ao atualizar documento: " + (err.response?.data?.message || err.message));
     } finally {
       setLoading(false);
     }
@@ -122,7 +161,7 @@ function DocumentosModal({ isOpen, onClose, processoId, onUpdate }) {
         <div className="modal-content">
           
           {/* Header */}
-          <div className="modal-header bg-primary text-white">
+          <div className="modal-header text-white" style={{ backgroundColor: Colors.primaryDark }}>
             <h5 className="modal-title">
               <i className="bi bi-file-earmark-text me-2"></i>
               Documentos do Processo
@@ -136,7 +175,8 @@ function DocumentosModal({ isOpen, onClose, processoId, onUpdate }) {
             {/* Botão Novo Documento */}
             {!showForm && (
               <button 
-                className="btn btn-success mb-3 w-100"
+                className="btn mb-3 w-100 text-white fw-bold"
+                style={{ backgroundColor: Colors.success }}
                 onClick={() => setShowForm(true)}
               >
                 <i className="bi bi-plus-circle me-2"></i>
@@ -147,10 +187,22 @@ function DocumentosModal({ isOpen, onClose, processoId, onUpdate }) {
             {/* Formulário de Cadastro */}
             {showForm && (
               <form onSubmit={handleSubmit} className="border rounded p-3 mb-3 bg-light">
-                <h6 className="fw-bold mb-3">Novo Documento</h6>
+                <h6 className="fw-bold mb-3" style={{ color: Colors.primaryDark }}>Novo Documento</h6>
                 
                 <div className="mb-3">
-                  <label className="form-label">Selecione o arquivo (PDF)</label>
+                  <label className="form-label">Descrição<span className="text-danger fw-bold"> *</span></label>
+                  <input 
+                    type="text"
+                    className="form-control"
+                    value={formData.descricoes[0] || ''}
+                    onChange={(e) => handleDescricaoChange(0, e.target.value)}
+                    placeholder="Digite a descrição do documento..."
+                    required
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">Selecione o arquivo (PDF)<span className="text-danger fw-bold"> *</span></label>
                   <input 
                     type="file" 
                     className="form-control"
@@ -160,30 +212,18 @@ function DocumentosModal({ isOpen, onClose, processoId, onUpdate }) {
                   />
                 </div>
 
-                {selectedFiles.length > 0 && (
-                  <div className="mb-3">
-                    <label className="form-label">Descrição do Arquivo</label>
-                    {selectedFiles.map((file, idx) => (
-                      <div key={idx} className="mb-2">
-                        <input 
-                          type="text"
-                          className="form-control form-control-sm"
-                          value={formData.descricoes[idx] || ''}
-                          onChange={(e) => handleDescricaoChange(idx, e.target.value)}
-                          required
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
-
                 <div className="d-flex gap-2">
-                  <button type="submit" className="btn btn-primary" disabled={loading}>
+                  <button 
+                    type="submit" 
+                    className="btn text-white" 
+                    style={{ backgroundColor: Colors.primaryDark }}
+                    disabled={loading}
+                  >
                     {loading ? 'Salvando...' : 'Salvar'}
                   </button>
                   <button 
                     type="button" 
-                    className="btn btn-secondary" 
+                    className="btn btn-outline-secondary"
                     onClick={() => {
                       setShowForm(false);
                       setSelectedFiles([]);
@@ -199,7 +239,7 @@ function DocumentosModal({ isOpen, onClose, processoId, onUpdate }) {
             {/* Lista de Documentos */}
             {loading ? (
               <div className="text-center p-4">
-                <div className="spinner-border text-primary" role="status">
+                <div className="spinner-border" style={{ color: Colors.primaryDark }} role="status">
                   <span className="visually-hidden">Carregando...</span>
                 </div>
               </div>
@@ -207,33 +247,83 @@ function DocumentosModal({ isOpen, onClose, processoId, onUpdate }) {
               <div className="list-group">
                 {documentos.map((doc) => (
                   <div key={doc.id} className="list-group-item">
-                    <div className="d-flex justify-content-between align-items-start">
-                      <div className="flex-grow-1">
-                        <h6 className="mb-1 fw-bold">{doc.nome}</h6>
-                        <p className="mb-1 text-muted small">{doc.descricao || 'Sem descrição'}</p>
-                        <small className="text-muted">
-                          <i className="bi bi-calendar-event me-1"></i>
-                          {formatDate(doc.dataCriacao)}
-                        </small>
+                    {editingId === doc.id ? (
+                      // Formulário de Edição
+                      <form onSubmit={handleUpdateSubmit}>
+                        <div className="mb-2">
+                          <label className="form-label fw-bold" style={{ color: Colors.primaryDark }}>
+                            Editar Descrição
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={editData.descricao}
+                            onChange={(e) => setEditData({ descricao: e.target.value })}
+                            required
+                          />
+                        </div>
+                        <div className="d-flex gap-2">
+                          <button 
+                            type="submit" 
+                            className="btn btn-sm text-white" 
+                            style={{ backgroundColor: Colors.success }}
+                            disabled={loading}
+                          >
+                            {loading ? 'Salvando...' : 'Salvar'}
+                          </button>
+                          <button 
+                            type="button" 
+                            className="btn btn-outline-secondary btn-sm"
+                            onClick={() => {
+                              setEditingId(null);
+                              setEditData({ descricao: '' });
+                            }}
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      </form>
+                    ) : (
+                      // Visualização Normal
+                      <div className="d-flex justify-content-between align-items-start">
+                        <div className="flex-grow-1">
+                          <h6 className="mb-1 fw-bold" style={{ color: Colors.primaryDark }}>
+                            {doc.descricao || 'Sem descrição'}
+                          </h6>
+                          <p className="mb-1 text-muted small">{doc.nome}</p>
+                          <small className="text-muted">
+                            <i className="bi bi-calendar-event me-1"></i>
+                            {formatDate(doc.dataCriacao)}
+                          </small>
+                        </div>
+                        
+                        <div className="btn-group btn-group-sm">
+                          <button 
+                            className="btn btn-sm border-0 me-1"
+                            style={{ borderColor: Colors.primaryDark, color: Colors.primaryDark }}
+                            onClick={() => handleDownload(doc.id, doc.nome)}
+                            title="Baixar">
+                            <i className="bi bi-download fs-6"></i>
+                          </button>
+
+                          <button
+                          className='btn btn-sm border-0 me-1' 
+                          style={{color: Colors.primaryDeep || '#2C2966'}}
+                          onClick={() => handleEdit(doc)}
+                          title="Editar">
+                          <i className="bi bi-pencil fs-6"></i>
+                          </button>
+
+                          <button 
+                            className='btn btn-sm border-0'
+                            style={{color: Colors.danger || '#c24c58'}}
+                            onClick={() => handleDelete(doc.id)}
+                            title="Excluir">
+                            <i className="bi bi-trash fs-6"></i>
+                          </button>
+                        </div>
                       </div>
-                      
-                      <div className="btn-group btn-group-sm">
-                        <button 
-                          className="btn btn-outline-primary"
-                          onClick={() => handleDownload(doc.id, doc.nome)}
-                          title="Baixar"
-                        >
-                          <i className="bi bi-download"></i>
-                        </button>
-                        <button 
-                          className="btn btn-outline-danger"
-                          onClick={() => handleDelete(doc.id)}
-                          title="Excluir"
-                        >
-                          <i className="bi bi-trash"></i>
-                        </button>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -247,7 +337,11 @@ function DocumentosModal({ isOpen, onClose, processoId, onUpdate }) {
 
           {/* Footer */}
           <div className="modal-footer">
-            <button type="button" className="btn btn-secondary" onClick={onClose}>
+            <button 
+              type="button" 
+              className="btn btn-outline-secondary"
+              onClick={onClose}
+            >
               Fechar
             </button>
           </div>

@@ -1,71 +1,54 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
+import './Sidebar.css';
 
-function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false);
-  const location = useLocation();
-
-  const toggleSidebar = () => {
-    setCollapsed(!collapsed);
-  };
-
-  const isActive = (path) => location.pathname === path;
-
-  const sidebarStyle = {
-    width: collapsed ? '80px' : '220px',
-    transition: 'width 0.3s ease',
-  };
-
+function Sidebar({ collapsed, onToggle }) {
   return (
-    <div className="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style={sidebarStyle}>
-      <div className="d-flex align-items-center justify-content-between mb-4">
-        {!collapsed && <span className="fs-4 fw-bold overflow-hidden text-nowrap">Juris</span>}
-
-        <button className="btn btn-dark border-0" onClick={toggleSidebar}>
-          <i className="bi bi-list fs-4"></i>
-        </button>
+    <aside className={`sidebar d-flex flex-column text-white ${collapsed ? 'sidebar-collapsed d-flex align-items-center gap-2' : ''}`}>
+      {/* Header com logo e toggle */}
+      <div className="sidebar-header">
+        <div className="d-flex align-items-center gap-2">
+          <img src="/logo.png" alt="Juris" className="sidebar-logo-img" />
+          {!collapsed && <span className="fw-bold fs-5">Juris</span>}
+        </div>
+        <i
+          className={`bi ${collapsed ? 'bi-chevron-right' : 'bi-list'} sidebar-toggle`}
+          role="button"
+          onClick={onToggle}
+          title={collapsed ? 'Expandir menu' : 'Recolher menu'}
+        ></i>
       </div>
-      
-      <hr />
-      
-      <ul className="nav nav-pills flex-column mb-auto">
-        <li className="nav-item">
-          <Link to="/dashboard"
-          className={`nav-link d-flex align-items-center ${isActive('/dashboard') ? 'active' : 'text-white'}`}
-          aria-current={isActive('/dashboard') ? 'page' : undefined}>
-            <i className="bi bi-house-door fs-4"></i>
-            {!collapsed && <span className="ms-2">Dashboard</span>}
-          </Link>
-        </li>
 
-        <li className='nav-item'>
-          <Link to="/processos"
-          className={`nav-link d-flex align-items-center ${isActive('/processos') ? 'active' : 'text-white'}`}
-          aria-current={isActive('/processos') ? 'page' : undefined}>
-            <i className="bi bi-folder fs-4"></i>
-            {!collapsed && <span className="ms-2">Processos</span>}
-          </Link>
-        </li>
-
-        <li className="nav-item">
-          <Link to="/advogados"
-          className={`nav-link d-flex align-items-center ${isActive('/advogados') ? 'active' : 'text-white'}`}
-          aria-current={isActive('/advogados') ? 'page' : undefined}>
-            <i className="bi bi-person-lines-fill fs-4"></i>
-            {!collapsed && <span className="ms-2">Advogados</span>}
-          </Link>
-        </li>
-
-        <li className="nav-item">
-          <Link to="/partes"
-          className={`nav-link d-flex align-items-center ${isActive('/partes') ? 'active' : 'text-white'}`}
-          aria-current={isActive('/partes') ? 'page' : undefined}>
-            <i className="bi bi-people-fill fs-4"></i>
-            {!collapsed && <span className="ms-2">Partes</span>}
-          </Link>
-        </li>
-      </ul>
-    </div>
+      {/* Menu */}
+      <nav className="flex-grow-1 py-2">
+        <ul className="nav flex-column">
+          <li className="nav-item">
+            <NavLink to="/dashboard" className={({ isActive }) => `nav-link sidebar-link ${isActive ? 'active' : ''}`} title="Dashboard">
+              <i className="bi bi-house-door sidebar-icon"></i>
+              {!collapsed && <span className="sidebar-label">Dashboard</span>}
+            </NavLink>
+          </li>
+          <li className="nav-item">
+            <NavLink to="/processos" className={({ isActive }) => `nav-link sidebar-link ${isActive ? 'active' : ''}`} title="Processos">
+              <i className="bi bi-folder sidebar-icon"></i>
+              {!collapsed && <span className="sidebar-label">Processos</span>}
+            </NavLink>
+          </li>
+          <li className="nav-item">
+            <NavLink to="/advogados" className={({ isActive }) => `nav-link sidebar-link ${isActive ? 'active' : ''}`} title="Advogados">
+              <i className="bi bi-person-badge sidebar-icon"></i>
+              {!collapsed && <span className="sidebar-label">Advogados</span>}
+            </NavLink>
+          </li>
+          <li className="nav-item">
+            <NavLink to="/partes" className={({ isActive }) => `nav-link sidebar-link ${isActive ? 'active' : ''}`} title="Partes">
+              <i className="bi bi-people sidebar-icon"></i>
+              {!collapsed && <span className="sidebar-label">Partes</span>}
+            </NavLink>
+          </li>
+        </ul>
+      </nav>
+    </aside>
   );
 }
 

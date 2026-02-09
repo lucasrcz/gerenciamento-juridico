@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import Tabela from '../../layouts/Tabela';
 import { Colors } from '../../constants/Colors';
 import { EstadosBrasileiros } from '../../constants/EstadosBrasileiros';
+import '../../constants/Colors.css';
 
 function Partes() {
   const [partes, setPartes] = useState([]);
@@ -16,7 +17,7 @@ function Partes() {
     email: '',
     estado: '',
     tipoPessoa: '',
-    cpfCnpj: ''
+    documento: ''
   });
 
   // Paginação
@@ -53,20 +54,25 @@ function Partes() {
   const fetchPartes = async () => {
     try {
       setLoading(true);
+      
+      // ✅ Construir params para o endpoint /partes/filtro
       const params = {
         page: pagination.currentPage,
         size: pagination.size,
-        sort: `${sorting.orderBy},${sorting.direction}`,
-        nome: filters.nome || null,
-        email: filters.email || null,
-        estado: filters.estado || null,
-        tipoPessoa: filters.tipoPessoa || null,
-        cpfCnpj: filters.cpfCnpj || null
+        sort: `${sorting.orderBy},${sorting.direction}`
       };
 
-      const res = await api.get('/partes', { params });
+      // Adicionar apenas filtros preenchidos
+      if (filters.nome) params.nome = filters.nome;
+      if (filters.email) params.email = filters.email;
+      if (filters.estado) params.estado = filters.estado;
+      if (filters.tipoPessoa) params.tipoPessoa = filters.tipoPessoa;
+      if (filters.documento) params.documento = filters.documento;
+
+      // ✅ Endpoint correto: /partes/filtro
+      const res = await api.get('/partes/filtro', { params });
       
-      setPartes(res.data.content || res.data);
+      setPartes(res.data.content || []);
       setPagination(prev => ({
         ...prev,
         totalPages: res.data.totalPages || 0,
@@ -97,10 +103,13 @@ function Partes() {
       email: '',
       estado: '',
       tipoPessoa: '',
-      cpfCnpj: ''
+      documento: ''
     });
     setPagination(prev => ({ ...prev, currentPage: 0 }));
-    fetchPartes();
+    
+    setTimeout(() => {
+      fetchPartes();
+    }, 0);
   };
 
   const handleSort = (columnKey) => {
@@ -114,29 +123,32 @@ function Partes() {
     setPagination(prev => ({ ...prev, currentPage: newPage }));
   };
 
-  const handleDelete = (id, tipoPessoa) => {
+  const handleSizeChange = (newSize) => {
+    setPagination(prev => ({ ...prev, size: newSize, currentPage: 0 }));
+  };
+
+  const handleDelete = async (id, tipoPessoa) => {
     const confirmMsg = tipoPessoa === "FISICA" 
       ? "Tem certeza que deseja desativar a pessoa física?" 
       : "Tem certeza que deseja desativar a pessoa jurídica?";
     
     if (!window.confirm(confirmMsg)) return;
 
-    api.delete('/partes/' + id)
-      .then(() => {
-        alert('Parte desativada com sucesso!');
-        fetchPartes();
-      })
-      .catch(err => {
-        console.error('Erro ao deletar:', err);
-        alert('Erro ao desativar parte');
-      });
+    try {
+      await api.delete(`/partes/${id}`);
+      alert('Parte desativada com sucesso!');
+      fetchPartes();
+    } catch (err) {
+      console.error('Erro ao deletar:', err);
+      alert('Erro ao desativar parte');
+    }
   };
 
   // Definição das colunas da tabela
   const headers = [
     { key: 'nome', label: 'Nome', sortable: true },
     { key: 'email', label: 'E-mail', sortable: true },
-    { key: 'cpfCnpj', label: 'CPF/CNPJ', sortable: false },
+    { key: 'documento', label: 'CPF/CNPJ', sortable: false },
     { key: 'tipoPessoa', label: 'Tipo', sortable: true },
     { key: 'estado', label: 'Estado', sortable: true },
     { key: 'acoes', label: 'Ações', sortable: false }
@@ -145,29 +157,31 @@ function Partes() {
   // Renderização de cada linha
   const renderRow = (parte) => (
     <tr key={parte.id}>
-      <td className="fw-semibold">{parte.nome}</td>
-      <td className="text-muted">{parte.email || '-'}</td>
-      <td>
+      <td className="fw-semibold" style={{ paddingLeft: '20px' }}>{parte.nome}</td>
+      <td className="text-center text-muted">{parte.email || '-'}</td>
+      <td className="text-center">
         <span className="badge bg-light text-dark border">
-          {formatDocument(parte.cpfCnpj)}
+          {formatDocument(parte.documento)}
         </span>
       </td>
-      <td>
-        <span className={`badge ${parte.tipoPessoa === 'FISICA' ? 'bg-info' : 'bg-warning'}`}>
+      <td className="text-center">
+        <span className={`badge rounded-pill ${parte.tipoPessoa === 'FISICA' ? 'bg-info' : 'bg-warning'}`}>
           {parte.tipoPessoa === 'FISICA' ? 'Pessoa Física' : 'Pessoa Jurídica'}
         </span>
       </td>
-      <td>
-        <span className="badge bg-light text-dark border">{parte.estado || '-'}</span>
+      <td className="text-center">
+        <span className="badge bg-light text-dark border">
+          {parte.endereco?.estado || '-'}
+        </span>
       </td>
-      <td>
+      <td className="text-center">
         <Link 
           to={`/partes/read/${parte.id}`} 
           className='btn btn-sm border-0 me-1' 
           style={{color: Colors.primaryDeep || '#2C2966'}} 
           title='Visualizar'
         >
-          <i className="bi bi-eye-fill fs-5"></i>
+          <i className="bi bi-eye-fill fs-6"></i>
         </Link>
         <Link 
           to={`/partes/update/${parte.id}`} 
@@ -175,14 +189,15 @@ function Partes() {
           style={{color: Colors.primaryDeep || '#2C2966'}} 
           title='Editar'
         >
-          <i className="bi bi-pencil-fill fs-5"></i>
+          <i className="bi bi-pencil-fill fs-6"></i>
         </Link>
         <button 
           onClick={() => handleDelete(parte.id, parte.tipoPessoa)} 
-          className='btn btn-sm text-danger border-0' 
+          className='btn btn-sm border-0'
+          style={{color: Colors.danger || '#c24c58' }}
           title='Desativar'
         >
-          <i className="bi bi-trash3-fill fs-5"></i>
+          <i className="bi bi-trash3-fill fs-6"></i>
         </button>
       </td>
     </tr>
@@ -268,8 +283,8 @@ function Partes() {
                   <input 
                     type="text"
                     className="form-control"
-                    name="cpfCnpj"
-                    value={filters.cpfCnpj}
+                    name="documento"
+                    value={filters.documento}
                     onChange={handleFilterChange}
                     placeholder="Digite o CPF ou CNPJ..."
                   />
@@ -308,13 +323,13 @@ function Partes() {
               </div>
 
               <div className="d-flex gap-2 mt-3">
-                <button type="submit" className="btn btn-primary">
+                <button type="submit" className="btn-filtrar-limpar">
                   <i className="bi bi-search me-2"></i>
-                  Buscar
+                  Filtrar
                 </button>
                 <button 
                   type="button" 
-                  className="btn btn-outline-secondary"
+                  className="btn-filtrar-limpar"
                   onClick={handleClearFilters}
                 >
                   <i className="bi bi-x-circle me-2"></i>
@@ -338,7 +353,9 @@ function Partes() {
               currentPage: pagination.currentPage,
               totalPages: pagination.totalPages,
               totalElements: pagination.totalElements,
-              onPageChange: handlePageChange
+              size: pagination.size,
+              onPageChange: handlePageChange,
+              onSizeChange: handleSizeChange
             }}
             sorting={{
               orderBy: sorting.orderBy,

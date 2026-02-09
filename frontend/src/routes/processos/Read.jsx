@@ -5,6 +5,7 @@ import { Colors } from '../../constants/Colors';
 import { EstadosBrasileiros } from '../../constants/EstadosBrasileiros';
 import DocumentosModal from '../../components/DocumentosModal';
 import PrazosModal from '../../components/PrazosModal';
+import '../../constants/Colors.css';
 
 function Read() {
   const { id } = useParams();
@@ -234,18 +235,6 @@ function Read() {
     return [...eventsPrazos, ...eventsDocs].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
   }, [prazosList, documentosList]);
 
-  const handleDownloadDoc = async (docId, nomeArquivo) => {
-    try {
-        const res = await api.get(`/documentos/${docId}/arquivo`, { responseType: 'blob' });
-        const url = window.URL.createObjectURL(new Blob([res.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', nomeArquivo || 'documento.pdf');
-        document.body.appendChild(link);
-        link.click();
-    } catch (e) { alert("Erro ao baixar documento."); }
-  };
-
   if (loading) return <div className="d-flex justify-content-center align-items-center vh-100">Carregando...</div>;
   if (error || !processo) return <div className="p-5 text-center text-danger">Processo não encontrado</div>;
 
@@ -261,12 +250,12 @@ function Read() {
         <div className='col-12 col-lg-7 h-100 overflow-auto p-4 custom-scrollbar'>
           <div className="d-flex justify-content-between align-items-center mb-4">
             <div>
-              <h2 className="fw-bold mb-0" style={{ color: Colors?.primaryDeep || '#0d6efd' }}>Processo <br/> {formatNumeroProcesso(processo.numero)}<br/></h2>
+              <h2 className="fw-bold mb-0" style={{ color: Colors?.primaryDeep || '#1a1761' }}>Processo <br/> {formatNumeroProcesso(processo.numero)}<br/></h2>
               <span className="badge bg-primary mt-2">{processo.status?.replace('_', ' ')}</span>
             </div>
             <div className="d-flex gap-2">
               <Link to="/processos" className='btn btn-outline-secondary btn-sm'>Voltar</Link>
-              <Link to={`/processos/update/${id}`} className='btn btn-success btn-sm'>Editar</Link>
+              <Link to={`/processos/update/${id}`} className='btn btn-sm text-white' style={{ backgroundColor: Colors.success }}>Editar</Link>
             </div>
           </div>
 
@@ -274,7 +263,8 @@ function Read() {
           <div className="row mb-4">
             <div className="col-md-6">
               <button 
-                className="btn btn-primary w-100 shadow-sm"
+                className="btn text-white w-100 shadow-sm fw-semibold"
+                style={{ backgroundColor: Colors.primaryDark }}
                 onClick={() => setShowDocumentosModal(true)}
               >
                 <i className="bi bi-file-earmark-text me-2"></i>
@@ -283,7 +273,8 @@ function Read() {
             </div>
             <div className="col-md-6">
               <button 
-                className="btn btn-danger w-100 shadow-sm"
+                className="btn text-white w-100 shadow-sm fw-semibold"
+                style={{ backgroundColor: Colors.primaryDark }}
                 onClick={() => setShowPrazosModal(true)}
               >
                 <i className="bi bi-calendar-event me-2"></i>
@@ -381,13 +372,13 @@ function Read() {
                   
                   return (
                     <div key={event.id} className="card border-0 shadow-sm mb-3 position-relative">
-                      <div className={`position-absolute top-0 start-0 translate-middle rounded-circle d-flex align-items-center justify-content-center text-white shadow-sm ${event.type === 'PRAZO' ? 'bg-danger' : 'bg-primary'}`} 
+                      <div className={`position-absolute top-0 start-0 translate-middle rounded-circle d-flex align-items-center justify-content-center text-white shadow-sm ${event.type === 'PRAZO' ? 'venc-prazo-icon' : 'bg-primary'}`} 
                            style={{width: '40px', height: '40px', left: '-22px', zIndex: 1}}>
                         <i className={`bi ${event.type === 'PRAZO' ? 'bi-calendar-event' : 'bi-paperclip'}`}></i>
                       </div>
                       <div className="card-body ms-2 py-2">
                         <div className="d-flex justify-content-between align-items-center">
-                          <h6 className={`fw-bold mb-0 ${event.type === 'PRAZO' ? 'text-danger' : 'text-primary'}`}>
+                          <h6 className={`fw-bold mb-0 ${event.type === 'PRAZO' ? 'vencimento-prazo' : 'text-primary'}`}>
                             {event.title}
                           </h6>
                           <div className="d-flex align-items-center gap-2">

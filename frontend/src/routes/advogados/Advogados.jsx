@@ -3,11 +3,13 @@ import { api } from '../../services/API';
 import { Link } from 'react-router-dom';
 import Tabela from '../../layouts/Tabela';
 import { Colors } from '../../constants/Colors';
+import { EstadosBrasileiros } from '../../constants/EstadosBrasileiros';
+import '../../constants/Colors.css';
 
 function Advogados() {
   const [advogados, setAdvogados] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [showFilters, setShowFilters] = useState(true); // ✅ Sempre aberto inicialmente
+  const [showFilters, setShowFilters] = useState(true);
   
   // Filtros
   const [filters, setFilters] = useState({
@@ -90,8 +92,27 @@ function Advogados() {
       ativo: true
     });
     setPagination(prev => ({ ...prev, currentPage: 0 }));
-    // ✅ Reseta a tabela para estado inicial
-    fetchAdvogados();
+    
+    setTimeout(() => {
+      const params = {
+        page: 0,
+        size: pagination.size,
+        sort: `${sorting.orderBy},${sorting.direction}`,
+        ativo: true
+      };
+      
+      api.get('/auth/advogados', { params })
+        .then(res => {
+          setAdvogados(res.data.content || []);
+          setPagination(prev => ({
+            ...prev,
+            currentPage: 0,
+            totalPages: res.data.totalPages || 0,
+            totalElements: res.data.totalElements || 0
+          }));
+        })
+        .catch(err => console.error('Erro ao limpar filtros:', err));
+    }, 0);
   };
 
   const handleSort = (columnKey) => {
@@ -103,6 +124,10 @@ function Advogados() {
 
   const handlePageChange = (newPage) => {
     setPagination(prev => ({ ...prev, currentPage: newPage }));
+  };
+
+  const handleSizeChange = (newSize) => {
+    setPagination(prev => ({ ...prev, size: newSize, currentPage: 0 }));
   };
 
   const handleDelete = async (id) => {
@@ -125,40 +150,47 @@ function Advogados() {
 
   const getRoleBadge = (role) => {
     const badges = {
-      'ADMIN': <span className="badge bg-danger">ADMIN</span>,
-      'USER': <span className="badge bg-primary">USER</span>
+      'ADMIN': <span className="badge rounded-pill bg-danger">ADMIN</span>,
+      'USER': <span className="badge rounded-pill bg-primary">USER</span>
     };
-    return badges[role] || <span className="badge bg-secondary">{role}</span>;
+    return badges[role] || <span className="badge rounded-pill bg-secondary">{role}</span>;
+  };
+
+  const getStatusBadge = (ativo) => {
+    return ativo 
+      ? <span className="badge rounded-pill bg-success">Ativo</span>
+      : <span className="badge rounded-pill bg-secondary">Inativo</span>;
   };
 
   // Definição das colunas da tabela
   const headers = [
     { key: 'nome', label: 'Nome', sortable: true },
     { key: 'email', label: 'E-mail', sortable: true },
-    { key: 'numeroOAB', label: 'Número OAB', sortable: false },
+    { key: 'numeroOAB', label: 'OAB', sortable: false },
     { key: 'role', label: 'Tipo', sortable: true },
+    { key: 'ativo', label: 'Status', sortable: true },
     { key: 'acoes', label: 'Ações', sortable: false }
   ];
 
-  // ✅ Renderização de cada linha - Botões no formato antigo
   const renderRow = (advogado) => (
     <tr key={advogado.id}>
-      <td className="fw-semibold">{advogado.nome}</td>
-      <td className="text-muted">{advogado.email}</td>
-      <td>
+      <td className="fw-semibold" style={{ paddingLeft: '20px' }}>{advogado.nome}</td>
+      <td className="text-center text-muted">{advogado.email}</td>
+      <td className="text-center">
         <span className="badge bg-light text-dark border">
           {formatOAB(advogado.numeroOAB, advogado.seccional)}
         </span>
       </td>
-      <td>{getRoleBadge(advogado.role)}</td>
-      <td>
+      <td className="text-center">{getRoleBadge(advogado.role)}</td>
+      <td className="text-center">{getStatusBadge(advogado.ativo)}</td>
+      <td className="text-center">
         <Link 
           to={`/advogados/read/${advogado.id}`} 
           className='btn btn-sm border-0 me-1' 
           style={{color: Colors.primaryDeep || '#2C2966'}} 
           title='Visualizar'
         >
-          <i className="bi bi-eye-fill fs-5"></i>
+          <i className="bi bi-eye-fill fs-6"></i>
         </Link>
         <Link 
           to={`/advogados/update/${advogado.id}`} 
@@ -166,14 +198,15 @@ function Advogados() {
           style={{color: Colors.primaryDeep || '#2C2966'}} 
           title='Editar'
         >
-          <i className="bi bi-pencil-fill fs-5"></i>
+          <i className="bi bi-pencil-fill fs-6"></i>
         </Link>
         <button 
           onClick={() => handleDelete(advogado.id)} 
-          className='btn btn-sm text-danger border-0' 
+          className='btn btn-sm border-0'
+          style={{color: Colors.danger || '#c24c58'}}
           title='Desativar'
         >
-          <i className="bi bi-trash3-fill fs-5"></i>
+          <i className="bi bi-trash3-fill fs-6"></i>
         </button>
       </td>
     </tr>
@@ -192,18 +225,20 @@ function Advogados() {
                 Cadastre, edite e gerencie os advogados do sistema.
               </p>
             </div>
-            <Link 
-              to="/advogados/create" 
-              className="btn shadow-sm"
-              style={{
-                backgroundColor: Colors?.primaryDeep || '#2C2966',
-                color: '#fff',
-                fontWeight: 'bold'
-              }}
-            >
-              <i className="bi bi-plus-circle me-2"></i>
-              Cadastrar Advogado
-            </Link>
+            <div className="d-flex gap-2">
+              <Link 
+                to="/advogados/create" 
+                className="btn shadow-sm"
+                style={{
+                  backgroundColor: Colors?.primaryDeep || '#2C2966',
+                  color: '#fff',
+                  fontWeight: 'bold'
+                }}
+              >
+                <i className="bi bi-plus-circle me-2"></i>
+                Cadastrar Advogado
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -268,15 +303,19 @@ function Advogados() {
 
                 <div className="col-md-4">
                   <label className="form-label small fw-semibold">Seccional (UF)</label>
-                  <input 
-                    type="text"
-                    className="form-control"
+                  <select 
+                    className="form-select"
                     name="seccional"
                     value={filters.seccional}
                     onChange={handleFilterChange}
-                    placeholder="Ex: SP, RJ..."
-                    maxLength={2}
-                  />
+                  >
+                    <option value="">Todos</option>
+                    {EstadosBrasileiros.map((estado) => (
+                      <option key={estado.sigla} value={estado.sigla}>
+                        {estado.sigla} - {estado.nome}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="col-md-4">
@@ -308,13 +347,13 @@ function Advogados() {
               </div>
 
               <div className="d-flex gap-2 mt-3">
-                <button type="submit" className="btn btn-primary">
+                <button type="submit" className="btn-filtrar-limpar">
                   <i className="bi bi-search me-2"></i>
-                  Buscar
+                  Filtrar
                 </button>
                 <button 
                   type="button" 
-                  className="btn btn-outline-secondary"
+                  className="btn-filtrar-limpar"
                   onClick={handleClearFilters}
                 >
                   <i className="bi bi-x-circle me-2"></i>
@@ -338,7 +377,9 @@ function Advogados() {
               currentPage: pagination.currentPage,
               totalPages: pagination.totalPages,
               totalElements: pagination.totalElements,
-              onPageChange: handlePageChange
+              size: pagination.size,
+              onPageChange: handlePageChange,
+              onSizeChange: handleSizeChange
             }}
             sorting={{
               orderBy: sorting.orderBy,

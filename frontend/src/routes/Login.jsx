@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../services/API';
+import './Login.css';
 
 function Login() {
   const [credentials, setCredentials] = useState({ login: '', senha: '' });
@@ -8,10 +9,8 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Função para formatar CPF
   const formatCPF = (value) => {
     const numbers = value.replace(/\D/g, '');
-    
     return numbers
       .replace(/(\d{3})(\d)/, '$1.$2')
       .replace(/(\d{3})(\d)/, '$1.$2')
@@ -29,7 +28,6 @@ function Login() {
     setLoading(true);
 
     try {
-      // Remove formatação do CPF antes de enviar
       const dataToSend = {
         login: credentials.login.replace(/\D/g, ''),
         senha: credentials.senha
@@ -47,57 +45,78 @@ function Login() {
   };
 
   return (
-    <div className="container">
-      <div className="row justify-content-center mt-5">
-        <div className="col-md-4">
-          <div className="card">
-            <div className="card-body">
-              <h3 className="card-title text-center mb-4">Login</h3>
-              
-              {error && (
-                <div className="alert alert-danger" role="alert">
-                  {error}
-                </div>
-              )}
+    <div className="login-page">
+      <div className="login-container">
+        {/* Logo e nome do sistema */}
+        <div className="login-brand">
+          <img src="/logo.png" alt="Juris Logo" className="login-logo" />
+          <h1 className="login-system-name">Juris</h1>
+          <p className="login-subtitle">Gerenciamento de Processos Jurídicos</p>
+        </div>
 
-              <form onSubmit={handleSubmit}>
-                <div className="mb-3">
-                  <label htmlFor='cpf' className="form-label"><b>CPF</b></label>
-                  <input
-                    type="text"
-                    id="cpf"
-                    name="login"
-                    className="form-control"
-                    value={credentials.login}
-                    onChange={handleCPFChange}
-                    maxLength="14"
-                    required
-                  />
-                </div>
-
-                <div className="mb-3">
-                  <label htmlFor='senha' className="form-label"><b>Senha</b></label>
-                  <input
-                    type="password"
-                    id="senha"
-                    name="senha"
-                    className="form-control"
-                    value={credentials.senha}
-                    onChange={(e) => setCredentials({...credentials, senha: e.target.value})}
-                    required
-                  />
-                </div>
-
-                <button 
-                  type="submit" 
-                  className="mx-auto d-block btn btn-primary w-50"
-                  disabled={loading}
-                >
-                  {loading ? 'Entrando...' : 'Entrar'}
-                </button>
-              </form>
+        {/* Card de login */}
+        <div className="login-card">
+          <h3 className="login-title">Entrar</h3>
+          
+          {error && (
+            <div className="alert alert-danger" role="alert">
+              <i className="bi bi-exclamation-triangle me-2"></i>
+              {error}
             </div>
-          </div>
+          )}
+
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label htmlFor="cpf" className="form-label login-label">
+                <i className="bi bi-person me-1"></i> CPF
+              </label>
+              <input
+                type="text"
+                id="cpf"
+                name="login"
+                className="form-control login-input"
+                placeholder="000.000.000-00"
+                value={credentials.login}
+                onChange={handleCPFChange}
+                maxLength="14"
+                required
+              />
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="senha" className="form-label login-label">
+                <i className="bi bi-lock me-1"></i> Senha
+              </label>
+              <input
+                type="password"
+                id="senha"
+                name="senha"
+                className="form-control login-input"
+                placeholder="Digite sua senha"
+                value={credentials.senha}
+                onChange={(e) => setCredentials({...credentials, senha: e.target.value})}
+                required
+              />
+            </div>
+
+            <button 
+              type="submit" 
+              className="btn login-btn w-100"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2"></span>
+                  Entrando...
+                </>
+              ) : (
+                <>
+                  <i className="bi bi-box-arrow-in-right me-2"></i>
+                  Entrar
+                </>
+              )}
+            </button>
+          </form>
         </div>
       </div>
     </div>

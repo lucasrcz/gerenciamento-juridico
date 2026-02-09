@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import Tabela from '../../layouts/Tabela';
 import { Colors } from '../../constants/Colors';
 import { EstadosBrasileiros } from '../../constants/EstadosBrasileiros';
+import '../../constants/Colors.css';
 
 function Processos() {
   const [processos, setProcessos] = useState([]);
@@ -310,6 +311,11 @@ function Processos() {
     setPagination(prev => ({ ...prev, currentPage: newPage }));
   };
 
+  // ✅ Nova função para mudar o tamanho da página
+  const handleSizeChange = (newSize) => {
+    setPagination(prev => ({ ...prev, size: newSize, currentPage: 0 }));
+  };
+
   const handleDelete = (id) => {
     if (!window.confirm("Deseja deletar este processo?")) return;
 
@@ -338,9 +344,9 @@ function Processos() {
 
   const renderRow = (row) => (
     <tr key={row.id}>
-      <td className="fw-semibold">{formatProcessoCNJ(row.numero)}</td>
+      <td className="fw-semibold" style={{ paddingLeft: '20px' }}>{formatProcessoCNJ(row.numero)}</td>
       
-      <td>
+      <td className="text-center">
         <span className={`badge rounded-pill ${
           row.status === 'EM_ANDAMENTO' ? 'bg-primary' : 
           row.status === 'ARQUIVADO' ? 'bg-secondary' : 
@@ -350,20 +356,20 @@ function Processos() {
         </span>
       </td>
       
-      <td>
+      <td className="text-center">
         <span>
           {formatEstado(row.estado)}
         </span>
       </td>
       
-      <td className="text-truncate" style={{maxWidth: '200px'}} 
+      <td className="text-center text-truncate" style={{maxWidth: '200px'}} 
           title={row.advogadoResponsavelId?.nome || 'Não informado'}>
         {row.advogadoResponsavelId?.nome || '-'}
       </td>
       
-      <td>
+      <td className="text-center">
         {row.proximoPrazo ? (
-          <div className="d-flex flex-column align-items-start">
+          <div className="d-flex flex-column align-items-center">
             <small className="text-muted fw-bold">
               {formatDate(row.proximoPrazo.dataVencimento)}
             </small>
@@ -376,14 +382,14 @@ function Processos() {
         )}
       </td>
       
-      <td>
+      <td className="text-center">
         <Link 
           to={`/processos/read/${row.id}`} 
           className='btn btn-sm border-0 me-1' 
           style={{color: Colors.primaryDeep || '#2C2966'}} 
           title='Visualizar'
         >
-          <i className="bi bi-eye-fill fs-5"></i>
+          <i className="bi bi-eye-fill fs-6"></i>
         </Link>
         <Link 
           to={`/processos/update/${row.id}`} 
@@ -391,18 +397,34 @@ function Processos() {
           style={{color: Colors.primaryDeep || '#2C2966'}} 
           title='Editar'
         >
-          <i className="bi bi-pencil-fill fs-5"></i>
+          <i className="bi bi-pencil-fill fs-6"></i>
         </Link>
         <button 
           onClick={() => handleDelete(row.id)} 
-          className='btn btn-sm text-danger border-0' 
+          className='btn btn-sm border-0'
+          style={{color: Colors.danger || '#c24c58'}}
           title='Deletar'
         >
-          <i className="bi bi-trash3-fill fs-5"></i>
+          <i className="bi bi-trash3-fill fs-6"></i>
         </button>
       </td>
     </tr>
   );
+
+  const handleGerarRelatorio = () => {
+    // ✅ Armazena os dados no sessionStorage (mais confiável para novas abas)
+    const relatorioData = {
+      processos: processos,
+      filters: filters,
+      timestamp: new Date().getTime()
+    };
+    
+    // ✅ Usar sessionStorage em vez de localStorage
+    sessionStorage.setItem('relatorioProcessos', JSON.stringify(relatorioData));
+    
+    // Abre nova aba com a rota do relatório
+    window.open('/processos/relatorio', '_blank');
+  };
 
   return (
     <div className="container-fluid p-4 bg-light min-vh-100">
@@ -417,18 +439,36 @@ function Processos() {
                 Cadastre, edite e gerencie os processos do sistema.
               </p>
             </div>
-            <Link 
-              to="/processos/create" 
-              className="btn shadow-sm"
-              style={{
-                backgroundColor: Colors?.primaryDeep || '#2C2966',
-                color: '#fff',
-                fontWeight: 'bold'
-              }}
-            >
-              <i className="bi bi-plus-circle me-2"></i>
-              Cadastrar Processo
-            </Link>
+            <div className="d-flex gap-2">
+              {/* Botão Gerar Relatório */}
+              <button
+                onClick={handleGerarRelatorio}
+                className="btn shadow-sm"
+                style={{
+                  backgroundColor: Colors?.accent || '#FFA051',
+                  color: Colors?.primaryDeep || '#1a1761',
+                  fontWeight: 'bold'
+                }}
+                disabled={processos.length === 0}
+                title={processos.length === 0 ? 'Nenhum processo para gerar relatório' : ''}
+              >
+                <i className="bi bi-file-earmark-pdf me-2"></i>
+                Gerar Relatório
+              </button>
+
+              <Link 
+                to="/processos/create" 
+                className="btn shadow-sm"
+                style={{
+                  backgroundColor: Colors?.primaryDeep || '#2C2966',
+                  color: '#fff',
+                  fontWeight: 'bold'
+                }}
+              >
+                <i className="bi bi-plus-circle me-2"></i>
+                Cadastrar Processo
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -564,13 +604,13 @@ function Processos() {
               </div>
 
               <div className="d-flex gap-2 mt-3">
-                <button type="submit" className="btn btn-primary">
+                <button type="submit" className="btn-filtrar-limpar">
                   <i className="bi bi-search me-2"></i>
-                  Buscar
+                  Filtrar
                 </button>
                 <button 
                   type="button" 
-                  className="btn btn-outline-secondary"
+                  className="btn-filtrar-limpar"
                   onClick={handleClearFilters}
                 >
                   <i className="bi bi-x-circle me-2"></i>
@@ -594,7 +634,9 @@ function Processos() {
               currentPage: pagination.currentPage,
               totalPages: pagination.totalPages,
               totalElements: pagination.totalElements,
-              onPageChange: handlePageChange
+              size: pagination.size,
+              onPageChange: handlePageChange,
+              onSizeChange: handleSizeChange
             }}
             sorting={{
               orderBy: sorting.orderBy,
