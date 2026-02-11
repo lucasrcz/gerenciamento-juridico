@@ -372,15 +372,16 @@ function Read() {
                   
                   return (
                     <div key={event.id} className="card border-0 shadow-sm mb-3 position-relative">
-                      <div className={`position-absolute top-0 start-0 translate-middle rounded-circle d-flex align-items-center justify-content-center text-white shadow-sm ${event.type === 'PRAZO' ? 'venc-prazo-icon' : 'bg-primary'}`} 
-                           style={{width: '40px', height: '40px', left: '-22px', zIndex: 1}}>
+                      <div className={`position-absolute top-0 start-0 translate-middle rounded-circle d-flex align-items-center justify-content-center text-white shadow-sm ${event.type === 'PRAZO' ? 'venc-prazo-icon' : ''}`} 
+                           style={{width: '40px', height: '40px', left: '-22px', zIndex: 1, backgroundColor: event.type === 'DOC' ? '#1a4d80' : undefined}}>
                         <i className={`bi ${event.type === 'PRAZO' ? 'bi-calendar-event' : 'bi-paperclip'}`}></i>
                       </div>
                       <div className="card-body ms-2 py-2">
                         <div className="d-flex justify-content-between align-items-center">
-                          <h6 className={`fw-bold mb-0 ${event.type === 'PRAZO' ? 'vencimento-prazo' : 'text-primary'}`}>
-                            {event.title}
-                          </h6>
+                        <h6 className={`fw-bold mb-1 mt-2 ${event.type === 'PRAZO' ? 'vencimento-prazo' : ''}`}
+                            style={{color: event.type === 'DOC' ? '#1a4d80' : undefined}}>
+                          {event.description}
+                        </h6>
                           <div className="d-flex align-items-center gap-2">
                             {/* Badge de Status (somente para Prazos) */}
                             {statusBadge && (
@@ -394,8 +395,8 @@ function Read() {
                             </span>
                           </div>
                         </div>
+                          <p className="card-text mb-0 small">{event.title}</p>
                         
-                        <p className="card-text mb-1 small mt-2">{event.description}</p>
                         
                         {/* Dias restantes (somente para Prazos) */}
                         {event.type === 'PRAZO' && event.diasRestantes != null && (

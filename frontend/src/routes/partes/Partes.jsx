@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { api } from '../../services/API';
+import { api, getLogin } from '../../services/API';
 import { Link } from 'react-router-dom';
 import Tabela from '../../layouts/Tabela';
 import { Colors } from '../../constants/Colors';
@@ -10,6 +10,8 @@ function Partes() {
   const [partes, setPartes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
+  const currentUser = getLogin();
+  const isAdmin = currentUser?.role === 'ADMIN';
   
   // Filtros
   const [filters, setFilters] = useState({
@@ -191,14 +193,16 @@ function Partes() {
         >
           <i className="bi bi-pencil-fill fs-6"></i>
         </Link>
-        <button 
-          onClick={() => handleDelete(parte.id, parte.tipoPessoa)} 
-          className='btn btn-sm border-0'
-          style={{color: Colors.danger || '#c24c58' }}
-          title='Desativar'
-        >
-          <i className="bi bi-trash3-fill fs-6"></i>
-        </button>
+        {isAdmin && (
+          <button 
+            onClick={() => handleDelete(parte.id, parte.tipoPessoa)} 
+            className='btn btn-sm border-0'
+            style={{color: Colors.danger || '#c24c58' }}
+            title='Desativar'
+          >
+            <i className="bi bi-trash3-fill fs-6"></i>
+          </button>
+        )}
       </td>
     </tr>
   );

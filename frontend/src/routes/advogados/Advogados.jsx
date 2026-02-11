@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { api } from '../../services/API';
+import { api, getLogin } from '../../services/API';
 import { Link } from 'react-router-dom';
 import Tabela from '../../layouts/Tabela';
 import { Colors } from '../../constants/Colors';
@@ -10,6 +10,8 @@ function Advogados() {
   const [advogados, setAdvogados] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
+  const currentUser = getLogin();
+  const isAdmin = currentUser?.role === 'ADMIN';
   
   // Filtros
   const [filters, setFilters] = useState({
@@ -168,7 +170,7 @@ function Advogados() {
     { key: 'email', label: 'E-mail', sortable: true },
     { key: 'numeroOAB', label: 'OAB', sortable: false },
     { key: 'role', label: 'Tipo', sortable: true },
-    { key: 'ativo', label: 'Status', sortable: true },
+    ...(isAdmin ? [{ key: 'ativo', label: 'Status', sortable: true }] : []),
     { key: 'acoes', label: 'Ações', sortable: false }
   ];
 
@@ -182,7 +184,7 @@ function Advogados() {
         </span>
       </td>
       <td className="text-center">{getRoleBadge(advogado.role)}</td>
-      <td className="text-center">{getStatusBadge(advogado.ativo)}</td>
+      {isAdmin && <td className="text-center">{getStatusBadge(advogado.ativo)}</td>}
       <td className="text-center">
         <Link 
           to={`/advogados/read/${advogado.id}`} 
@@ -200,14 +202,16 @@ function Advogados() {
         >
           <i className="bi bi-pencil-fill fs-6"></i>
         </Link>
-        <button 
-          onClick={() => handleDelete(advogado.id)} 
-          className='btn btn-sm border-0'
-          style={{color: Colors.danger || '#c24c58'}}
-          title='Desativar'
-        >
-          <i className="bi bi-trash3-fill fs-6"></i>
-        </button>
+        {isAdmin && (
+          <button 
+            onClick={() => handleDelete(advogado.id)} 
+            className='btn btn-sm border-0'
+            style={{color: Colors.danger || '#c24c58'}}
+            title='Desativar'
+          >
+            <i className="bi bi-trash3-fill fs-6"></i>
+          </button>
+        )}
       </td>
     </tr>
   );
@@ -332,18 +336,20 @@ function Advogados() {
                   </select>
                 </div>
 
-                <div className="col-md-4">
-                  <label className="form-label small fw-semibold">Status</label>
-                  <select 
-                    className="form-select"
-                    name="ativo"
-                    value={filters.ativo}
-                    onChange={handleFilterChange}
-                  >
-                    <option value={true}>Ativo</option>
-                    <option value={false}>Inativo</option>
-                  </select>
-                </div>
+                {isAdmin && (
+                  <div className="col-md-4">
+                    <label className="form-label small fw-semibold">Status</label>
+                    <select 
+                      className="form-select"
+                      name="ativo"
+                      value={filters.ativo}
+                      onChange={handleFilterChange}
+                    >
+                      <option value={true}>Ativo</option>
+                      <option value={false}>Inativo</option>
+                    </select>
+                  </div>
+                )}
               </div>
 
               <div className="d-flex gap-2 mt-3">

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { api } from '../../services/API';
+import { api, getLogin } from '../../services/API';
 import { EstadosBrasileiros } from '../../constants/EstadosBrasileiros';
 import { Colors, headerStyle, actionBtnStyle } from '../../constants/Colors';
 
@@ -19,6 +19,8 @@ function Create() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const currentUser = getLogin();
+  const isAdmin = currentUser?.role === 'ADMIN';
 
   // Função auxiliar para estilo de inputs preenchidos
   const getInputStyle = (value) => 
@@ -95,7 +97,8 @@ function Create() {
         ...rest,
         login: rest.cpf.replace(/\D/g, ''),
         cpf: rest.cpf.replace(/\D/g, ''),
-        telefone: rest.telefone.replace(/\D/g, '')
+        telefone: rest.telefone.replace(/\D/g, ''),
+        role: isAdmin ? rest.role : 'USER'
       };
 
       console.log('Dados enviados:', dataToSend);
@@ -118,10 +121,9 @@ function Create() {
           
           {/* Header */}
           <div className="d-flex justify-content-between align-items-center border-bottom border-2 pb-3 mb-4">
-            <h5 className="fw-bold mb-0" style={headerStyle}>
-              <i className="bi bi-person-plus-fill me-2"></i>
-              Cadastrar Novo Advogado
-            </h5>
+            <h4 className="fw-bold mb-0" style={headerStyle}>
+              Novo Advogado
+            </h4>
             <Link to="/advogados" className="btn btn-outline-secondary btn-sm">
               <i className="bi bi-arrow-left me-2"></i>
               Voltar
@@ -144,14 +146,14 @@ function Create() {
           <form onSubmit={handleSubmit}>
             
             {/* Dados Pessoais */}
-            <h5 className="fw-bold text-secondary mt-3 mb-3">
+            <h5 className="fw-bold text-secondary mt-3 mb-3 bg-light p-2">
               <i className="bi bi-person-circle me-2"></i>
               Dados Pessoais
             </h5>
             <div className="row mb-3">
               <div className="col-12 mb-3">
                 <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>
-                  Nome Completo *
+                  Nome Completo<span className='fw-bold text-danger'> *</span>
                 </label>
                 <input
                   type="text"
@@ -169,7 +171,7 @@ function Create() {
 
               <div className="col-md-6 mb-3">
                 <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>
-                  CPF *
+                  CPF<span className='fw-bold text-danger'> *</span>
                 </label>
                 <input
                   type="text"
@@ -186,7 +188,7 @@ function Create() {
 
               <div className="col-md-6 mb-3">
                 <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>
-                  Telefone *
+                  Telefone<span className='fw-bold text-danger'> *</span>
                 </label>
                 <input
                   type="text"
@@ -203,7 +205,7 @@ function Create() {
 
               <div className="col-12 mb-3">
                 <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>
-                  E-mail *
+                  E-mail<span className='fw-bold text-danger'> *</span>
                 </label>
                 <input
                   type="email"
@@ -220,14 +222,14 @@ function Create() {
             </div>
 
             {/* Dados Profissionais */}
-            <h5 className="fw-bold text-secondary mt-4 mb-3">
+            <h5 className="fw-bold text-secondary mt-4 mb-3 bg-light p-2">
               <i className="bi bi-briefcase-fill me-2"></i>
               Dados Profissionais
             </h5>
             <div className="row mb-3">
               <div className="col-md-6 mb-3">
                 <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>
-                  Número OAB *
+                  Número OAB<span className='fw-bold text-danger'> *</span>
                 </label>
                 <input
                   type="text"
@@ -244,7 +246,7 @@ function Create() {
 
               <div className='col-md-6 mb-3'>
                 <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>
-                  Seccional (UF) *
+                  Seccional (UF)<span className='fw-bold text-danger'> *</span>
                 </label>
                 <select 
                   name='seccional' 
@@ -263,38 +265,40 @@ function Create() {
                 </select>
               </div>
 
-              <div className="col-12 mb-3">
-                <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>
-                  Nível de Acesso *
-                </label>
-                <select 
-                  name='role' 
-                  className='form-select' 
-                  value={advogado.role}
-                  onChange={handleChange}
-                  style={getInputStyle(advogado.role)}
-                  required
-                >
-                  <option value="">Selecione o nível</option>
-                  <option value="USER">👤 Usuário (Acesso Básico)</option>
-                  <option value="ADMIN">🔑 Administrador (Acesso Total)</option>
-                </select>
-                <small className="text-muted">
-                  <i className="bi bi-info-circle me-1"></i>
-                  Usuários têm acesso restrito, administradores têm controle total do sistema
-                </small>
-              </div>
+              {isAdmin && (
+                <div className="col-12 mb-3">
+                  <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>
+                    Nível de Acesso<span className='fw-bold text-danger'> *</span>
+                  </label>
+                  <select 
+                    name='role' 
+                    className='form-select' 
+                    value={advogado.role}
+                    onChange={handleChange}
+                    style={getInputStyle(advogado.role)}
+                    required
+                  >
+                    <option value="">Selecione o nível</option>
+                    <option value="USER">👤 Usuário (Acesso Básico)</option>
+                    <option value="ADMIN">🔑 Administrador (Acesso Total)</option>
+                  </select>
+                  <small className="text-muted">
+                    <i className="bi bi-info-circle me-1"></i>
+                    Usuários têm acesso restrito, administradores têm controle total do sistema
+                  </small>
+                </div>
+              )}
             </div>
 
             {/* Dados de Acesso */}
-            <h5 className="fw-bold text-secondary mt-4 mb-3">
+            <h5 className="fw-bold text-secondary mt-4 mb-3 bg-light p-2">
               <i className="bi bi-shield-lock-fill me-2"></i>
               Dados de Acesso
             </h5>
             <div className="row mb-3">
               <div className="col-md-6 mb-3">
                 <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>
-                  Senha *
+                  Senha<span className='fw-bold text-danger'> *</span>
                 </label>
                 <input
                   type="password"
@@ -316,7 +320,7 @@ function Create() {
 
               <div className="col-md-6 mb-3">
                 <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>
-                  Confirmar Senha *
+                  Confirmar Senha<span className='fw-bold text-danger'> *</span>
                 </label>
                 <input
                   type="password"

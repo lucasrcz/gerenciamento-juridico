@@ -12,7 +12,6 @@ export const Colors = {
 };
 
 export const headerStyle = {
-    letterSpacing: '0.05em', 
     color: Colors.primaryDark,
     borderColor: Colors.primaryDark,
     backgroundColor: '#f8f9fa',

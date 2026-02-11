@@ -289,9 +289,9 @@ function Create() {
         <div className="card-body p-4">
           
           <div className="d-flex justify-content-between align-items-center border-bottom border-2 pb-2 mb-4">
-             <h5 className="fw-bold mb-0" style={headerStyle}>
-               {step === 1 ? 'Novo Processo: Dados Gerais' : 'Novo Processo: Prazos e Documentos'}
-             </h5>
+             <h4 className="fw-bold mb-0" style={headerStyle}>
+               {step === 1 ? 'Novo Processo: Dados Principais' : 'Novo Processo: Prazos e Documentos'}
+             </h4>
              <span className="badge bg-secondary">Etapa {step} de 2</span>
           </div>
 
@@ -299,14 +299,14 @@ function Create() {
           <form onSubmit={handleStep1Submit}>
             <div className="row mb-3">
               <div className='col-12 col-md-4 mb-3'>
-                <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>Número do Processo *</label>
+                <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>Número do Processo<span className='fw-bold text-danger'> *</span></label>
                 <input type="text" className='form-control' placeholder="0000000-00.0000.0.00.0000"
                 value={processo.numero} style={getInputStyle(processo.numero)} maxLength={25}
                 onChange={handleProcessoMask} required/>
               </div>
 
               <div className='col-12 col-md-4 mb-3'>
-                <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>Status *</label>
+                <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>Status<span className='fw-bold text-danger'> *</span></label>
                 <select className='form-select' value={processo.status} style={getInputStyle(processo.status)}
                   onChange={e => setProcesso({...processo, status: e.target.value})} required>
                   <option value="">Selecionar</option>
@@ -317,7 +317,7 @@ function Create() {
               </div>
 
               <div className='col-12 col-md-4 mb-3'>
-                <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>Estado *</label>
+                <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>Estado<span className='fw-bold text-danger'> *</span></label>
                 <select className='form-select' value={processo.estado} style={getInputStyle(processo.estado)}
                   onChange={e => setProcesso({...processo, estado: e.target.value})} required>
                     <option value="">Selecionar</option>
@@ -326,15 +326,16 @@ function Create() {
               </div>
 
               <div className='col-8 mb-2'>
-                <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>Contrato (PDF)</label>
+                <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>Contrato (PDF)<span className='fw-bold text-danger'> *</span></label>
                   <input type="file" className='form-control' accept='.pdf' onChange={(e) => setContrato(e.target.files[0])} style={getInputStyle(contrato)} required/>
               </div>
             </div>
 
-            <h5 className="fw-bold text-secondary mt-4 mb-3">Advogados</h5>
+            <h5 className="fw-bold text-secondary mt-4 mb-3 bg-light p-2">Advogados</h5>
+            <hr/>
             <div className="row mb-3" ref={advPrincipalDropdownRef}>
               <div className='col-12 col-md-6 mb-3'>
-                <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>Advogado Responsável *</label>
+                <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>Advogado Responsável<span className='fw-bold text-danger'> *</span></label>
                 <div className="position-relative">
                   <input type="text" className="form-control" placeholder="Busca por nome..."
                     style={getInputStyle(advPrincipalTerm)} value={advPrincipalTerm}
@@ -357,7 +358,7 @@ function Create() {
 
             <div className='row mb-4' ref={advDropdownRef}>
               <div className='col-6'>
-                <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>Advogados Associados</label>
+                <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>Advogados Associados<span className='fw-bold text-danger'> *</span></label>
                 <div className="position-relative">
                   <input type="text" className='form-control' placeholder='Busca por nome...'
                     value={advTerm} onChange={e => setAdvTerm(e.target.value)} onFocus={() => setShowAdvDropdown(true)}/>
@@ -381,10 +382,11 @@ function Create() {
               ))}
             </div>
 
-            <h5 className="fw-bold text-secondary mt-4 mb-3">Partes Envolvidas</h5>
+            <h5 className="fw-bold text-secondary mt-4 mb-3 bg-light p-2">Partes Envolvidas</h5>
+            <hr/>
             <div className="row mb-3" ref={partesDropdownRef}>
               <div className="col-6">
-                <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>Adicionar Parte</label>
+                <label className="form-label fw-bold" style={{color: Colors.primaryDeep}}>Adicionar Parte<span className='fw-bold text-danger'> *</span></label>
                 <div className="position-relative">
                   <input type="text" className='form-control' placeholder='Busca por nome...'
                     value={partesTerm} onChange={e => setPartesTerm(e.target.value)} onFocus={() => setShowPartesDropdown(true)}/>
@@ -507,6 +509,7 @@ function Create() {
         </div>
       </div>
     </div>
+    
   )
 }
 

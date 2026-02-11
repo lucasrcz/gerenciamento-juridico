@@ -1,11 +1,16 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { api } from '../../services/API'
+import { api, getLogin } from '../../services/API'
 import { EstadosBrasileiros } from '../../constants/EstadosBrasileiros'
+import { Colors, headerStyle, actionBtnStyle } from '../../constants/Colors'
 
 function Update() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const currentUser = getLogin();
+  const isAdmin = currentUser?.role === 'ADMIN';
+  const [novaSenha, setNovaSenha] = useState('');
+  const [confirmarNovaSenha, setConfirmarNovaSenha] = useState('');
   const [advogado, setAdvogado] = useState({
     nome: '',
     cpf: '',
@@ -72,14 +77,26 @@ function Update() {
   const handleUpdate = async (e) => {
     e.preventDefault();
 
+    // Validação de senha (apenas se admin preencheu nova senha)
+    if (isAdmin && novaSenha) {
+      if (novaSenha !== confirmarNovaSenha) {
+        alert('As senhas não coincidem');
+        return;
+      }
+      if (novaSenha.length < 6) {
+        alert('A senha deve ter no mínimo 6 caracteres');
+        return;
+      }
+    }
+
     try {
       const dataToSend = {
         nome: advogado.nome,
         email: advogado.email,
         seccional: advogado.seccional,
         numeroOAB: advogado.numeroOAB,
-        role: advogado.role,
-        senha: advogado.senha,
+        role: isAdmin ? advogado.role : undefined,
+        senha: (isAdmin && novaSenha) ? novaSenha : undefined,
         login: advogado.cpf.replace(/\D/g, ''),
         cpf: advogado.cpf.replace(/\D/g, ''),
         telefone: advogado.telefone.replace(/\D/g, '')
@@ -153,16 +170,58 @@ function Update() {
               </select>
             </div>
 
-            <div className="col-md-4 mb-3">
-              <label htmlFor="role"><b>Role</b></label>
-              <select name='role' className='form-select'
-              value={advogado.role}
-              onChange={handleChange} required>
-                <option value="USER">Usuário</option>
-                <option value="ADMIN">Administrador</option>
-              </select>
-            </div>
+            {isAdmin && (
+              <div className="col-md-4 mb-3">
+                <label htmlFor="role"><b>Role</b></label>
+                <select name='role' className='form-select'
+                value={advogado.role}
+                onChange={handleChange} required>
+                  <option value="USER">Usuário</option>
+                  <option value="ADMIN">Administrador</option>
+                </select>
+              </div>
+            )}
           </div>
+
+          {/* Alterar Senha (apenas Admin) */}
+          {isAdmin && (
+            <>
+              <h6 className="fw-bold text-secondary mt-4 mb-3 bg-light p-2">
+                <i className="bi bi-shield-lock-fill me-2"></i>
+                Alterar Senha
+              </h6>
+              <div className="row">
+                <div className="col-md-6 mb-3">
+                  <label><b>Nova Senha</b></label>
+                  <input
+                    type="password"
+                    className="form-control"
+                    value={novaSenha}
+                    onChange={(e) => setNovaSenha(e.target.value)}
+                    placeholder="Digite a nova senha"
+                    minLength="6"
+                    maxLength="30"
+                  />
+                  <small className="text-muted">
+                    <i className="bi bi-info-circle me-1"></i>
+                    Deixe em branco para manter a senha atual
+                  </small>
+                </div>
+                <div className="col-md-6 mb-3">
+                  <label><b>Confirmar Nova Senha</b></label>
+                  <input
+                    type="password"
+                    className="form-control"
+                    value={confirmarNovaSenha}
+                    onChange={(e) => setConfirmarNovaSenha(e.target.value)}
+                    placeholder="Confirme a nova senha"
+                    minLength="6"
+                    maxLength="30"
+                  />
+                </div>
+              </div>
+            </>
+          )}
 
           <center><br/>
             <button className='btn btn-success'>Atualizar</button>

@@ -328,7 +328,7 @@ function Update() {
                 
                 <div className="row g-3">
                   <div className="col-md-6">
-                    <label htmlFor="numero" className="form-label"><strong>Nº Processo *</strong></label>
+                    <label htmlFor="numero" className="form-label"><strong>Nº Processo</strong></label>
                     <input 
                       type="text" 
                       id="numero"
@@ -344,11 +344,11 @@ function Update() {
                   </div>
 
                   <div className="col-md-6">
-                    <label htmlFor="status" className="form-label"><strong>Status *</strong></label>
+                    <label htmlFor="status" className="form-label"><strong>Status</strong></label>
                     <select 
                       id="status"
                       name='status' 
-                      className='form-control'
+                      className='form-select'
                       value={processo.status}
                       onChange={e => setProcesso({...processo, status: e.target.value})} 
                       required
@@ -361,11 +361,11 @@ function Update() {
                   </div>
 
                   <div className="col-md-6">
-                    <label htmlFor="estado" className="form-label"><strong>Estado *</strong></label>
+                    <label htmlFor="estado" className="form-label"><strong>Estado</strong></label>
                     <select 
                       id="estado"
                       name='estado' 
-                      className='form-control'
+                      className='form-select'
                       value={processo.estado}
                       onChange={e => setProcesso({...processo, estado: e.target.value})}
                       required
@@ -401,7 +401,7 @@ function Update() {
                 <h5 className="card-title fw-bold border-bottom pb-2 mb-3 text-secondary">Advogados</h5>
                 
                 <div className="mb-3" ref={advPrincipalDropdownRef}>
-                  <label className="form-label"><strong>Advogado Responsável *</strong></label>
+                  <label className="form-label"><strong>Advogado Responsável</strong></label>
                   <div className="position-relative">
                     <input 
                       type="text" 
@@ -521,7 +521,6 @@ function Update() {
                           }} 
                           required
                         >
-                          <option value="">Selecione o Tipo *</option>
                           <option value="AUTOR">Autor</option>
                           <option value="REU">Réu</option>
                           <option value="TERCEIRO">Terceiro</option>
@@ -532,7 +531,7 @@ function Update() {
                       <div className="col-2">
                         <button 
                           type="button" 
-                          className="btn btn-danger w-100" 
+                          className="btn btn-danger w-80" 
                           onClick={() => toggleParte({id: p.parteId})}
                         >
                           <i className="bi bi-trash"></i>
