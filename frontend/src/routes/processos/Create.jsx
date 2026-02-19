@@ -331,7 +331,10 @@ function Create() {
               </div>
             </div>
 
-            <h5 className="fw-bold text-secondary mt-4 mb-3 bg-light p-2">Advogados</h5>
+            <h5 className="fw-bold text-secondary mt-4 mb-3 bg-light p-2">
+              <i className="bi bi-person-badge me-2"></i>  
+              Advogados
+            </h5>
             <hr/>
             <div className="row mb-3" ref={advPrincipalDropdownRef}>
               <div className='col-12 col-md-6 mb-3'>
@@ -382,7 +385,10 @@ function Create() {
               ))}
             </div>
 
-            <h5 className="fw-bold text-secondary mt-4 mb-3 bg-light p-2">Partes Envolvidas</h5>
+            <h5 className="fw-bold text-secondary mt-4 mb-3 bg-light p-2">
+              <i className="bi bi-people me-2"></i>
+              Partes Envolvidas
+            </h5>
             <hr/>
             <div className="row mb-3" ref={partesDropdownRef}>
               <div className="col-6">

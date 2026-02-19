@@ -1,7 +1,7 @@
 .sidebar {
   background-color: #131047;
   min-height: 100vh;
-  width: 220px;
+  width: 200px;
   min-width: 200px;
   transition: all 0.3s ease;
   overflow: hidden;
@@ -89,7 +89,7 @@
 
 /* === Estado recolhido === */
 .sidebar-collapsed .sidebar-link {
-  padding: 14px 0;
+  padding: 15px 0;
   justify-content: center;
   border-left: 3px solid transparent;
   border-radius: 0;
@@ -102,8 +102,10 @@
 }
 
 .sidebar-collapsed .sidebar-icon {
+  padding: 15px;
   font-size: 1.25rem;
   width: 56px;
   min-width: auto;
   text-align: center;
+  margin-right: 15px;
 }

@@ -1,0 +1,860 @@
+/* Container Principal */
+.todo-container {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(19, 16, 71, 0.08);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  max-height: calc(100vh - 180px);
+  overflow-y: auto;
+}
+
+/* Cabeçalho */
+.todo-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  color: #131047;
+}
+
+.header-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.todo-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.todo-counter {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #6C6C94;
+  background: #f0f0f5;
+  padding: 2px 10px;
+  border-radius: 20px;
+  margin-left: auto;
+}
+
+/* --- Input e Contador --- */
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.input-group {
+  display: flex;
+  gap: 0;
+  background: #f0f0f0;
+  border-radius: 50px;
+  padding: 4px;
+  margin-bottom: 5px;
+}
+
+.char-count {
+  font-size: 0.8rem;
+  color: #6C6C94;
+  text-align: right;
+  padding-right: 15px;
+}
+
+.todo-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 12px 20px;
+  font-size: 0.95rem;
+  outline: none;
+  color: #131047;
+}
+
+.todo-input::placeholder {
+  color: #6C6C94;
+}
+
+.add-btn {
+  background-color: #FFA051;
+  color: #131047;
+  border: none;
+  border-radius: 50px;
+  padding: 10px 24px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.add-btn:hover {
+  background-color: #e88a3a;
+}
+
+.add-btn:disabled {
+  background-color: #d0d0d0;
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* Lista de Tarefas */
+.todo-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.todo-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.todo-item:last-child {
+  border-bottom: none;
+}
+
+/* Conteúdo da Tarefa */
+.task-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  flex: 1;
+  min-width: 0;
+}
+
+.task-text {
+  font-size: 1rem;
+  color: #131047;
+  transition: color 0.2s;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  margin-top: 2px;
+}
+
+.checkbox {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #6C6C94;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.checkbox.checked {
+  background-color: #2C2966;
+  border-color: #2C2966;
+}
+
+.checkbox svg {
+  width: 14px;
+  height: 14px;
+}
+
+.todo-item.completed .task-text {
+  text-decoration: line-through;
+  color: #6C6C94;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: #6C6C94;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s, background 0.2s;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+.delete-btn:hover {
+  color: #c24c58;
+  background-color: #fdf0f1;
+}
+
+.delete-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Estado vazio */
+.todo-empty {
+  text-align: center;
+  padding: 24px 0;
+  color: #6C6C94;
+  font-size: 0.95rem;
+}
+
+/* Botões de Cadastro Rápido */
+.quick-actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.quick-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 12px;
+  background-color: #2C2966;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(44, 41, 102, 0.2);
+}
+
+.quick-action-btn i {
+  font-size: 1.1rem;
+}
+
+.quick-action-btn:hover {
+  background-color: #FFA051;
+  color: #131047;
+  box-shadow: 0 4px 12px rgba(255, 160, 81, 0.3);
+  transform: translateY(-1px);
+}
+
+.quick-action-btn:active {
+  transform: translateY(0);
+}
+
+/* ===== Gráfico de Pizza ===== */
+.chart-container {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(19, 16, 71, 0.08);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  color: #131047;
+}
+
+.chart-header-icon {
+  font-size: 1.6rem;
+}
+
+.chart-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.chart-loading,
+.chart-empty {
+  text-align: center;
+  padding: 32px 0;
+  color: #6C6C94;
+  font-size: 0.95rem;
+}
+
+.chart-content {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.pie-svg {
+  width: 160px;
+  height: 160px;
+  flex-shrink: 0;
+}
+
+.chart-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.92rem;
+  color: #131047;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-label {
+  font-weight: 600;
+  min-width: 100px;
+}
+
+.legend-value {
+  color: #131047;
+  font-weight: 500;
+}
+
+.legend-pct {
+  color: #6C6C94;
+  font-weight: 400;
+  font-size: 0.85rem;
+}
+
+.legend-total {
+  margin-top: 6px;
+  padding-top: 8px;
+  border-top: 1px solid #f0f0f0;
+  font-weight: 700;
+  color: #2C2966;
+  font-size: 0.95rem;
+}
+
+/* ===== Dashboard Grid Layout ===== */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 1200px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .right-column {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  .right-column {
+    grid-column: span 1;
+  }
+}
+
+/* ===== Painel de Prazos ===== */
+.prazos-panel {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(19, 16, 71, 0.08);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.prazos-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  color: #131047;
+}
+
+.prazos-header-icon {
+  font-size: 1.6rem;
+}
+
+.prazos-panel-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Grid de status dos prazos */
+.prazos-status-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 992px) {
+  .prazos-status-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.prazo-status-card {
+  background: #fafafa;
+  border-radius: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.prazo-status-card:hover {
+  background: var(--hover-bg, #f5f5f5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(19, 16, 71, 0.1);
+}
+
+.prazo-status-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.prazo-status-count {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.prazo-status-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #131047;
+}
+
+.prazo-status-hint {
+  font-size: 0.75rem;
+  color: #6C6C94;
+  margin-top: 2px;
+}
+
+/* Próximos vencimentos */
+.prazos-proximos {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 20px;
+}
+
+.prazos-proximos-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.prazos-proximos-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #131047;
+  margin: 0;
+}
+
+.prazos-filtro {
+  display: flex;
+  gap: 4px;
+  background: #f0f0f5;
+  border-radius: 8px;
+  padding: 3px;
+}
+
+.prazos-filtro-btn {
+  border: none;
+  background: transparent;
+  color: #6C6C94;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.prazos-filtro-btn:hover {
+  color: #131047;
+}
+
+.prazos-filtro-btn.active {
+  background: #2C2966;
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(44, 41, 102, 0.2);
+}
+
+.prazos-proximos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.prazo-proximo-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #fafafa;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.prazo-proximo-item:hover {
+  background: #f0f0f5;
+  transform: translateX(2px);
+}
+
+.prazo-proximo-indicator {
+  width: 4px;
+  height: 40px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.prazo-proximo-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.prazo-proximo-numero {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #131047;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.prazo-proximo-desc {
+  font-size: 0.8rem;
+  color: #6C6C94;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.prazo-proximo-date {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.prazo-proximo-venc {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #131047;
+}
+
+.prazo-proximo-dias {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* ===== Modal de Prazos ===== */
+.prazos-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(19, 16, 71, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.prazos-modal {
+  background: #ffffff;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 680px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(19, 16, 71, 0.2);
+  animation: slideUp 0.2s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.prazos-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 3px solid;
+}
+
+.prazos-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.prazos-modal-title h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #131047;
+  margin: 0;
+}
+
+.prazos-modal-badge {
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 20px;
+}
+
+.prazos-modal-close {
+  background: none;
+  border: none;
+  color: #6C6C94;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  transition: all 0.15s;
+}
+
+.prazos-modal-close:hover {
+  background: #f0f0f5;
+  color: #131047;
+}
+
+.prazos-modal-body {
+  padding: 16px 24px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.prazos-modal-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.prazos-modal-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: #fafafa;
+  border-radius: 12px;
+  transition: background 0.15s;
+}
+
+.prazos-modal-item:hover {
+  background: #f0f0f5;
+}
+
+.prazos-modal-item-indicator {
+  width: 4px;
+  height: 48px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.prazos-modal-item-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.prazos-modal-item-numero {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #131047;
+}
+
+.prazos-modal-item-desc {
+  font-size: 0.82rem;
+  color: #6C6C94;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.prazos-modal-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 4px;
+}
+
+.prazos-modal-item-date {
+  font-size: 0.82rem;
+  color: #131047;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.prazos-modal-item-dias {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.prazos-modal-item-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #2C2966;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.prazos-modal-item-btn:hover {
+  background: #FFA051;
+  color: #131047;
+}
+
+/* ===== Right Column ===== */
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Botão Novo Processo dentro do chart-container */
+.chart-new-processo-btn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 16px;
+  font-size: 0.82rem;
+  background: transparent;
+  color: #2C2966;
+  border: 1.5px dashed #c5c4d9;
+  box-shadow: none;
+}
+
+.chart-new-processo-btn:hover {
+  background: #f0f0f5;
+  border-color: #2C2966;
+  color: #2C2966;
+  box-shadow: none;
+  transform: none;
+}
+
+.chart-new-processo-btn i {
+  font-size: 1rem;
+}
+
+/* ===== Info Cards (Advogados / Partes) ===== */
+.info-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 20px rgba(19, 16, 71, 0.08);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.info-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: #131047;
+}
+
+.info-card-icon {
+  font-size: 1.1rem;
+}
+
+.info-card-header h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.info-card-body {
+  margin-bottom: 8px;
+}
+
+.info-card-stats-row {
+  display: flex;
+  gap: 10px;
+}
+
+.info-card-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 6px 6px;
+}
+
+.info-card-stat-total {
+  background: #f0f0f5;
+}
+
+.info-card-stat-value {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #2C2966;
+  line-height: 1;
+}
+
+.info-card-stat-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #6C6C94;
+  margin-top: 2px;
+  text-align: center;
+}
+
+.info-card-btn {
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 0.82rem;
+  background: transparent;
+  color: #2C2966;
+  border: 1.5px dashed #c5c4d9;
+  box-shadow: none;
+}
+
+.info-card-btn:hover {
+  background: #f0f0f5;
+  border-color: #2C2966;
+  color: #2C2966;
+  box-shadow: none;
+  transform: none;
+}
+
+.info-card-btn i {
+  font-size: 1rem;
+}

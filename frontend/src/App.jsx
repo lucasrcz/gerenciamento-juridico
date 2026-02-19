@@ -19,7 +19,6 @@ import UpdatePartes from "./routes/partes/Update"
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
-import Create2 from "./routes/processos/Create2"
 
 function App() {
 
@@ -39,7 +38,6 @@ function App() {
           {/* Procesos */}
           <Route path='processos' element={<Processos />}/>
           <Route path='processos/create' element={<CreateProcessos />}/>
-          <Route path='processos/create2' element={<Create2 />}/>
           <Route path='processos/update/:id' element={<UpdateProcessos />}/>
           <Route path='processos/read/:id' element={<ReadProcessos />}/>
 

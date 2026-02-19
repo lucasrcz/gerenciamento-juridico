@@ -11,6 +11,11 @@ import java.util.List;
 
 public interface PrazoRepository extends JpaRepository<Prazo, Long> {
 
+    @Query("SELECT p FROM Prazo p " +
+            "WHERE p.dataVencimento >= :dataAtual " +
+            "ORDER BY p.dataVencimento ASC")
+    List<Prazo> buscarPrazosNaoVencidos(@Param("dataAtual") LocalDate dataAtual);
+
     //TODO Futuramente colocar por usuário a pesquisa WHERE processo.usuario == usuario AND...
     @Query("SELECT p FROM Prazo p " +
             "WHERE p.dataVencimento BETWEEN :dataAtual AND :dataFinal " +
