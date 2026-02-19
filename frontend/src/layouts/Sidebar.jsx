@@ -49,7 +49,7 @@ function Sidebar({ collapsed, onToggle }) {
         </ul>
       </nav>
       <footer className="d-flex align-items-center px-3 fixed-bottom ">
-        {!collapsed && <span className="sidebar-label py-2">Juris © 2026</span>}
+        {!collapsed && <span className="sidebar-label py-3 ps-3" style={{}}>Juris © 2026</span>}
       </footer>
     </aside>
   );

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api, getLogin } from '../../services/API'
 import { EstadosBrasileiros } from '../../constants/EstadosBrasileiros'
-import { Colors, headerStyle, actionBtnStyle } from '../../constants/Colors'
+import { Colors } from '../../constants/Colors'
 
 function Update() {
   const navigate = useNavigate();
@@ -11,6 +11,8 @@ function Update() {
   const isAdmin = currentUser?.role === 'ADMIN';
   const [novaSenha, setNovaSenha] = useState('');
   const [confirmarNovaSenha, setConfirmarNovaSenha] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [advogado, setAdvogado] = useState({
     nome: '',
     cpf: '',
@@ -21,34 +23,28 @@ function Update() {
     seccional: ''
   });
 
-  useEffect(()=> { 
-      api.get('/auth/advogados/' + id)
-        .then(res => setAdvogado(res.data))
-        .catch(err => console.log(err));
-    }, [id])
+  useEffect(() => { 
+    setLoading(true);
+    api.get('/auth/advogados/' + id)
+      .then(res => { setAdvogado(res.data); setLoading(false); })
+      .catch(err => { console.log(err); setLoading(false); });
+  }, [id]);
 
-
-  // Função para formatar CPF
   const formatCPF = (value) => {
     const numbers = value.replace(/\D/g, '');
-    
     return numbers
       .replace(/(\d{3})(\d)/, '$1.$2')
       .replace(/(\d{3})(\d)/, '$1.$2')
       .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
   };
 
-  // Função para formatar telefone
   const formatTelefone = (value) => {
     const numbers = value.replace(/\D/g, '');
-    
     if (numbers.length <= 10) {
-      // Formato: (11) 1234-5678
       return numbers
         .replace(/^(\d{2})(\d)/g, '($1) $2')
         .replace(/(\d{4})(\d)/, '$1-$2');
     } else {
-      // Formato: (11) 91234-5678
       return numbers
         .replace(/^(\d{2})(\d)/g, '($1) $2')
         .replace(/(\d{5})(\d)/, '$1-$2');
@@ -59,7 +55,6 @@ function Update() {
     const { name, value } = e.target;
     let formattedValue = value;
 
-    // Aplica formatação específica para cada campo
     if (name === 'cpf') {
       formattedValue = formatCPF(value);
     } else if (name === 'telefone') {
@@ -77,7 +72,6 @@ function Update() {
   const handleUpdate = async (e) => {
     e.preventDefault();
 
-    // Validação de senha (apenas se admin preencheu nova senha)
     if (isAdmin && novaSenha) {
       if (novaSenha !== confirmarNovaSenha) {
         alert('As senhas não coincidem');
@@ -90,6 +84,7 @@ function Update() {
     }
 
     try {
+      setSaving(true);
       const dataToSend = {
         nome: advogado.nome,
         email: advogado.email,
@@ -110,124 +105,171 @@ function Update() {
       if (err.response && err.response.data && err.response.data.errors) {
          console.log("Erros de validação:", err.response.data.errors);
       }
+    } finally {
+      setSaving(false);
     }
   };
 
+  if (loading) return <div className="d-flex justify-content-center align-items-center vh-100">Carregando...</div>;
+
   return (
-    <div className='d-flex w-100 vh-100 justify-content-center align-items-center bg-light'>
-      <div className='w-50 border bg-white shadow px-5 pt-3 pb-5 rounded'>
-        <center><h2>Editar Advogado</h2><br /></center>
-        
-        <form onSubmit={handleUpdate}>
-          <div className="mb-2">
-            <label htmlFor="nome"><b>Nome Completo</b></label>
-            <input type="text" name="nome" className="form-control" minLength="1" maxLength="150"
-            value={advogado.nome}
-            onChange={handleChange} required/>
-          </div>
+    <div className='container-fluid vh-100 overflow-hidden bg-light'>
+      <div className='row h-100'>
+        <div className='col-12 col-lg-8 mx-auto h-100 overflow-auto p-4'>
 
-          <div className="row">
-            <div className="col-md-6 mb-2">
-              <label htmlFor="cpf"><b>CPF</b></label>
-              <input type="text" name="cpf" className="form-control" maxLength="14"
-              value={advogado.cpf}
-              onChange={handleChange} required/>
+          {/* Cabeçalho */}
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h2 className="fw-bold mb-1" style={{ color: Colors.primaryDeep }}>
+                Editar Advogado
+              </h2>
+              <span className="badge bg-warning text-dark">Modo Edição</span>
             </div>
-
-            <div className="col-md-6 mb-2">
-              <label htmlFor="telefone"><b>Telefone</b></label>
-              <input type="text" name="telefone" className="form-control" maxLength="15"
-              value={advogado.telefone}
-              onChange={handleChange} required/>
+            <div className="d-flex gap-2">
+              <Link to={`/advogados/read/${id}`} className='btn btn-outline-secondary btn-sm'>
+                <i className="bi bi-x-circle me-1"></i>Cancelar
+              </Link>
             </div>
           </div>
 
-          <div className="mb-2">
-            <label htmlFor="email"><b>E-mail</b></label>
-            <input type="email" name="email" className="form-control" maxLength="150"
-            value={advogado.email}
-            onChange={handleChange} required/>
-          </div>
-
-          <div className="row">
-            <div className="col-md-4 mb-3">
-              <label htmlFor="numeroOAB"><b>Número OAB</b></label>
-              <input type="text" name="numeroOAB" className="form-control" maxLength="6"
-              value={advogado.numeroOAB}
-              onChange={handleChange} required/>
+          <form onSubmit={handleUpdate}>
+            {/* Dados Pessoais */}
+            <div className="card shadow-sm border-0 mb-4">
+              <div className="card-body">
+                <h5 className="card-title fw-bold border-bottom pb-2 mb-3 text-secondary">
+                  <i className="bi bi-person-fill me-2"></i>Dados Pessoais
+                </h5>
+                <div className="row g-3">
+                  <div className="col-12">
+                    <label htmlFor="nome" className="form-label"><strong>Nome Completo</strong></label>
+                    <input type="text" id="nome" name="nome" className="form-control" minLength="1" maxLength="150"
+                      value={advogado.nome}
+                      onChange={handleChange} required />
+                  </div>
+                  <div className="col-md-6">
+                    <label htmlFor="cpf" className="form-label"><strong>CPF</strong></label>
+                    <input type="text" id="cpf" name="cpf" className="form-control" maxLength="14"
+                      value={advogado.cpf}
+                      onChange={handleChange} required />
+                  </div>
+                  <div className="col-md-6">
+                    <label htmlFor="telefone" className="form-label"><strong>Telefone</strong></label>
+                    <input type="text" id="telefone" name="telefone" className="form-control" maxLength="15"
+                      value={advogado.telefone}
+                      onChange={handleChange} required />
+                  </div>
+                  <div className="col-12">
+                    <label htmlFor="email" className="form-label"><strong>E-mail</strong></label>
+                    <input type="email" id="email" name="email" className="form-control" maxLength="150"
+                      value={advogado.email}
+                      onChange={handleChange} required />
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="col-md-6 mb-3">
-              <label htmlFor="seccional"><b>Seccional</b></label>
-              <select type="text" name="seccional" className="form-select"
-              value={advogado.seccional}
-              onChange={handleChange} required>
-              {EstadosBrasileiros.map((seccional) => (
-                    <option key={seccional.sigla} value={seccional.sigla}>
-                      {seccional.sigla} - {seccional.nome}
-                    </option>
-                  ))}
-              </select>
+            {/* Dados Profissionais */}
+            <div className="card shadow-sm border-0 mb-4">
+              <div className="card-body">
+                <h5 className="card-title fw-bold border-bottom pb-2 mb-3 text-secondary">
+                  <i className="bi bi-briefcase-fill me-2"></i>Dados Profissionais
+                </h5>
+                <div className="row g-3">
+                  <div className="col-md-4">
+                    <label htmlFor="numeroOAB" className="form-label"><strong>Número OAB</strong></label>
+                    <input type="text" id="numeroOAB" name="numeroOAB" className="form-control" maxLength="6"
+                      value={advogado.numeroOAB}
+                      onChange={handleChange} required />
+                  </div>
+                  <div className="col-md-4">
+                    <label htmlFor="seccional" className="form-label"><strong>Seccional</strong></label>
+                    <select id="seccional" name="seccional" className="form-select"
+                      value={advogado.seccional}
+                      onChange={handleChange} required>
+                      {EstadosBrasileiros.map((seccional) => (
+                        <option key={seccional.sigla} value={seccional.sigla}>
+                          {seccional.sigla} - {seccional.nome}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {isAdmin && (
+                    <div className="col-md-4">
+                      <label htmlFor="role" className="form-label"><strong>Permissão</strong></label>
+                      <select id="role" name='role' className='form-select'
+                        value={advogado.role}
+                        onChange={handleChange} required>
+                        <option value="USER">Usuário</option>
+                        <option value="ADMIN">Administrador</option>
+                      </select>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
 
+            {/* Alterar Senha (apenas Admin) */}
             {isAdmin && (
-              <div className="col-md-4 mb-3">
-                <label htmlFor="role"><b>Role</b></label>
-                <select name='role' className='form-select'
-                value={advogado.role}
-                onChange={handleChange} required>
-                  <option value="USER">Usuário</option>
-                  <option value="ADMIN">Administrador</option>
-                </select>
+              <div className="card shadow-sm border-0 mb-4">
+                <div className="card-body">
+                  <h5 className="card-title fw-bold border-bottom pb-2 mb-3 text-secondary">
+                    <i className="bi bi-shield-lock-fill me-2"></i>Alterar Senha
+                  </h5>
+                  <div className="row g-3">
+                    <div className="col-md-6">
+                      <label className="form-label"><strong>Nova Senha</strong></label>
+                      <input
+                        type="password"
+                        className="form-control"
+                        value={novaSenha}
+                        onChange={(e) => setNovaSenha(e.target.value)}
+                        placeholder="Digite a nova senha"
+                        minLength="6"
+                        maxLength="30"
+                      />
+                      <small className="text-muted">
+                        <i className="bi bi-info-circle me-1"></i>
+                        Deixe em branco para manter a senha atual
+                      </small>
+                    </div>
+                    <div className="col-md-6">
+                      <label className="form-label"><strong>Confirmar Nova Senha</strong></label>
+                      <input
+                        type="password"
+                        className="form-control"
+                        value={confirmarNovaSenha}
+                        onChange={(e) => setConfirmarNovaSenha(e.target.value)}
+                        placeholder="Confirme a nova senha"
+                        minLength="6"
+                        maxLength="30"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
-          </div>
 
-          {/* Alterar Senha (apenas Admin) */}
-          {isAdmin && (
-            <>
-              <h6 className="fw-bold text-secondary mt-4 mb-3 bg-light p-2">
-                <i className="bi bi-shield-lock-fill me-2"></i>
-                Alterar Senha
-              </h6>
-              <div className="row">
-                <div className="col-md-6 mb-3">
-                  <label><b>Nova Senha</b></label>
-                  <input
-                    type="password"
-                    className="form-control"
-                    value={novaSenha}
-                    onChange={(e) => setNovaSenha(e.target.value)}
-                    placeholder="Digite a nova senha"
-                    minLength="6"
-                    maxLength="30"
-                  />
-                  <small className="text-muted">
-                    <i className="bi bi-info-circle me-1"></i>
-                    Deixe em branco para manter a senha atual
-                  </small>
-                </div>
-                <div className="col-md-6 mb-3">
-                  <label><b>Confirmar Nova Senha</b></label>
-                  <input
-                    type="password"
-                    className="form-control"
-                    value={confirmarNovaSenha}
-                    onChange={(e) => setConfirmarNovaSenha(e.target.value)}
-                    placeholder="Confirme a nova senha"
-                    minLength="6"
-                    maxLength="30"
-                  />
-                </div>
-              </div>
-            </>
-          )}
+            {/* Botões de Ação */}
+            <div className="d-flex justify-content-end gap-2">
+              <Link to={`/advogados/read/${id}`} className='btn btn-outline-secondary'>
+                <i className="bi bi-x-circle me-2"></i>Cancelar
+              </Link>
+              <button type="submit" className='btn text-white' style={{ backgroundColor: Colors.success }} disabled={saving}>
+                {saving ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Salvando...
+                  </>
+                ) : (
+                  <>
+                    <i className="bi bi-check-circle me-2"></i>Salvar Alterações
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
 
-          <center><br/>
-            <button className='btn btn-success'>Atualizar</button>
-            <Link to="/advogados" className='btn btn-primary ms-3'>Voltar</Link>
-          </center>
-        </form>
+        </div>
       </div>
     </div>
   );

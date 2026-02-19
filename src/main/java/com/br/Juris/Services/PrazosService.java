@@ -26,8 +26,7 @@ public class PrazosService {
 
     public List<PrazosOutDTO> getPrazosList() {
         LocalDate dataAtual = LocalDate.now();
-        LocalDate dataFinal = dataAtual.plusDays(15);
-        List<Prazo> prazos = repository.buscarPrazosProximos(dataAtual,dataFinal);
+        List<Prazo> prazos = repository.buscarPrazosNaoVencidos(dataAtual);
         return prazos.stream().map(PrazosOutDTO::fromEntity).toList();
     }
 

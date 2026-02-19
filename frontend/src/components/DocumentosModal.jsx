@@ -9,7 +9,9 @@ function DocumentosModal({ isOpen, onClose, processoId, onUpdate }) {
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({ arquivos: [], descricoes: [] });
   const [selectedFiles, setSelectedFiles] = useState([]);
-  const [editData, setEditData] = useState({ descricao: '' });
+  const [editData, setEditData] = useState({ descricao: '', arquivo: null });
+  const [viewingDoc, setViewingDoc] = useState(null);
+  const [pdfUrl, setPdfUrl] = useState(null);
 
   useEffect(() => {
     if (isOpen) fetchDocumentos();
@@ -83,7 +85,35 @@ function DocumentosModal({ isOpen, onClose, processoId, onUpdate }) {
 
   const handleEdit = (doc) => {
     setEditingId(doc.id);
-    setEditData({ descricao: doc.descricao || '' });
+    setEditData({ descricao: doc.descricao || '', arquivo: null });
+  };
+
+  const handleEditFileChange = (e) => {
+    const file = e.target.files[0];
+    setEditData(prev => ({ ...prev, arquivo: file }));
+  };
+
+  const handleViewPdf = async (doc) => {
+    try {
+      setLoading(true);
+      const res = await api.get(`/documentos/${doc.id}/arquivo`, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+      setPdfUrl(url);
+      setViewingDoc(doc);
+    } catch (err) {
+      console.error("Erro ao carregar PDF:", err);
+      alert("Erro ao carregar visualização do documento");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const closePdfViewer = () => {
+    if (pdfUrl) {
+      window.URL.revokeObjectURL(pdfUrl);
+    }
+    setPdfUrl(null);
+    setViewingDoc(null);
   };
 
   const handleUpdateSubmit = async (e) => {
@@ -92,13 +122,18 @@ function DocumentosModal({ isOpen, onClose, processoId, onUpdate }) {
     try {
       setLoading(true);
       
-      const formData = new FormData();
+      const data = new FormData();
+      
+      // Adiciona o arquivo se foi selecionado um novo
+      if (editData.arquivo) {
+        data.append('arquivos', editData.arquivo);
+      }
       
       const params = new URLSearchParams();
       params.append('ids', editingId);
       params.append('descricoes', editData.descricao);
       
-      await api.put(`/documentos?${params.toString()}`, formData, {
+      await api.put(`/documentos?${params.toString()}`, data, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -106,7 +141,7 @@ function DocumentosModal({ isOpen, onClose, processoId, onUpdate }) {
       
       alert("Documento atualizado com sucesso!");
       setEditingId(null);
-      setEditData({ descricao: '' });
+      setEditData({ descricao: '', arquivo: null });
       fetchDocumentos();
       onUpdate?.();
     } catch (err) {
@@ -131,20 +166,6 @@ function DocumentosModal({ isOpen, onClose, processoId, onUpdate }) {
       alert("Erro ao excluir documento");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleDownload = async (docId, nome) => {
-    try {
-      const res = await api.get(`/documentos/${docId}/arquivo`, { responseType: 'blob' });
-      const url = window.URL.createObjectURL(new Blob([res.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', nome || 'documento.pdf');
-      document.body.appendChild(link);
-      link.click();
-    } catch (err) {
-      alert("Erro ao baixar documento");
     }
   };
 
@@ -258,9 +279,21 @@ function DocumentosModal({ isOpen, onClose, processoId, onUpdate }) {
                             type="text"
                             className="form-control"
                             value={editData.descricao}
-                            onChange={(e) => setEditData({ descricao: e.target.value })}
+                            onChange={(e) => setEditData(prev => ({ ...prev, descricao: e.target.value }))}
                             required
                           />
+                        </div>
+                        <div className="mb-2">
+                          <label className="form-label fw-bold" style={{ color: Colors.primaryDark }}>
+                            Substituir Arquivo (opcional)
+                          </label>
+                          <input
+                            type="file"
+                            className="form-control"
+                            accept=".pdf"
+                            onChange={handleEditFileChange}
+                          />
+                          <small className="text-muted">Deixe vazio para manter o arquivo atual</small>
                         </div>
                         <div className="d-flex gap-2">
                           <button 
@@ -276,7 +309,7 @@ function DocumentosModal({ isOpen, onClose, processoId, onUpdate }) {
                             className="btn btn-outline-secondary btn-sm"
                             onClick={() => {
                               setEditingId(null);
-                              setEditData({ descricao: '' });
+                              setEditData({ descricao: '', arquivo: null });
                             }}
                           >
                             Cancelar
@@ -290,7 +323,15 @@ function DocumentosModal({ isOpen, onClose, processoId, onUpdate }) {
                           <h6 className="mb-1 fw-bold" style={{ color: Colors.primaryDark }}>
                             {doc.descricao || 'Sem descrição'}
                           </h6>
-                          <p className="mb-1 text-muted small">{doc.nome}</p>
+                          <p 
+                            className="mb-1 text-muted small" 
+                            style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                            onClick={() => handleViewPdf(doc)}
+                            title="Clique para visualizar o documento"
+                          >
+                            <i className="bi bi-file-earmark-pdf me-1"></i>
+                            {doc.nome}
+                          </p>
                           <small className="text-muted">
                             <i className="bi bi-calendar-event me-1"></i>
                             {formatDate(doc.dataCriacao)}
@@ -298,14 +339,6 @@ function DocumentosModal({ isOpen, onClose, processoId, onUpdate }) {
                         </div>
                         
                         <div className="btn-group btn-group-sm">
-                          <button 
-                            className="btn btn-sm border-0 me-1"
-                            style={{ borderColor: Colors.primaryDark, color: Colors.primaryDark }}
-                            onClick={() => handleDownload(doc.id, doc.nome)}
-                            title="Baixar">
-                            <i className="bi bi-download fs-6"></i>
-                          </button>
-
                           <button
                           className='btn btn-sm border-0 me-1' 
                           style={{color: Colors.primaryDeep || '#2C2966'}}
@@ -347,6 +380,50 @@ function DocumentosModal({ isOpen, onClose, processoId, onUpdate }) {
           </div>
         </div>
       </div>
+
+      {/* Modal de Visualização do PDF */}
+      {viewingDoc && (
+        <div 
+          className="modal show d-block" 
+          style={{ backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 1060 }}
+          onClick={closePdfViewer}
+        >
+          <div 
+            className="modal-dialog modal-xl modal-dialog-centered" 
+            style={{ maxWidth: '90vw', height: '90vh' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-content h-100">
+              <div className="modal-header text-white" style={{ backgroundColor: Colors.primaryDark }}>
+                <h5 className="modal-title">
+                  <i className="bi bi-file-earmark-pdf me-2"></i>
+                  {viewingDoc.descricao || viewingDoc.nome}
+                </h5>
+                <button 
+                  type="button" 
+                  className="btn-close btn-close-white" 
+                  onClick={closePdfViewer}
+                ></button>
+              </div>
+              <div className="modal-body p-0" style={{ height: 'calc(100% - 56px)' }}>
+                {pdfUrl ? (
+                  <iframe 
+                    src={pdfUrl} 
+                    className="w-100 h-100 border-0" 
+                    title={viewingDoc.nome}
+                  ></iframe>
+                ) : (
+                  <div className="d-flex justify-content-center align-items-center h-100">
+                    <div className="spinner-border" style={{ color: Colors.primaryDark }} role="status">
+                      <span className="visually-hidden">Carregando...</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
