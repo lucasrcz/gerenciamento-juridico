@@ -36,6 +36,13 @@ function Partes() {
     direction: 'asc'
   });
 
+  // Formatar Estado (Sigla + Nome Completo)
+  const formatEstado = (sigla) => {
+    if (!sigla) return '-';
+    const estado = EstadosBrasileiros.find(e => e.sigla === sigla);
+    return estado ? `${sigla} - ${estado.nome}` : sigla;
+  };
+
   // Formatar CPF/CNPJ
   const formatDocument = (doc) => {
     if (!doc) return '-';
@@ -161,19 +168,15 @@ function Partes() {
     <tr key={parte.id}>
       <td className="fw-semibold" style={{ paddingLeft: '20px' }}>{parte.nome}</td>
       <td className="text-center text-muted">{parte.email || '-'}</td>
+      <td className="text-center text-muted">{formatDocument(parte.documento)}</td>
       <td className="text-center">
-        <span className="badge bg-light text-dark border">
-          {formatDocument(parte.documento)}
-        </span>
-      </td>
-      <td className="text-center">
-        <span className={`badge rounded-pill ${parte.tipoPessoa === 'FISICA' ? 'bg-info' : 'bg-warning'}`}>
+        <span className="badge rounded-pill text-white" style={{ backgroundColor: parte.tipoPessoa === 'FISICA' ? '#1a4d80' : 'darkred' }}>
           {parte.tipoPessoa === 'FISICA' ? 'Pessoa Física' : 'Pessoa Jurídica'}
         </span>
       </td>
       <td className="text-center">
-        <span className="badge bg-light text-dark border">
-          {parte.endereco?.estado || '-'}
+        <span>
+          {parte.endereco?.estado ? formatEstado(parte.endereco.estado) : '-'}
         </span>
       </td>
       <td className="text-center">

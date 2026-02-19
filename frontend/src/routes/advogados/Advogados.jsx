@@ -178,11 +178,7 @@ function Advogados() {
     <tr key={advogado.id}>
       <td className="fw-semibold" style={{ paddingLeft: '20px' }}>{advogado.nome}</td>
       <td className="text-center text-muted">{advogado.email}</td>
-      <td className="text-center">
-        <span className="badge bg-light text-dark border">
-          {formatOAB(advogado.numeroOAB, advogado.seccional)}
-        </span>
-      </td>
+      <td className="text-center text-muted">{formatOAB(advogado.numeroOAB, advogado.seccional)}</td>
       <td className="text-center">{getRoleBadge(advogado.role)}</td>
       {isAdmin && <td className="text-center">{getStatusBadge(advogado.ativo)}</td>}
       <td className="text-center">
