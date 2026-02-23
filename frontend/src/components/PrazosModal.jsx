@@ -12,6 +12,7 @@ function PrazosModal({ isOpen, onClose, processoId, onUpdate }) {
     dataVencimento: '',
     idProcesso: parseInt(processoId)
   });
+  const [editData, setEditData] = useState({ descricao: '', dataVencimento: '' });
 
   useEffect(() => {
     if (isOpen) fetchPrazos();
@@ -37,25 +38,20 @@ function PrazosModal({ isOpen, onClose, processoId, onUpdate }) {
       dataVencimento: '',
       idProcesso: parseInt(processoId)
     });
-    setEditingId(null);
     setShowForm(false);
   };
 
   const handleEdit = (prazo) => {
-    console.log('Editando prazo:', prazo); // DEBUG
-    
     if (!prazo.id) {
       alert("Erro: ID do prazo não encontrado");
       return;
     }
 
     setEditingId(prazo.id);
-    setFormData({
+    setEditData({
       descricao: prazo.descricao,
       dataVencimento: prazo.dataVencimento,
-      idProcesso: prazo.idProcesso || parseInt(processoId)
     });
-    setShowForm(true);
   };
 
   const handleSubmit = async (e) => {
@@ -75,24 +71,14 @@ function PrazosModal({ isOpen, onClose, processoId, onUpdate }) {
         idProcesso: parseInt(processoId)
       };
 
-      console.log('=== SALVANDO PRAZO ===');
-      console.log('Payload:', JSON.stringify(payload, null, 2));
-      console.log('URL:', editingId ? `/prazos/${editingId}` : '/prazos');
-      
-      if (editingId) {
-        await api.put(`/prazos/${editingId}`, payload);
-        alert("Prazo atualizado com sucesso!");
-      } else {
-        await api.post('/prazos', payload);
-        alert("Prazo cadastrado com sucesso!");
-      }
+      await api.post('/prazos', payload);
+      alert("Prazo cadastrado com sucesso!");
       
       resetForm();
       fetchPrazos();
       onUpdate?.();
     } catch (err) {
       console.error("Erro ao salvar prazo:", err);
-      console.error("Response:", err.response?.data);
       
       const errorMsg = err.response?.data?.message 
         || err.response?.data?.error 
@@ -100,6 +86,44 @@ function PrazosModal({ isOpen, onClose, processoId, onUpdate }) {
         || 'Erro desconhecido';
       
       alert(`Erro ao salvar prazo: ${errorMsg}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!editData.descricao || !editData.dataVencimento) {
+      alert("Preencha todos os campos obrigatórios");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      
+      const payload = {
+        descricao: String(editData.descricao).trim(),
+        dataVencimento: editData.dataVencimento,
+        idProcesso: parseInt(processoId)
+      };
+
+      await api.put(`/prazos/${editingId}`, payload);
+      alert("Prazo atualizado com sucesso!");
+      
+      setEditingId(null);
+      setEditData({ descricao: '', dataVencimento: '' });
+      fetchPrazos();
+      onUpdate?.();
+    } catch (err) {
+      console.error("Erro ao atualizar prazo:", err);
+      
+      const errorMsg = err.response?.data?.message 
+        || err.response?.data?.error 
+        || err.message 
+        || 'Erro desconhecido';
+      
+      alert(`Erro ao atualizar prazo: ${errorMsg}`);
     } finally {
       setLoading(false);
     }
@@ -179,7 +203,7 @@ function PrazosModal({ isOpen, onClose, processoId, onUpdate }) {
             {showForm && (
               <form onSubmit={handleSubmit} className="border rounded p-3 mb-3 bg-light">
                 <h6 className="fw-bold mb-3" style={{ color: Colors.primaryDark }}>
-                  {editingId ? 'Editar Prazo' : 'Novo Prazo'}
+                  Novo Prazo
                 </h6>
                 
                 <div className="mb-3">
@@ -237,46 +261,98 @@ function PrazosModal({ isOpen, onClose, processoId, onUpdate }) {
               <div className="list-group">
                 {prazos.map((prazo, index) => (
                   <div key={prazo.id || `prazo-${index}`} className="list-group-item">
-                    <div className="d-flex justify-content-between align-items-start">
-                      <div className="flex-grow-1">
-                        <div className="d-flex align-items-center gap-2 mb-2">
-                          <h6 className="mb-0 fw-bold" style={{ color: Colors.primaryDark }}>
-                            {formatDate(prazo.dataVencimento)}
-                          </h6>
-                          {getStatusBadge(prazo.diasFimPrazo)}
+                    {editingId === prazo.id ? (
+                      // Formulário de Edição Inline
+                      <form onSubmit={handleUpdateSubmit}>
+                        <div className="mb-2">
+                          <label className="form-label fw-bold" style={{ color: Colors.primaryDark }}>
+                            Editar Descrição
+                          </label>
+                          <textarea
+                            className="form-control"
+                            rows="3"
+                            value={editData.descricao}
+                            onChange={(e) => setEditData(prev => ({ ...prev, descricao: e.target.value }))}
+                            required
+                            maxLength={500}
+                          />
                         </div>
-                        <p className="mb-1 text-muted">{prazo.descricao}</p>
-                        {prazo.diasFimPrazo != null && (
-                          <small className="text-muted">
-                            {prazo.diasFimPrazo >= 0 
-                              ? `${prazo.diasFimPrazo} dia(s) restante(s)` 
-                              : `Vencido há ${Math.abs(prazo.diasFimPrazo)} dia(s)`
-                            }
-                          </small>
-                        )}
+                        <div className="mb-2">
+                          <label className="form-label fw-bold" style={{ color: Colors.primaryDark }}>
+                            Data de Vencimento
+                          </label>
+                          <input
+                            type="date"
+                            className="form-control"
+                            value={editData.dataVencimento}
+                            onChange={(e) => setEditData(prev => ({ ...prev, dataVencimento: e.target.value }))}
+                            required
+                          />
+                        </div>
+                        <div className="d-flex gap-2">
+                          <button 
+                            type="submit" 
+                            className="btn btn-sm text-white" 
+                            style={{ backgroundColor: Colors.success }}
+                            disabled={loading}
+                          >
+                            {loading ? 'Salvando...' : 'Salvar'}
+                          </button>
+                          <button 
+                            type="button" 
+                            className="btn btn-outline-secondary btn-sm"
+                            onClick={() => {
+                              setEditingId(null);
+                              setEditData({ descricao: '', dataVencimento: '' });
+                            }}
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      </form>
+                    ) : (
+                      // Visualização Normal
+                      <div className="d-flex justify-content-between align-items-start">
+                        <div className="flex-grow-1">
+                          <div className="d-flex align-items-center gap-2 mb-2">
+                            <h6 className="mb-0 fw-bold" style={{ color: Colors.primaryDark }}>
+                              {formatDate(prazo.dataVencimento)}
+                            </h6>
+                            {getStatusBadge(prazo.diasFimPrazo)}
+                          </div>
+                          <p className="mb-1 text-muted">{prazo.descricao}</p>
+                          {prazo.diasFimPrazo != null && (
+                            <small className="text-muted">
+                              {prazo.diasFimPrazo >= 0 
+                                ? `${prazo.diasFimPrazo} dia(s) restante(s)` 
+                                : `Vencido há ${Math.abs(prazo.diasFimPrazo)} dia(s)`
+                              }
+                            </small>
+                          )}
+                        </div>
+                        
+                        <div>
+                          <button
+                            className='btn btn-sm border-0 me-1' 
+                            style={{color: Colors.primaryDeep || '#2C2966'}}
+                            onClick={() => handleEdit(prazo)}
+                            title="Editar"
+                            disabled={!prazo.id}
+                          >
+                            <i className="bi bi-pencil fs-6"></i>
+                          </button>
+                          <button 
+                            className='btn btn-sm border-0'
+                            style={{color: Colors.danger || '#c24c58'}}
+                            onClick={() => handleDelete(prazo.id)}
+                            title="Excluir"
+                            disabled={!prazo.id}
+                          >
+                            <i className="bi bi-trash fs-6"></i>
+                          </button>
+                        </div>
                       </div>
-                      
-                      <div>
-                        <button
-                          className='btn btn-sm border-0 me-1' 
-                          style={{color: Colors.primaryDeep || '#2C2966'}}
-                          onClick={() => handleEdit(prazo)}
-                          title="Editar"
-                          disabled={!prazo.id}
-                        >
-                          <i className="bi bi-pencil fs-6"></i>
-                        </button>
-                        <button 
-                          className='btn btn-sm border-0'
-                          style={{color: Colors.danger || '#c24c58'}}
-                          onClick={() => handleDelete(prazo.id)}
-                          title="Excluir"
-                          disabled={!prazo.id}
-                        >
-                          <i className="bi bi-trash fs-6"></i>
-                        </button>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 ))}
               </div>
