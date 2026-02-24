@@ -59,6 +59,8 @@ public class AuthorizationService implements UserDetailsService {
             advogado.setSenha(passwordEncoder.encode(dto.senha()));
         }
         advogado.setRole(dto.role());
+        advogado.setEmail(dto.email());
+        advogado.setTelefone(dto.telefone());
         advogado.setNumeroOAB(dto.numeroOAB());
         advogado.setSeccional(dto.seccional());
 

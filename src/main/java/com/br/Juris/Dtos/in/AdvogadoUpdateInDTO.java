@@ -13,8 +13,8 @@ public record AdvogadoUpdateInDTO(
         @NotBlank(message = "O nome é obrigatório")
         @Size(max = 150, message = "O nome pode ter no máximo 150 caracteres")
         @Pattern(
-                regexp = "^[A-Za-zÀ-ÿ ]+$",
-                message = "O nome deve conter apenas letras e espaços"
+                regexp = "^[A-Za-zÀ-ÿ0-9 '.\\-]+$",
+                message = "O nome deve conter apenas letras, números, espaços e caracteres como . ' -"
         )
         String nome,
 
@@ -31,8 +31,8 @@ public record AdvogadoUpdateInDTO(
 
         @NotBlank(message = "O telefone é obrigatório")
         @Pattern(
-                regexp = "^\\(?\\d{2}\\)?\\s?9?\\d{4}-?\\d{4}$",
-                message = "Telefone inválido. Ex: (11) 91234-5678"
+                regexp = "^[0-9]{10,11}$",
+                message = "Telefone inválido. Use apenas números (DDD + número). Ex: 11912345678"
         )
         String telefone,
 

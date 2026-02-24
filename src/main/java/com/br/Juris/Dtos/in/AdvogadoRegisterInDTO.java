@@ -13,8 +13,8 @@ public record AdvogadoRegisterInDTO(
         @NotBlank(message = "O nome do advogado é obrigatório")
         @Size(max = 150, message = "O nome pode ter no máximo 150 caracteres")
         @Pattern(
-                regexp = "^[A-Za-zÀ-ÿ ]+$",
-                message = "O nome deve conter apenas letras e espaços"
+                regexp = "^[A-Za-zÀ-ÿ0-9 '.\\-]+$",
+                message = "O nome deve conter apenas letras, números, espaços e caracteres como . ' -"
         )
         String nome,
 

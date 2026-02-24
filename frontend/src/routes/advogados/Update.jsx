@@ -90,7 +90,7 @@ function Update() {
         email: advogado.email,
         seccional: advogado.seccional,
         numeroOAB: advogado.numeroOAB,
-        role: isAdmin ? advogado.role : undefined,
+        role: advogado.role,
         senha: (isAdmin && novaSenha) ? novaSenha : undefined,
         login: advogado.cpf.replace(/\D/g, ''),
         cpf: advogado.cpf.replace(/\D/g, ''),
@@ -102,8 +102,18 @@ function Update() {
       navigate('/advogados/read/' + id);
     } catch (err) {
       console.log(err);
-      if (err.response && err.response.data && err.response.data.errors) {
-         console.log("Erros de validação:", err.response.data.errors);
+      if (err.response && err.response.data) {
+         const data = err.response.data;
+         if (data.errors && Array.isArray(data.errors)) {
+           const mensagens = data.errors.map(e => e.defaultMessage || e.message || JSON.stringify(e));
+           alert('Erro de validação:\n' + mensagens.join('\n'));
+         } else if (data.message) {
+           alert('Erro: ' + data.message);
+         } else {
+           alert('Erro ao atualizar advogado.');
+         }
+      } else {
+         alert('Erro ao atualizar advogado.');
       }
     } finally {
       setSaving(false);
